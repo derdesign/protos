@@ -13,7 +13,7 @@ support might be added in the future.
 - Fast Configuration with bootstrap file
 - Multi Core Cluster support
 - Easy Deployment with JSON or Command line
-- MongoDB, MySQL & Redis Development Stack
+- MongoDB, MySQL, Redis & RabbitMQ Development Stack
 - Application Helpers
 - Application Models supporting ORM &amp; Relationships
 - Database Drivers & Storages
@@ -71,6 +71,7 @@ Here's the Development Stack the framework provides, in a nutshell:
 [Redis](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-redis.js), [File](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-file.js), 
 [Console](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-console.js),
 [JSON](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-console.js)
+- **Message Queue** &nbsp; _Use the mq middleware_
 
 To install the driver & storage component dependencies, use the `protos install <component>` command. For a full list of components and
 their dependencies, see the [dependencies.json](https://github.com/derdesign/protos/blob/master/dependencies.json) file.
@@ -94,7 +95,8 @@ The Application's functionality can be extended with the following (ready to use
 - [session](http://derdesign.github.com/protos/middleware#session) &nbsp; *Full session support with Storages, guest sessions and regeneration*
 - [shortcode](http://derdesign.github.com/protos/middleware#shortcode) &nbsp; *Allows custom content to be inserted into views using shortcodes*
 - [socket_io](http://derdesign.github.com/protos/middleware#socket_io) &nbsp; *Socket.io Integration with applications*
-- [static_server](http://derdesign.github.com/protos/middleware#static_server) &nbsp; *Complete Static Server solution, supporting Ranges, Conditional GETs, etc.*
+- [static_server](http://derdesign.github.com/protos/middleware#static_server) &nbsp; *Complete Static Server solution, supporting Ranges, Conditional GETs, etc*
+- [mq](http://derdesign.github.com/protos/middleware#mq) &nbsp; *Message Queue solution using RabbitMQ*
 
 To install the middleware dependencies, use the `protos install <middleware>` command. For a full list of components and
 their dependencies, see the [dependencies.json](https://github.com/derdesign/protos/blob/master/dependencies.json) file.
