@@ -1,6 +1,6 @@
 
 // Prevent timezone conflicts
-process.env.TZ = 'UTC';
+process.env.TZ = '';
 
 var env,
     _ = require('underscore'),
