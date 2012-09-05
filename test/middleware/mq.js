@@ -16,7 +16,7 @@ vows.describe('Message Queue (middleware)').addBatch({
       var promise = new EventEmitter();
       
       app.use('mq', {
-        server: 'amqp://127.0.0.1:5672',
+        server: 'amqp://',
         queues: ['my_queue', 'another_queue'],
         exchanges: {
           alpha: {type: 'fanout'},
