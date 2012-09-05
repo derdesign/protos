@@ -1,9 +1,6 @@
 
-// Sample test case:
-// https://gist.github.com/1738905
-
 // Prevent timezone conflicts
-// process.env.TZ = '';
+process.env.TZ = 'UTC';
 
 var env,
     _ = require('underscore'),
