@@ -5,10 +5,6 @@
   
   Provides markdown support for applications & views.
   
-  The markdown syntax is automatically sanitized, if the flag alias specified has been
-  configured to be sanitized. In other words, if it's present in the `sanitize` 
-  configuration array.
-  
   » References:
     https://github.com/chjj/marked
     https://github.com/theSmaw/Caja-HTML-Sanitizer

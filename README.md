@@ -96,6 +96,7 @@ The Application's functionality can be extended with the following (ready to use
 - [shortcode](http://derdesign.github.com/protos/middleware#shortcode) &nbsp; *Allows custom content to be inserted into views using shortcodes*
 - [socket_io](http://derdesign.github.com/protos/middleware#socket_io) &nbsp; *Socket.io Integration with applications*
 - [static_server](http://derdesign.github.com/protos/middleware#static_server) &nbsp; *Complete Static Server solution, supporting Ranges, Conditional GETs, etc*
+- [repl](http://derdesign.github.com/protos/middleware#repl) &nbsp; *Provides a REPL to interact with the application's runtime*
 - [mq](http://derdesign.github.com/protos/middleware#mq) &nbsp; *Message Queue solution using RabbitMQ*
 
 To install the middleware dependencies, use the `protos install <middleware>` command. For a full list of components and
