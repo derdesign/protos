@@ -185,12 +185,13 @@ Session.prototype.destroy = function(req, res, callback) {
     get('/login', app.session.load, function(req, res) {
       res.render('login');
     });
+    
+  @param {object} req
+  @param {object} res
  */
  
 Session.prototype.load = function(req, res) {
-  this.loadSession(req, res, function() {
-    req.next();
-  });
+  this.loadSession(req, res, req.next);
 }
 
 /**
