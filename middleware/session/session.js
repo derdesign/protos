@@ -191,7 +191,7 @@ Session.prototype.destroy = function(req, res, callback) {
  */
  
 Session.prototype.load = function(req, res) {
-  this.loadSession(req, res, req.next);
+  (this instanceof Session ? this : app.session).loadSession(req, res, req.next);
 }
 
 /**
@@ -204,6 +204,7 @@ Session.prototype.load = function(req, res) {
 */
 
 Session.prototype.loadSession = function(req, res, callback) {
+  
   var fingerprint, sessHash, sessId, self;
 
   if (req.__loadedSession === true) {
