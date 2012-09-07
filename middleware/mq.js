@@ -49,7 +49,7 @@ function MessageQueue(config, middleware) {
   app[middleware] = this;
   
   // Extend config
-  var config = protos.extend({
+  config = protos.extend({
     server: null,
     defaultExchange: null,
     queues: {},
