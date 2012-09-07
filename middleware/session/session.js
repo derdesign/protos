@@ -175,6 +175,25 @@ Session.prototype.destroy = function(req, res, callback) {
 }
 
 /**
+  Loads the user session and passes control to next route.
+  
+  This function will automatically load the session, and call req.next()
+  after it has been loaded, to pass control to the next route callback.
+  
+  Example:
+  
+    get('/login', app.session.load, function(req, res) {
+      res.render('login');
+    });
+ */
+ 
+Session.prototype.load = function(req, res) {
+  this.loadSession(req, res, function() {
+    req.next();
+  });
+}
+
+/**
   Loads the session
 
   @param {object} req
