@@ -105,6 +105,7 @@ vows.describe('lib/application.js').addBatch({
         '$jazz_link',
         '$kernel_link',
         '$sanitize',
+        '$wrap',
         '$escape',
         '$safe_str' ];
         
