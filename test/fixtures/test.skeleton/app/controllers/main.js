@@ -16,6 +16,17 @@ function MainController(app) {
     delete app.globals.testval;
   });
   
+  /* Request Metadata */
+  
+  var metadataCallback = function(req, res) {
+    req.set('secret', "HELLO WORLD!");
+    req.next();
+  }
+  
+  get('/request/metadata', metadataCallback, function(req, res) {
+    res.end(req.get('secret'));
+  });
+  
   /* File Download */
   
   get('/download', function(req, res) {

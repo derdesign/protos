@@ -24,6 +24,9 @@ vows.describe('Request Misc').addBatch({
       // Specific Page Title
       multi.curl('-G -d "msg=Hello%20World" /request/title');
       
+      // Request metadata
+      multi.curl('/request/metadata');
+      
       multi.exec(function(err, results) {
         promise.emit('success', err || results);
       });
@@ -39,6 +42,11 @@ vows.describe('Request Misc').addBatch({
     "Sets custom page title": function(results) {
       var r = results[1];
       assert.equal(r, '{My Application &raquo; Hello World}');
+    },
+    
+    "Gets & Sets metadata": function(results) {
+      var r = results[2];
+      assert.equal(r, 'HELLO WORLD!');
     }
     
   }
