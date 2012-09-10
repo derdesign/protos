@@ -355,4 +355,31 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
     
   }
   
+}).addBatch({
+  
+  'Static Views (directory structure)': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      multi.curl('/category/archive');
+      multi.curl('/category/uncategorized/post');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    "Renders custom paths for static views within directories": function(results) {
+      var r1 = results[0];
+      var r2 = results[1];
+      
+      assert.isTrue(r1.indexOf('CATEGORY ARCHIVE') >= 0);
+      assert.isTrue(r2.indexOf('THIS IS A POST') >= 0);
+    }
+    
+  }
+  
 }).export(module);
