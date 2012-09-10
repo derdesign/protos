@@ -415,42 +415,16 @@ var commands = {
     args: 99,
     validate: validateApp,
     run: function(data) {
-      
-      var app = pathModule.basename(process.cwd());
-      
-      var files = [];
-      var dirs = [];
-      var cwd = process.cwd();
-      
-      data.args.forEach(function(path) {
-        getDirPaths(path).forEach(function(p) {
-          var file = cwd + '/app/views/__layout/' + p;
-          if (! /\.[a-z]+$/.test(p)) file += ('.' + (data.ext || 'html'));
-          file = '"' + file + '"';
-          var dir = '"' + pathModule.dirname(file.slice(1,-1)) + '"';
-          if (files.indexOf(file) === -1) files.push(file);
-          if (dirs.indexOf(dir) === -1) dirs.push(dir);
-        });
-      });
-      
-      var cmd = '';
-      
-      if (dirs.length) cmd += 'mkdir -p ' + dirs.join(' ') + ';';
-      if (files.length) cmd += ' touch ' + files.join(' ');
-      
-      files.forEach(function(f) {
-        f = f.slice(1,-1);
-        if (fs.existsSync(f)) {
-          console.log(util.format('» Skipping %s%s: file exists'), app, f.replace(cwd, ''));
-        } else {
-          console.log(util.format('» Created %s%s'), app, f.replace(cwd, ''));
-        }
-      });
-      
-      cp.exec(cmd, function(err) {
-        if (err) console.exit(err);
-      });
-      
+      recursivelyCreateFiles('__layout', data);
+    }
+  },
+  
+  static: {
+    single: ['ext'],
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      recursivelyCreateFiles('__static', data);
     }
   },
   
@@ -514,18 +488,6 @@ var commands = {
     validate: validateApp,
     run: function(data) {
       commands.view.run.call(this, data, true); // Set partial
-    }
-  },
-  
-  static: {
-    single: ['ext'],
-    args: 99,
-    validate: validateApp,
-    run: function(data) {
-      data.args = data.args.map(function(view) {
-        return '__static/' + view;
-      });
-      commands.view.run.call(this, data, false); // Set view directory
     }
   },
   
@@ -1051,6 +1013,45 @@ bouncy(function(req, bounce) { var host, port;\
     console.log("Proxy server listening on " + data.port);
     
   }
+}
+
+function recursivelyCreateFiles(target, data) {
+  
+  var app = pathModule.basename(process.cwd());
+  
+  var files = [];
+  var dirs = [];
+  var cwd = process.cwd();
+  
+  data.args.forEach(function(path) {
+    getDirPaths(path).forEach(function(p) {
+      var file = cwd + '/app/views/' + target + '/' + p;
+      if (! /\.[a-z]+$/.test(p)) file += ('.' + (data.ext || 'html'));
+      file = '"' + file + '"';
+      var dir = '"' + pathModule.dirname(file.slice(1,-1)) + '"';
+      if (files.indexOf(file) === -1) files.push(file);
+      if (dirs.indexOf(dir) === -1) dirs.push(dir);
+    });
+  });
+  
+  var cmd = '';
+  
+  if (dirs.length) cmd += 'mkdir -p ' + dirs.join(' ') + ';';
+  if (files.length) cmd += ' touch ' + files.join(' ');
+  
+  files.forEach(function(f) {
+    f = f.slice(1,-1);
+    if (fs.existsSync(f)) {
+      console.log(util.format('» Skipping %s%s: file exists'), app, f.replace(cwd, ''));
+    } else {
+      console.log(util.format('» Created %s%s'), app, f.replace(cwd, ''));
+    }
+  });
+  
+  cp.exec(cmd, function(err) {
+    if (err) console.exit(err);
+  });
+  
 }
 
 var cli = new CommandLine(commands);

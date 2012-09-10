@@ -363,8 +363,8 @@ Created myapp1/app/views/__layout/nice/partial.html';
     topic: function() {
       var promise = new EventEmitter();
 
-      protos.command('static hello world');
-      protos.command('static about contact --ext jade');
+      protos.command('static category/post,archive.jade,display about archive/2009/09/index,display.mustache');
+      protos.command('static some/view view --ext jade');
 
       protos.exec(function(err, results) {
         promise.emit('success', err || results);
@@ -373,21 +373,29 @@ Created myapp1/app/views/__layout/nice/partial.html';
       return promise;
     },
 
-    "Properly generates static views": function(results) {
+    "Properly generates layout partials": function(results) {
       var r1 = results[0];
-      var expected = '» Created myapp1/app/views/__static/hello.html\n» Created myapp1/app/views/__static/world.html';
+      var expected =  '» Created myapp1/app/views/__static/category/post.html\n» Created myapp1/app/views/__static/category/\
+archive.jade\n» Created myapp1/app/views/__static/category/display.html\n» Created myapp1/app/views/__static/about.html\n» \
+Created myapp1/app/views/__static/archive/2009/09/index.html\n» Created myapp1/app/views/__static/archive/2009/09/display\
+.mustache';
+      
       assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('app/views/__static/hello.html'));
-      assert.isTrue(fs.existsSync('app/views/__static/world.html'));
+      assert.isTrue(fs.existsSync('app/views/__static/category/post.html'));
+      assert.isTrue(fs.existsSync('app/views/__static/category/archive.jade'));
+      assert.isTrue(fs.existsSync('app/views/__static/category/display.html'));
+      assert.isTrue(fs.existsSync('app/views/__static/about.html'));
+      assert.isTrue(fs.existsSync('app/views/__static/archive/2009/09/index.html'));
+      assert.isTrue(fs.existsSync('app/views/__static/archive/2009/09/display.mustache'));
     },
 
     "Uses custom extensions when using --ext": function(results) {
       var r2 = results[1];
-      var expected = '» Created myapp1/app/views/__static/about.jade\n» Created myapp1/app/views/__static/contact.jade';
+      var expected =  '» Created myapp1/app/views/__static/some/view.jade\n» Created myapp1/app/views/__static/view.jade';
       
       assert.equal(r2, expected);
-      assert.isTrue(fs.existsSync('app/views/__static/about.jade'));
-      assert.isTrue(fs.existsSync('app/views/__static/contact.jade'));
+      assert.isTrue(fs.existsSync('app/views/__static/some/view.jade'));
+      assert.isTrue(fs.existsSync('app/views/__static/view.jade'));
     }
 
   }
