@@ -13,6 +13,7 @@
   "dependencies"        : {
     "underscore"        : ">= 1.3.3",
     "underscore.string" : ">= 2.2.0rc",
+    "node-inspector"    : ">= 0.2.0beta3",
     "sanitizer"         : ">= 0.0.15",
     "bouncy"            : ">= 1.3.1",
     "multi"             : ">= 0.1.2",
