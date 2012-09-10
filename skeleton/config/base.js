@@ -15,6 +15,11 @@ module.exports = {
     'X-Powered-By': 'protos'
   },
   
+  cli: {
+    viewExtension: 'html',
+    partialExtension: 'html'
+  },
+  
   server: {
     strictRouting: true,
   },
