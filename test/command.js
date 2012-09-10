@@ -237,7 +237,7 @@ Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin
     topic: function() {
       var promise = new EventEmitter();
 
-      protos.command('view main/info blog/post admin/settings');
+      protos.command('view main/info blog/post admin/settings.jade,update.mustache,user');
       protos.command('view main/m1 blog/m2 admin/m3 --ext eco.html');
 
       protos.exec(function(err, results) {
@@ -249,13 +249,17 @@ Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin
 
     "Properly generates views": function(results) {
       var r1 = results[0];
-      var expected =  '» Created myapp1/app/views/main/main-info.html\n» Created myapp1/app/views/blog/blog-post.html\n» \
-Created myapp1/app/views/admin/admin-settings.html';
+      
+      var expected = '» Created myapp1/app/views/main/main-info.html\n» Created myapp1/app/views/blog/blog-post.html\n» \
+Created myapp1/app/views/admin/settings.jade\n» Created myapp1/app/views/admin/update.mustache\n» \
+Created myapp1/app/views/admin/admin-user.html';
 
       assert.equal(r1, expected);
       assert.isTrue(fs.existsSync('app/views/main/main-info.html'));
       assert.isTrue(fs.existsSync('app/views/blog/blog-post.html'));
-      assert.isTrue(fs.existsSync('app/views/admin/admin-settings.html'));
+      assert.isTrue(fs.existsSync('app/views/admin/settings.jade'));
+      assert.isTrue(fs.existsSync('app/views/admin/update.mustache'));
+      assert.isTrue(fs.existsSync('app/views/admin/admin-user.html'));
     },
     
     "Uses custom extensions when using --ext": function(results) {
@@ -268,6 +272,8 @@ Created myapp1/app/views/blog/blog-m2.eco.html\n» Created myapp1/app/views/admi
       assert.isTrue(fs.existsSync('app/views/blog/blog-m2.eco.html'));
       assert.isTrue(fs.existsSync('app/views/admin/admin-m3.eco.html'));
     }
+    
+    
 
   }
   

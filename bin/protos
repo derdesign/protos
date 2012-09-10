@@ -486,7 +486,22 @@ var commands = {
       
       process.chdir('../');
       
-      data.args.forEach(function(args) {
+      var views = [];
+      
+      data.args.forEach(function(arr) {
+        var name = arr[2];
+        if (name.indexOf(',') > 0) {
+          name = name.split(',').forEach(function(v) {
+            var newArr = arr.concat([]);
+            newArr[2] = v;
+            views.push(newArr);
+          });
+        } else {
+          views.push(arr);
+        }
+      });
+      
+      views.forEach(function(args) {
         createView.apply(data, args);
       });
       
