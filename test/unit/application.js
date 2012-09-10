@@ -81,10 +81,10 @@ vows.describe('lib/application.js').addBatch({
     'Properly registers partials': function() {
       
       var expected = [
-        'layout_footer',
-        'layout_header',
-        'layout_widget',
-        'layout_mydir_mywidget',
+        'footer',
+        'header',
+        'widget',
+        'mydir_mywidget',
         'main_coffeekup',
         'main_dot',
         'main_eco',
