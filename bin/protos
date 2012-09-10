@@ -808,6 +808,8 @@ function createView(app, controller, view, partial) {
   var tpl, file;
   var config = require(process.cwd() + '/' + app + '/config/base.js');
   
+  if (!config.cli) config.cli = {};
+  
   var dir = util.format('%s/app/views/%s', app, controller);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
   
@@ -825,7 +827,7 @@ function createView(app, controller, view, partial) {
     } else {
       file = util.format('%s/%s-%s.', dir, controller, view);
     }
-    file += (this.mustache) ? 'mustache' : (this.ext || config.cli[partial ? 'partialExtension' : 'viewExtension'] || 'html');
+    file += (this.mustache) ? 'mustache' : (this.ext || config.cli[partial ? 'partialExt' : 'viewExt'] || 'html');
   }
   
   // Replace static file prefix
@@ -1025,10 +1027,12 @@ function recursivelyCreateFiles(target, data) {
   var cwd = process.cwd();
   var config = require(cwd + '/config/base.js');
   
+  if (!config.cli) config.cli = {};
+  
   data.args.forEach(function(path) {
     getDirPaths(path).forEach(function(p) {
       var file = cwd + '/app/views/' + target + '/' + p;
-      if (! /\.[a-z]+$/.test(p)) file += ('.' + (data.ext || config.cli.viewExtension || 'html'));
+      if (! /\.[a-z]+$/.test(p)) file += ('.' + (data.ext || config.cli.viewExt || 'html'));
       file = '"' + file + '"';
       var dir = '"' + pathModule.dirname(file.slice(1,-1)) + '"';
       if (files.indexOf(file) === -1) files.push(file);

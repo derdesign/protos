@@ -15,8 +15,8 @@ module.exports = {
   },
   
   cli: {
-    viewExtension: 'html',
-    partialExtension: 'html'
+    viewExt: 'html',
+    partialExt: 'html'
   },
   
   server: {
