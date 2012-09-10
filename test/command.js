@@ -307,7 +307,49 @@ Created myapp1/app/views/blog/blog-m2.eco.html\n» Created myapp1/app/views/admi
       }
 
     }
-  
+    
+}).addBatch({
+
+  'protos layout': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+
+      protos.command('layout sidebar/display,posts.jade,pages hello.mustache nice/partial');
+      protos.command('layout hello hi/there/another/dir/test --ext mustache');
+
+      protos.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+
+      return promise;
+    },
+
+    "Properly generates layout partials": function(results) {
+      var r1 = results[0];
+      var expected =  '» Created myapp1/app/views/__layout/sidebar/display.html\n» Created myapp1/app/views/__layout/sidebar\
+/posts.jade\n» Created myapp1/app/views/__layout/sidebar/pages.html\n» Created myapp1/app/views/__layout/hello.mustache\n» \
+Created myapp1/app/views/__layout/nice/partial.html';
+      
+      assert.equal(r1, expected);
+      assert.isTrue(fs.existsSync('app/views/__layout/sidebar/display.html'));
+      assert.isTrue(fs.existsSync('app/views/__layout/sidebar/posts.jade'));
+      assert.isTrue(fs.existsSync('app/views/__layout/sidebar/pages.html'));
+      assert.isTrue(fs.existsSync('app/views/__layout/hello.mustache'));
+      assert.isTrue(fs.existsSync('app/views/__layout/nice/partial.html'));
+    },
+
+    "Uses custom extensions when using --ext": function(results) {
+      var r2 = results[1];
+      var expected =  '» Skipping myapp1/app/views/__layout/hello.mustache: file exists\n» Created myapp1/app/views/__layout/hi/there/another/dir/test.mustache';
+      
+      assert.equal(r2, expected);
+      assert.isTrue(fs.existsSync('app/views/__layout/hello.mustache'));
+      assert.isTrue(fs.existsSync('app/views/__layout/hi/there/another/dir/test.mustache'));
+    }
+    
+  }
+
 }).addBatch({
   
   'protos static': {
