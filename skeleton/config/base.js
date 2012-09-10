@@ -10,7 +10,6 @@ module.exports = {
   
   headers: {
     'Content-Type': function(req, res) { return "text/html; charset=" + this.config.encoding; },
-    'Date': function() { return new Date().toUTCString(); },
     'Status': function(req, res) {  return res.statusCode + " " + this.httpStatusCodes[res.statusCode]; },
     'X-Powered-By': 'protos'
   },

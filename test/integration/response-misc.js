@@ -48,7 +48,7 @@ vows.describe('Response Misc').addBatch({
           headers = results[0][1];
       var expected = Object.keys(app.config.headers).map(function(elem) {
         return elem.toLowerCase();
-      }).concat(['cache-control', 'connection', 'transfer-encoding']).sort();
+      }).concat(['date', 'cache-control', 'connection', 'transfer-encoding']).sort();
       assert.deepEqual(Object.keys(headers).sort(), expected);
     },
     
