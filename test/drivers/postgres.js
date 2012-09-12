@@ -479,7 +479,8 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
         condition: 'id=$1 OR id=$2',
         params: [1, 2],
         table: table,
-        values: {username: 'user', password: 'pass'}
+        values: {username: 'user', password: 'pass'},
+        appendSql: 'RETURNING id'
       });
 
       multi.exec(function(err, results) {
@@ -493,9 +494,11 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
       var q1 = results[0],
           q2 = results[1],
           q3 = results[2];
+          
       assert.isTrue(q1.command === 'UPDATE' && q1.rowCount === 1);
       assert.isTrue(q2.command === 'UPDATE' && q2.rowCount === 1);
       assert.isTrue(q3.command === 'UPDATE' && q3.rowCount === 2);
+      assert.deepEqual(q3.rows, [ { id: 2 }, { id: 1 } ]);
     }
     
   }
@@ -518,7 +521,8 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
       multi.updateById({
         id: [1,2],
         table: table,
-        values: {password: 'p9999'}
+        values: {password: 'p9999'},
+        appendSql: 'RETURNING id'
       });
       
       multi.exec(function(err, results) {
@@ -533,6 +537,7 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
           q2 = results[1];
       assert.isTrue(q1.command === 'UPDATE' && q1.rowCount === 1);
       assert.isTrue(q2.command === 'UPDATE' && q2.rowCount === 2);
+      assert.deepEqual(q2.rows, [ { id: 2 }, { id: 1 } ]);
     }
     
   }
@@ -565,7 +570,8 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
       multi.deleteWhere({
         condition: 'id=$1 OR id=$2',
         params: [1, 2],
-        table: table
+        table: table,
+        appendSql: 'RETURNING id'
       });
 
       multi.exec(function(err, results) {
@@ -583,6 +589,7 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
       assert.isTrue(q1.command === 'DELETE' && q1.rowCount === 1);
       assert.isTrue(q2.command === 'DELETE' && q2.rowCount === 1);
       assert.isTrue(q3.command === 'DELETE' && q3.rowCount === 2);
+      assert.deepEqual(q3.rows, [ { id: 2 }, { id: 1 } ]);
     }
     
   }
