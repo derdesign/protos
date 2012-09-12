@@ -55,7 +55,7 @@ function Logger(config, middleware) {
   if (typeof config.accessLog == 'boolean') {
     if (config.accessLog) config.accessLog = {console: true};
   } else {
-    if (config.accessLog && !(config.accessLog instanceof Object)) {
+    if (config.accessLog && typeof config.accessLog != 'object') {
       config.accessLog = {console: true};
     }
   }
@@ -64,7 +64,7 @@ function Logger(config, middleware) {
   if (config.accessLog) this.enableAccessLog(config.accessLog);
   
   // Create logging levels
-  if (config.levels && config.levels instanceof Object) createLoggingLevels.call(this, config.levels);
+  if (config.levels && typeof config.levels == 'object') createLoggingLevels.call(this, config.levels);
   
   // console.exit(this);
 }

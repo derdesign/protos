@@ -14,7 +14,7 @@ function JSONTransport(evt, config, level, noAttach) {
     config = {filename: config}; // Accept filename as config
   } else if (typeof config == 'boolean') {
     config = {stdout: true}; // Accept boolean as config
-  } else if ( !(config instanceof Object)) {
+  } else if (typeof config != 'object') {
     return;
   }
   

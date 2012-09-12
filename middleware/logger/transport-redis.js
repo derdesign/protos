@@ -20,7 +20,7 @@ function RedisTransport(evt, config, level, noAttach) {
   if (typeof config == 'boolean') {
     if (config) config = {};
     else return;
-  } else if (!(config instanceof Object)) {
+  } else if (typeof config != 'object') {
     return;
   }
   

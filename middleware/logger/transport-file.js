@@ -9,7 +9,7 @@ function FileTransport(evt, config, level, noAttach) {
   
   if (typeof config == 'string') {
     config = {filename: config};
-  } else if (!(config instanceof Object)) {
+  } else if (typeof config != 'object') {
     return;
   }
   

@@ -24,7 +24,7 @@ function MongoTransport(evt, config, level, noAttach) {
   if (typeof config == 'boolean') {
     if (config) config = {};
     else return;
-  } else if (!(config instanceof Object)) {
+  } else if (typeof config != 'object') {
     return;
   }
   
@@ -102,7 +102,7 @@ MongoTransport.prototype.write = function(log) {
  */
 
 MongoTransport.prototype.pushLog = function(log, data, native) {
-  if (native && native instanceof Object) log = native;
+  if (native && typeof native == 'object') log = native;
   this.collection.insert({log: log}, logHandler);
 }
 
