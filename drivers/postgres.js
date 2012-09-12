@@ -120,7 +120,6 @@ PostgreSQL.prototype.query = function(o, callback) {
 */
 
 PostgreSQL.prototype.exec = function(o, callback) {
-  var self = this;
   var args, 
       self = this,
       sql = o.sql || '',
@@ -156,7 +155,6 @@ PostgreSQL.prototype.exec = function(o, callback) {
  */
 
 PostgreSQL.prototype.queryWhere = function(o, callback) {
-  var self = this;
   var args, 
       self = this,
       condition = o.condition || '',
@@ -196,7 +194,6 @@ PostgreSQL.prototype.queryWhere = function(o, callback) {
  */
 
 PostgreSQL.prototype.queryAll = function(o, callback) {
-  var self = this;
   var args, 
       self = this,
       columns = o.columns || '*',
@@ -432,7 +429,7 @@ PostgreSQL.prototype.updateWhere = function(o, callback) {
       
   if (!util.isArray(params)) params = [params];
   
-  var query = util.format("UPDATE %s SET ", table);
+  query = util.format("UPDATE %s SET ", table);
   
   query += createInsertParams(values);
   
@@ -639,8 +636,9 @@ PostgreSQL.prototype.__modelMethods = {
       callback.call(self, new Error(util.format("%s: Empty arguments", this.className)));
       return;
     } else {
-      var condition = [];
-      for (var i=0,len=keys.length; i < len; i++) {
+      var len;
+      condition = [];
+      for (i=0,len=keys.length; i < len; i++) {
         condition.push(util.format('%s=$%d', keys[i], (i+1)));
       }
       condition = condition.join(' AND ');
