@@ -9,6 +9,12 @@ var testData = {
       {username: 'user2', password: 'pass2'},
       {username: '!@#$%', password: 'pass3'}] // invalid
   },
+  PostgreSQL: { // pkey constraint, need auto_increment
+    insert: [
+      {username: 'user'+process.pid, password: 'pass1'},
+      {username: 'user2', password: 'pass2'},
+      {username: '!@#$%', password: 'pass3'}] // invalid
+  },
   MongoDB: {
     insert: [ // mongodb is more flexible when it comes to id's
       {id: 1, username: 'user'+process.pid, password: 'pass1'},

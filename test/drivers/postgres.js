@@ -6,30 +6,27 @@ var app = require('../fixtures/bootstrap'),
     colorize = protos.util.colorize,
     ModelBatch = require('../fixtures/model-batch'),
     Multi = require('multi'),
-    createClient = require('mysql').createClient,
+    pg = require('pg'),
+    Client = pg.Client,
     EventEmitter = require('events').EventEmitter;
 
-var mysql, multi, model, storageMulti, modelBatch;
+var postgres, multi, model, storageMulti, modelBatch;
 
-var config = app.config.drivers.mysql,
-    client = createClient(config),
-    mclient = new Multi(client);
+var config = app.config.drivers.postgres,
+    client = new Client(config),
+    pclient = new Multi(client);
+    
+client.connect();
 
 var table = config.table;
 
 // Test table
-var createTable = util.format('\
-CREATE TABLE IF NOT EXISTS %s (\n\
-  id INTEGER AUTO_INCREMENT NOT NULL,\n\
-  username VARCHAR(255),\n\
-  password VARCHAR(255),\n\
-  PRIMARY KEY (id)\n\
-)', table);
+var createTable = util.format('CREATE TABLE %s (id serial PRIMARY KEY, username varchar(255), password VARCHAR(255));', table);
 
 // Test Model
 function TestModel() {
 
-  this.driver = 'mysql';
+  this.driver = 'postgres';
 
   this.properties = app.globals.commonModelProps;
 
@@ -39,34 +36,38 @@ util.inherits(TestModel, protos.lib.model);
 
 var modelBatch = new ModelBatch();
     
-var batch = vows.describe('drivers/mysql.js').addBatch({
+var batch = vows.describe('drivers/postgres.js').addBatch({
   
   'Integrity Checks': {
     
     topic: function() {
+      
       var promise = new EventEmitter();
-      app._getResource('drivers/mysql', function(driver) {
-        mysql = driver;
-        multi = mysql.multi();
+      app._getResource('drivers/postgres', function(driver) {
+        
+        postgres = driver;
+        multi = postgres.multi();
         
         multi.on('pre_exec', app.backupFilters);
         multi.on('post_exec', app.restoreFilters);
         
         promise.emit('success');
+
       });
       return promise;
     },
     
-    'Sets db': function() {
-      assert.isNotNull(mysql.db);
+    'Sets db': function(results) {
+      assert.isNotNull(postgres.db);
+      assert.equal(postgres.db, config.database);
     },
 
     'Sets config': function() {
-      assert.strictEqual(mysql.config.host, app.config.drivers.mysql.host);
+      assert.strictEqual(postgres.config.host, app.config.drivers.postgres.host);
     },
     
     'Sets client': function() {
-      assert.instanceOf(mysql.client, client.constructor);
+      assert.strictEqual(Client, client.constructor);
     }
 
   }
@@ -77,9 +78,9 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
     
     topic: function() {
       var promise = new EventEmitter();
-      mclient.query('DROP TABLE IF EXISTS ' + table);
-      mclient.query(createTable);
-      mclient.exec(function(err, results) {
+      pclient.query('DROP TABLE IF EXISTS ' + table);
+      pclient.query(createTable);
+      pclient.exec(function(err, results) {
         promise.emit('success', err);
       });
       return promise;
@@ -93,7 +94,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::exec': {
+  'PostgreSQL::exec': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -103,8 +104,8 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       
       // sql + params
       multi.__exec({
-        sql: util.format('INSERT INTO %s VALUES (?,?,?)', table),
-        params: [null, 'username', 'password']
+        sql: util.format('INSERT INTO %s(username, password) VALUES ($1,$2) RETURNING id', table),
+        params: ['username', 'password']
       });
       
       multi.exec(function(err, results) {
@@ -114,22 +115,22 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
     },
     
     'Performs simple queries': function(results) {
-      assert.deepEqual(results[0], [{count: 0}]);
+      assert.deepEqual(results[0].rows, [{count: 0}]);
     },
     
     'Performs queries with parameters': function(results) {
-      assert.strictEqual(results[1].affectedRows, 1);
+      assert.strictEqual(results[1].rows[0].id, 1);
     }
     
   }
   
 }).addBatch({
   
-  'MySQL::insertInto': {
+  'PostgreSQL::insertInto': {
     
     topic: function() {
       var promise = new EventEmitter();
-      mysql.insertInto({
+      postgres.insertInto({
         table: table,
         values: {
           username: 'user1',
@@ -149,7 +150,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::query': {
+  'PostgreSQL::query': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -159,13 +160,13 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       
       // sql + params
       multi.query({
-        sql: util.format('SELECT * FROM %s WHERE id=?', table),
+        sql: util.format('SELECT * FROM %s WHERE id=$1', table),
         params: [2]
       });
       
       // sql + params + appendSql
       multi.query({
-        sql: util.format('SELECT id,username FROM %s WHERE id=? OR id=1', table),
+        sql: util.format('SELECT id,username FROM %s WHERE id=$1 OR id=1', table),
         params: [2],
         appendSql: 'ORDER BY id DESC'
       });
@@ -198,14 +199,14 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::queryWhere': {
+  'PostgreSQL::queryWhere': {
     
     topic: function() {
       var promise = new EventEmitter();
       
       // cond + params + table
       multi.queryWhere({
-        condition: 'id=?',
+        condition: 'id=$1',
         params: [1],
         table: table
       });
@@ -260,7 +261,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::queryAll': {
+  'PostgreSQL::queryAll': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -312,7 +313,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::queryById': {
+  'PostgreSQL::queryById': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -374,12 +375,12 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::countRows': {
+  'PostgreSQL::countRows': {
     
     topic: function() {
       var promise = new EventEmitter();
       
-      mysql.countRows({table: table}, function(err, count) {
+      postgres.countRows({table: table}, function(err, count) {
         promise.emit('success', count);
       });
       
@@ -394,7 +395,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::idExists': {
+  'PostgreSQL::idExists': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -432,12 +433,17 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
           q2 = results[1],
           q3 = results[2],
           q3Keys = Object.keys(q3);
+          
       assert.strictEqual(q1Keys.length, 3);
       assert.strictEqual(q1[1].id, 1);
       assert.strictEqual(q1[2].id, 2);
       assert.isNull(q1[3]);
       assert.deepEqual(q1Keys, ['1', '2', '3']);
-      assert.deepEqual(q2, {id: 1});
+      
+      assert.deepEqual(q2, {
+        '1': {id: 1}
+      });
+      
       assert.strictEqual(q3Keys.length, 2);
       assert.strictEqual(q3[1].id, 1);
       assert.strictEqual(q3[2].id, 2);
@@ -448,7 +454,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   
 }).addBatch({
   
-  'MySQL::updateWhere': {
+  'PostgreSQL::updateWhere': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -462,7 +468,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
 
       // condition + params + table + values
       multi.updateWhere({
-        condition: 'id=?',
+        condition: 'id=$1',
         params: [1],
         table: table,
         values: {username: '__user1', password: '__pass1'}
@@ -470,11 +476,10 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
 
       // condition + params + table + values + appendSql
       multi.updateWhere({
-        condition: 'id=? OR id=?',
+        condition: 'id=$1 OR id=$2',
         params: [1, 2],
         table: table,
-        values: {username: 'user', password: 'pass'},
-        appendSql: 'LIMIT 1'
+        values: {username: 'user', password: 'pass'}
       });
 
       multi.exec(function(err, results) {
@@ -488,16 +493,16 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       var q1 = results[0],
           q2 = results[1],
           q3 = results[2];
-      assert.strictEqual(q1.affectedRows, 1);
-      assert.strictEqual(q2.affectedRows, 1);
-      assert.strictEqual(q3.affectedRows, 1);
+      assert.isTrue(q1.command === 'UPDATE' && q1.rowCount === 1);
+      assert.isTrue(q2.command === 'UPDATE' && q2.rowCount === 1);
+      assert.isTrue(q3.command === 'UPDATE' && q3.rowCount === 2);
     }
     
   }
 
 }).addBatch({
   
-  'MySQL::updateById': {
+  'PostgreSQL::updateById': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -513,8 +518,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       multi.updateById({
         id: [1,2],
         table: table,
-        values: {password: 'p9999'},
-        appendSql: 'LIMIT 1'
+        values: {password: 'p9999'}
       });
       
       multi.exec(function(err, results) {
@@ -527,15 +531,15 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
     'Updates values correctly': function(results) {
       var q1 = results[0],
           q2 = results[1];
-      assert.strictEqual(q1.affectedRows, 1);
-      assert.strictEqual(q2.affectedRows, 1);
+      assert.isTrue(q1.command === 'UPDATE' && q1.rowCount === 1);
+      assert.isTrue(q2.command === 'UPDATE' && q2.rowCount === 2);
     }
     
   }
   
 }).addBatch({
   
-  'MySQL::deleteWhere': {
+  'PostgreSQL::deleteWhere': {
 
     topic: function() {
       var promise = new EventEmitter();
@@ -552,17 +556,16 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       
       // condition + params + table
       multi.deleteWhere({
-        condition: 'id=?',
+        condition: 'id=$1',
         params: [3],
         table: table
       });
       
       // condition + params + table + appendSql
       multi.deleteWhere({
-        condition: 'id=? OR id=?',
+        condition: 'id=$1 OR id=$2',
         params: [1, 2],
-        table: table,
-        appendSql: 'LIMIT 1'
+        table: table
       });
 
       multi.exec(function(err, results) {
@@ -577,16 +580,16 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       var q1 = results[2],
           q2 = results[3],
           q3 = results[4];
-      assert.strictEqual(q1.affectedRows, 1);
-      assert.strictEqual(q2.affectedRows, 1);
-      assert.strictEqual(q3.affectedRows, 1);
+      assert.isTrue(q1.command === 'DELETE' && q1.rowCount === 1);
+      assert.isTrue(q2.command === 'DELETE' && q2.rowCount === 1);
+      assert.isTrue(q3.command === 'DELETE' && q3.rowCount === 2);
     }
     
   }
   
 }).addBatch({
   
-  'MySQL::deleteById': {
+  'PostgreSQL::deleteById': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -605,7 +608,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       multi.deleteById({
         id: [5,6,99],
         table: table,
-        appendSql: 'LIMIT 2'
+        appendSql: 'RETURNING id'
       });
       
       multi.exec(function(err, results) {
@@ -619,8 +622,10 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       // Note: The first two insert the new entries
       var q1 = results[2],
           q2 = results[3];
-      assert.strictEqual(q1.affectedRows, 1);
-      assert.strictEqual(q2.affectedRows, 2);
+          
+      assert.isTrue(q1.command === 'DELETE' && q1.rowCount === 0);
+      assert.isTrue(q2.command === 'DELETE' && q2.rowCount === 2); // We're returning on the appendSql option
+      
     }
     
   }
@@ -710,8 +715,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
           
       // Insert user1 + invalidate existing cache
       assert.equal(r1[0], 7);
-      assert.equal(r1[1].affectedRows, 1);
-      assert.equal(r1[1].serverStatus, 2);
+      assert.equal(r1[1].rowCount, 1);
       
       // Retrieve user 1 + store 'test_user_query' cache with only user1
       assert.instanceOf(r2, Array);
@@ -722,8 +726,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       
       // Insert user2
       assert.equal(r3[0], 8);
-      assert.equal(r3[1].affectedRows, 1);
-      assert.equal(r3[1].serverStatus, 2);
+      assert.equal(r3[1].rowCount, 1);
       
       // Retrieve 'test_user_query' cache => Should return only user1, since it's returning from cache
       assert.instanceOf(r4, Array);
@@ -734,8 +737,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
 
       // Insert user3 + invalidate 'test_user_query' cache
       assert.equal(r5[0], 9);
-      assert.equal(r5[1].affectedRows, 1);
-      assert.equal(r5[1].serverStatus, 2);
+      assert.equal(r5[1].rowCount, 1);
       
       // Retrieve 'test_user_query' cache => cache has been invalidated
       // New query should return test_user1, test_user2 and test_user3
@@ -770,10 +772,10 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       modelBatch.model = model;
       
       // Start with a clean table
-      mclient.query('DROP TABLE ' + table);
-      mclient.query(createTable);
+      pclient.query('DROP TABLE ' + table);
+      pclient.query(createTable);
       
-      mclient.exec(function(err, results) {
+      pclient.exec(function(err, results) {
         promise.emit('success', err || model);
       });
       

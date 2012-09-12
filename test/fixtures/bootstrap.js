@@ -47,7 +47,7 @@ var protos = Protos.bootstrap(testSkeleton, {
       events: {
         components: function(protos) {
           // Load framework components
-          protos.loadDrivers('mongodb', 'mysql');
+          protos.loadDrivers('mongodb', 'mysql', 'postgres');
           protos.loadStorages('mongodb', 'redis');
           protos.loadEngines('coffeekup', 'dot', 'eco', 'ejs', 'haml', 'hamlcoffee', 'handlebars', 'hogan', 'jade',
           'jazz', 'jqtpl', 'jshtml', 'kernel', 'liquor', 'swig', 'whiskers');
@@ -70,9 +70,11 @@ var protos = Protos.bootstrap(testSkeleton, {
 
           // Attach storages
           testConfig.mysql.storage = 'redis';
+          testConfig.postgres.storage = 'redis';
           testConfig.mongodb.storage = 'redis';
           
           app.config.drivers.mysql = testConfig.mysql;
+          app.config.drivers.postgres = testConfig.postgres;
           app.config.drivers.mongodb = testConfig.mongodb;
 
           app.config.storages.redis = testConfig.redis;
@@ -91,6 +93,12 @@ var protos = Protos.bootstrap(testSkeleton, {
             mysql.host = '0.0.0.0';
             mysql.user = 'root';
             mysql.password = '';
+            
+            var postgres = app.config.drivers.postgres;
+
+            postgres.host = '0.0.0.0';
+            postgres.user = 'root';
+            postgres.password = '';
 
             // Note: Redis uses default settings, no need to configure
 
