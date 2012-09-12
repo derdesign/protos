@@ -135,14 +135,14 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
           user: 'user1',
           pass: 'pass1'
         }
-      }, function(err, results) {
-        promise.emit('success', err || results);
+      }, function(err, id) {
+        promise.emit('success', err || id);
       });
       return promise;
     },
     
-    'Inserts records into the database': function(results) {
-      assert.strictEqual(results.insertId, 2);
+    'Inserts records into the database': function(id) {
+      assert.strictEqual(id, 2);
     }
     
   }
@@ -709,8 +709,9 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
           r6 = results[5];
           
       // Insert user1 + invalidate existing cache
-      assert.equal(r1.affectedRows, 1);
-      assert.equal(r1.serverStatus, 2);
+      assert.equal(r1[0], 7);
+      assert.equal(r1[1].affectedRows, 1);
+      assert.equal(r1[1].serverStatus, 2);
       
       // Retrieve user 1 + store 'test_user_query' cache with only user1
       assert.instanceOf(r2, Array);
@@ -720,8 +721,9 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.isTrue(r2[0][0].user == 'test_user1' && r2[0][0].pass == 'pass_user1');
       
       // Insert user2
-      assert.equal(r3.affectedRows, 1);
-      assert.equal(r3.serverStatus, 2);
+      assert.equal(r3[0], 8);
+      assert.equal(r3[1].affectedRows, 1);
+      assert.equal(r3[1].serverStatus, 2);
       
       // Retrieve 'test_user_query' cache => Should return only user1, since it's returning from cache
       assert.instanceOf(r4, Array);
@@ -731,8 +733,9 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.isTrue(r4[0][0].user == 'test_user1' && r4[0][0].pass == 'pass_user1');
 
       // Insert user3 + invalidate 'test_user_query' cache
-      assert.equal(r5.affectedRows, 1);
-      assert.equal(r5.serverStatus, 2);
+      assert.equal(r5[0], 9);
+      assert.equal(r5[1].affectedRows, 1);
+      assert.equal(r5[1].serverStatus, 2);
       
       // Retrieve 'test_user_query' cache => cache has been invalidated
       // New query should return test_user1, test_user2 and test_user3

@@ -273,7 +273,7 @@ MySQL.prototype.insertInto = function(o, callback) {
   }
   
   args.push(function(err, info) {
-    callback.call(self, err, info);
+    callback.call(self, err, info.insertId, info);
   });
   
   // console.exit(args);
@@ -462,7 +462,7 @@ MySQL.prototype.countRows = function(o, callback) {
   
   args.push(function(err, results, fields) {
     args = err ? [err, null] : [err, results[0].total];
-    callback.apply(self.app, args);
+    callback.apply(self, args);
   });
   
   this.client.query.apply(this.client, args);
@@ -518,7 +518,7 @@ MySQL.prototype.idExists = function(o, callback) {
           num = id[i];
           exists[num] = (found.indexOf(num) >= 0) ? records[num] : null;
         }
-        callback.apply(self.app, [null, exists]);
+        callback.apply(self, [null, exists]);
       }
     }
   });
@@ -552,10 +552,10 @@ MySQL.prototype.__modelMethods = {
       this.driver.insertInto({
         table: this.context,
         values: o
-      }, function(err, results) {
+      }, function(err, id) {
         if (err) callback.call(self, err, null);
         else {
-          callback.call(self, null, results.insertId);
+          callback.call(self, null, id);
         }
       });
       

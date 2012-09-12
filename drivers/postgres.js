@@ -275,10 +275,10 @@ PostgreSQL.prototype.insertInto = function(o, callback) {
   
   if (values instanceof Array) {
     params = values;
-    sql = util.format("INSERT INTO %s VALUES(%s)", table, createInsertParams(params));
+    sql = util.format("INSERT INTO %s VALUES(%s) RETURNING id", table, createInsertParams(params));
   } else {
     params = _.values(values);
-    sql = util.format("INSERT INTO %s(%s) VALUES(%s)", table, Object.keys(values), createInsertParams(params));
+    sql = util.format("INSERT INTO %s(%s) VALUES(%s) RETURNING id", table, Object.keys(values), createInsertParams(params));
   }
   
   // console.exit(sql);
@@ -288,7 +288,7 @@ PostgreSQL.prototype.insertInto = function(o, callback) {
     values: params
   }, function(err, results) {
     if (err) callback.call(self, err);
-    else callback.call(self, null, results.rows, results);
+    else callback.call(self, null, results.rows[0].id, results);
   });
 }
 
@@ -453,34 +453,91 @@ PostgreSQL.prototype.updateWhere = function(o, callback) {
   });
 }
 
+/**
+  Counts rows in a table
 
+  Example:
 
+    postgres.countRows({
+      table: 'mytable',
+    }, function(err, count) {
+      console.log([err, count]);
+    });
 
+  @method countRows
+  @param {object} o
+  @param {function} callback
+ */
 
+PostgreSQL.prototype.countRows = function(o, callback) {
+  var args, 
+      self = this,
+      table = o.table || '';
+  
+  var sql = util.format("SELECT COUNT('') AS total FROM %s LIMIT 1", table);
+  
+  this.client.query({
+    text: sql,
+  }, function(err, results) {
+    if (err) callback.call(self, err);
+    else callback.call(self, null, results.rows[0].total);
+  });
+  
+}
 
+/**
+  Queries rows by ID, returning an object with the ID`s as keys,
+  which contain the row (if found), or null if the row is not found.
 
+  Example:
 
+    postgres.idExists({
+      id: [1,2],
+      table: 'users'
+    }, function(err, results) {
+      console.log([err, results]);
+    });
 
+  @method idExists
+  @param {object} o
+  @param {function} callback
+ */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+PostgreSQL.prototype.idExists = function(o, callback) {
+  var args, 
+      self = this,
+      id = o.id,
+      table = o.table || '',
+      columns = o.columns || '*',
+      appendSql = o.appendSql || '';
+  
+  if (typeof id == 'number') id = [id];
+  
+  args = [o]; // Passing unmodified `o`
+  
+  args.push(function(err, results, fields) {
+    if (err) {
+      callback.call(self, err, null);
+    } else {
+      var num,
+          found = [],
+          records = {},
+          exists = {};
+      for (var result, i=0; i < results.length; i++) {
+        result = results[i];
+        found.push(result.id);
+        records[result.id] = results[i];
+      }
+      for (i=0; i < id.length; i++) {
+        num = id[i];
+        exists[num] = (found.indexOf(num) >= 0) ? records[num] : null;
+      }
+      callback.apply(self, [null, exists]);
+    }
+  });
+  
+  this.queryById.apply(this, args);
+}
 
 function createInsertParams(values) {
   var out = [];
@@ -496,6 +553,195 @@ function createInsertParams(values) {
     }
   }
   return out.join(', ');
+}
+
+// Model methods. See lib/driver.js for Model API docs
+
+PostgreSQL.prototype.__modelMethods = {
+  
+  /* Model API insert */
+  
+  insert: function(o, callback) {
+    var self = this;
+    
+    // Data is validated prior to being inserted
+    var err = this.validateProperties(o);
+
+    if (err) callback.call(self, err);
+    
+    else {
+      
+      // Convert object types to strings
+      this.convertTypes(o);
+
+      // Set model defaults
+      this.setDefaults(o);
+
+      // Save data into the database
+      this.driver.insertInto({
+        table: this.context,
+        values: o
+      }, function(err, id) {
+        if (err) callback.call(self, err, null);
+        else {
+          callback.call(self, null, id);
+        }
+      });
+      
+    }
+
+  },
+  
+  /* Model API get */
+  
+  get: function(o, callback) {
+    var self = this;
+    
+    if (typeof o == 'number') { 
+      // If `o` is number: Convert to object
+      o = {id: o};
+    } else if (util.isArray(o)) {
+      
+      // If `o` is an array of params, process args recursively using multi
+      var arr = o, 
+          multi = this.multi();
+      for (var i=0; i < arr.length; i++) {
+        multi.get(arr[i]);
+      }
+      multi.exec(function(err, results) {
+        callback.call(self, err, results);
+      });
+      return;
+      
+    } else if (typeof o == 'object') {
+      
+      // IF `o` is object: Validate without checking required fields
+      this.propertyCheck(o);
+      
+    } else {
+      
+      callback.call(self, new Error(util.format("%s: Wrong value for `o` argument", this.className)), null);
+      return;
+      
+    }
+      
+    // Prepare custom query
+    var condition, key, value,
+        keys = [], values = [];
+    
+    for (key in o) {
+      keys.push(key);
+      values.push(o[key]);
+    }
+    
+    // Prevent empty args
+    if (keys.length === 0) {
+      callback.call(self, new Error(util.format("%s: Empty arguments", this.className)));
+      return;
+    } else {
+      var condition = [];
+      for (var i=0,len=keys.length; i < len; i++) {
+        condition.push(util.format('%s=$%d', keys[i], (i+1)));
+      }
+      condition = condition.join(' AND ');
+    }
+    
+    // Get model data & return generated model (if found)
+    this.driver.queryWhere({
+      condition: condition,
+      params: values,
+      table: this.context,
+    }, function(err, results) {
+      if (err) callback.call(self, err, null);
+      else {
+        if (results.length === 0) callback.call(self, null, []);
+        else {
+          for (var models=[],i=0; i < results.length; i++) {
+            models.push(self.createModel(results[i]));
+          }
+          callback.call(self, null, models);
+        }
+      }
+    });
+  },
+  
+  /* Model API getAll */
+  
+  getAll: function(callback) {
+    var self = this;
+
+    this.driver.queryAll({
+      table: this.context
+    }, function(err, results) {
+      if (err) callback.call(self, err, null);
+      else {
+        for (var models=[],i=0; i < results.length; i++) {
+          models.push(self.createModel(results[i]));
+        }
+        callback.call(self, null, models);
+      }
+    });
+
+  },
+  
+  /* Model API save */
+  
+  save: function(o, callback) {
+    var id, self = this;
+    
+    // // Get id, and prepare update data
+    id = o.id; 
+    delete o.id;
+    
+    if (typeof id == 'undefined') {
+      callback.call(this, new Error(util.format("%s: Unable to update model object without ID", this.className)));
+      return;
+    }
+    
+    // Data is validated prior to being updated
+    var err = this.validateProperties(o, {noRequired: true});
+    
+    if (err) callback.call(self, err);
+    
+    else {
+      
+      // Update data
+      this.driver.updateById({
+        id: id,
+        table: this.context,
+        values: o
+      }, function(err, results) {
+        callback.call(self, err);
+      });
+      
+    }
+    
+  },
+  
+  /* Model API delete */
+  
+  delete: function(id, callback) {
+    var self = this;
+    
+    if (typeof id == 'number' || id instanceof Array) {
+      
+      // Remove entry from database
+      this.driver.deleteById({
+        id: id,
+        table: this.context
+      }, function(err, results) {
+        callback.call(self, err);
+      });
+      
+    } else {
+      
+      console.log(id);
+      callback.call(self, new Error(util.format("%s: Wrong value for `id` parameter", this.className)));
+      
+    }
+
+  }
+  
 }
 
 module.exports = PostgreSQL;
