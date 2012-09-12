@@ -72,6 +72,10 @@ vows.describe('Models').addBatch({
     'Alternative shortcut set (app.xxxModel)': function() {
       assert.equal(app.usersModel.className, 'UsersModel');
       assert.isTrue(app.usersModel instanceof protos.lib.model);
+    },
+    
+    'Allows context override': function() {
+      assert.equal(app.contextModel.context, 'my_custom_context');
     }
 
   }

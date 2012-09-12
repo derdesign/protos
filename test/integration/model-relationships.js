@@ -31,7 +31,8 @@ vows.describe('Model Relationships').addBatch({
     },
     
     "Initialized models": function(models) {
-      assert.equal(Object.keys(models).length, 7);
+      assert.equal(Object.keys(models).length, 8);
+      assert.isTrue('context' in models);
       assert.isTrue('accounts' in models);
       assert.isTrue('buddies' in models);
       assert.isTrue('companies' in models);
