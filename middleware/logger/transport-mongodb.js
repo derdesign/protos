@@ -24,7 +24,7 @@ function MongoTransport(evt, config, level, noAttach) {
   if (typeof config == 'boolean') {
     if (config) config = {};
     else return;
-  } else if (typeof config != 'object') {
+  } else if (config.constructor !== Object) {
     return;
   }
   

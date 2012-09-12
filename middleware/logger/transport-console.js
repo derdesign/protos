@@ -9,7 +9,7 @@ function ConsoleTransport(evt, config, level, noAttach) {
 
   if (typeof config == 'boolean') {
     config = (config) ? {stdout: true} : {};
-  } else if (typeof config != 'object') {
+  } else if (config.constructor !== Object) {
     return;
   }
   
