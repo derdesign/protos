@@ -5,6 +5,9 @@
   "mysql": {
     "mysql"               : ">= 0.9.6"
   },
+  "postgres": {
+    "pg"                  : ">= 1.0.12"
+  },
   "redis": {
     "redis"               : "= 0.7.2",
     "hiredis"             : ">= 0.1.14"

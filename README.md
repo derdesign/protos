@@ -13,7 +13,7 @@ support might be added in the future.
 - Fast Configuration with bootstrap file
 - Multi Core Cluster support
 - Easy Deployment with JSON or Command line
-- MongoDB, MySQL, Redis & RabbitMQ Development Stack
+- MongoDB, MySQL, PostgreSQL, Redis & RabbitMQ Development Stack
 - Application Helpers
 - Application Models supporting ORM &amp; Relationships
 - Database Drivers & Storages
@@ -59,22 +59,22 @@ means you can use a database backend for development, and another for production
 
 Here's the Development Stack the framework provides, in a nutshell:
 
-- **Drivers** &nbsp; _[MongoDB](https://github.com/derdesign/protos/blob/master/drivers/mongodb.js), [MySQL](https://github.com/derdesign/protos/blob/master/drivers/mysql.js)_
-- **Storages** &nbsp; _[MongoDB](https://github.com/derdesign/protos/blob/master/storages/mongodb.js), [Redis](https://github.com/derdesign/protos/blob/master/storages/redis.js)_
+- **Drivers** &nbsp; _[MongoDB](https://bitbucket.org/derdesign/protos/src/master/drivers/mongodb.js), [PostgreSQL](https://bitbucket.org/derdesign/protos/src/master/drivers/postgres.js)_, [MySQL](https://bitbucket.org/derdesign/protos/src/master/drivers/mysql.js)_
+- **Storages** &nbsp; _[MongoDB](https://bitbucket.org/derdesign/protos/src/master/storages/mongodb.js), [Redis](https://bitbucket.org/derdesign/protos/src/master/storages/redis.js)_
 - **Models** &nbsp; _Use any Driver supported_
 - **Query Cache (Drivers)** &nbsp; _Use any Storage supported_
 - **Query Cache (Models)** &nbsp; _Handled by underlying Driver_
 - **Caching** &nbsp; _Use any Storage supported_
 - **Sessions** &nbsp; _Use any Storage supported_
 - **Response Caching** &nbsp; _Use any Storage supported_
-- **Logging** &nbsp; [MongoDB](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-mongodb.js), 
-[Redis](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-redis.js), [File](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-file.js), 
-[Console](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-console.js),
-[JSON](https://github.com/derdesign/protos/blob/master/middleware/logger/transport-console.js)
+- **Logging** &nbsp; [MongoDB](https://bitbucket.org/derdesign/protos/src/master/middleware/logger/transport-mongodb.js), 
+[Redis](https://bitbucket.org/derdesign/protos/src/master/middleware/logger/transport-redis.js), [File](https://bitbucket.org/derdesign/protos/src/master/middleware/logger/transport-file.js), 
+[Console](https://bitbucket.org/derdesign/protos/src/master/middleware/logger/transport-console.js),
+[JSON](https://bitbucket.org/derdesign/protos/src/master/middleware/logger/transport-console.js)
 - **Message Queue** &nbsp; _Use the mq middleware_
 
 To install the driver & storage component dependencies, use the `protos install <component>` command. For a full list of components and
-their dependencies, see the [dependencies.json](https://github.com/derdesign/protos/blob/master/dependencies.json) file.
+their dependencies, see the [dependencies.json](https://bitbucket.org/derdesign/protos/src/master/dependencies.json) file.
 
 ## Middleware
 
@@ -100,7 +100,7 @@ The Application's functionality can be extended with the following (ready to use
 - [mq](http://derdesign.github.com/protos/middleware#mq) &nbsp; *Message Queue solution using RabbitMQ*
 
 To install the middleware dependencies, use the `protos install <middleware>` command. For a full list of components and
-their dependencies, see the [dependencies.json](https://github.com/derdesign/protos/blob/master/dependencies.json) file.
+their dependencies, see the [dependencies.json](https://bitbucket.org/derdesign/protos/src/master/dependencies.json) file.
 
 ## Template Engines
 
@@ -131,7 +131,7 @@ The following view engine components are provided by protos:
 - [Whiskers](https://github.com/gsf/whiskers.js/tree)
 
 To install the engine dependencies, use the `protos install <engine>` command. For a full list of components and
-their dependencies, see the [dependencies.json](https://github.com/derdesign/protos/blob/master/dependencies.json) file.
+their dependencies, see the [dependencies.json](https://bitbucket.org/derdesign/protos/src/master/dependencies.json) file.
 
 
 ## License
