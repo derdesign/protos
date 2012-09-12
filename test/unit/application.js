@@ -650,4 +650,14 @@ vows.describe('lib/application.js').addBatch({
     
   }
   
+}).addBatch({
+
+  'Async Queue and "ready" event': {
+
+    "The 'ready' event is fired after flushing all queues": function() {
+      assert.isTrue(app.__readyEventFired);
+    }
+
+  }
+
 }).export(module);

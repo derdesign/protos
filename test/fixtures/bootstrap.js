@@ -112,6 +112,20 @@ var app = protos.app;
 
 app.logging = false;
 
+// -- Async tasks --
+
+app.addAsyncTask();
+
+setTimeout(function() {
+  app.flushAsyncTask();
+}, 100);
+
+app.on('ready', function() {
+  app.__readyEventFired = true;
+});
+
+// -- Async tasks --
+
 protos.path = Protos.path + '/test/fixtures/test-protos';
 
 // Extend assert to check view engine compatibility
