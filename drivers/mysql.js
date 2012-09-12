@@ -156,7 +156,7 @@ MySQL.prototype.queryWhere = function(o, callback) {
 
   if (!util.isArray(params)) params = [params];
   
-  args = [("SELECT " + columns + " FROM " + table + " WHERE " + condition + " " + appendSql).trim(), params];
+  args = [util.format("SELECT %s FROM %s WHERE %s %s", columns, table, condition, appendSql).trim(), params];
   
   args.push(function(err, results, fields) {
     callback.call(self, err, results, fields);
@@ -191,7 +191,7 @@ MySQL.prototype.queryAll = function(o, callback) {
       table = o.table || '',
       appendSql = o.appendSql || '';
   
-  args = [("SELECT " + columns + " FROM " + table + " " + appendSql).trim()];
+  args = [util.format("SELECT %s FROM %s %s", columns, table, appendSql).trim()];
   
   args.push(function(err, results, columns) {
     callback.call(self, err, results, columns);
@@ -227,7 +227,7 @@ MySQL.prototype.queryById = function(o, callback) {
   if (typeof id == 'number') id = [id];
   
   args = [{
-    condition: "id IN (" + (id.toString()) + ")",
+    condition: util.format("id IN (%s)", id.toString()),
     table: table,
     columns: columns,
     appendSql: appendSql
@@ -261,9 +261,9 @@ MySQL.prototype.insertInto = function(o, callback) {
       
   if (util.isArray(values)) {
     params = protos.util.strRepeat('?, ', values.length).replace(regex.endingComma, '');
-    args = ["INSERT INTO " + table + " VALUES(" + params + ")", values];
+    args = [util.format("INSERT INTO %s VALUES(%s)", table, params), values];
   } else {
-    query = "INSERT INTO " + table + " SET ";
+    query = util.format("INSERT INTO %s SET ", table);
     if (values.id == null) values.id = null;
     for (var key in values) {
       query += key + "=?, ";
@@ -307,7 +307,7 @@ MySQL.prototype.deleteById = function(o, callback) {
   if (typeof id == 'number') id = [id];
   
   args = [{
-    condition: "id IN (" + (id.toString()) + ")",
+    condition: util.format("id IN (%s)", id.toString()),
     table: table,
     appendSql: appendSql
   }, callback]
@@ -343,7 +343,7 @@ MySQL.prototype.deleteWhere = function(o, callback) {
       
   if (!util.isArray(params)) params = [params];
   
-  args = ["DELETE FROM " + table + " WHERE " + condition + " " + appendSql, params];
+  args = [util.format("DELETE FROM %s WHERE %s %s", table, condition, appendSql), params];
   
   args.push(function(err, info) {
     callback.call(self, err, info);
@@ -380,7 +380,7 @@ MySQL.prototype.updateById = function(o, callback) {
   if (typeof id == 'number') id = [id];
   
   args = [{
-    condition: "id IN (" + (id.toString()) + ")",
+    condition: util.format("id IN (%s)", id.toString()),
     table: table,
     values: values,
     appendSql: appendSql
@@ -417,7 +417,7 @@ MySQL.prototype.updateWhere = function(o, callback) {
       values = o.values || {},
       appendSql = o.appendSql || '';
   
-  query = "UPDATE " + table + " SET ";
+  query = util.format("UPDATE %s SET ", table);
   
   if (!util.isArray(params)) params = [params];
   
@@ -458,7 +458,7 @@ MySQL.prototype.countRows = function(o, callback) {
       self = this,
       table = o.table || '';
       
-  args = ["SELECT COUNT('') AS total FROM " + table, []];
+  args = [util.format("SELECT COUNT('') AS total FROM %s", table), []];
   
   args.push(function(err, results, fields) {
     args = err ? [err, null] : [err, results[0].total];
