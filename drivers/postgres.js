@@ -292,10 +292,208 @@ PostgreSQL.prototype.insertInto = function(o, callback) {
   });
 }
 
+/**
+  Deletes records by ID
+
+  Example:
+
+    postgres.deleteById({
+      id: 4,
+      table: 'users'
+    }, function(err, info) {
+      console.log([err, info]);
+    });
+
+  @method deleteById
+  @param {object} o
+  @param {function} callback
+  */
+
+PostgreSQL.prototype.deleteById = function(o, callback) {
+  var args,
+      id = o.id,
+      table = o.table || '',
+      appendSql = o.appendSql || '';
+  
+  if (typeof id == 'number') id = [id];
+  
+  args = [{
+    condition: util.format("id IN (%s)", id.toString()),
+    table: table,
+    appendSql: appendSql
+  }, callback]
+  
+  this.deleteWhere.apply(this, args);
+}
+
+/**
+  Deletes rows where condition is satisfied
+  
+  Example:
+
+    postgres.deleteWhere({
+      condition: 'id=$1',
+      params: [5],
+      table: 'users'
+    }, function(err, info) {
+      console.log([err, info]);
+    });
+
+  @method deleteWhere
+  @param {object} o
+  @param {function} callback
+ */
+
+PostgreSQL.prototype.deleteWhere = function(o, callback) {
+  var self = this;
+  var args, 
+      condition = o.condition || '',
+      params = o.params || [],
+      table = o.table || '',
+      appendSql = o.appendSql || '';
+      
+  if (!util.isArray(params)) params = [params];
+  
+  var sql = util.format('DELETE FROM %s WHERE %s %s', table, condition, appendSql);
+
+  this.client.query({
+    text: sql,
+    values: params
+  }, function(err, results) {
+    if (err) callback.call(self, err);
+    else callback.call(self, null, results);
+  });
+}
+
+/**
+  Updates records by ID
+  
+  Example:
+
+    postgres.updateById({
+      id: 1,
+      table: 'users',
+      values: {user: 'ernie'}
+    }, function(err, info) {
+      console.log([err, info]);
+    });
+
+  @method updateById
+  @param {object} o
+  @param {function} callback
+ */
+
+PostgreSQL.prototype.updateById = function(o, callback) {
+  var args,
+      id = o.id,
+      table = o.table || '',
+      values = o.values || {},
+      appendSql = o.appendSql || '';
+  
+  if (typeof id == 'number') id = [id];
+  
+  args = [{
+    condition: util.format("id IN (%s)", id.toString()),
+    table: table,
+    values: values,
+    appendSql: appendSql
+  }, callback]
+  
+  this.updateWhere.apply(this, args);
+}
+
+/**
+  Updates rows where condition is satisfied
+  
+  Example:
+
+    postgres.updateWhere({
+      condition: 'id=$1',
+      params: [1],
+      table: 'users',
+      values: {user: 'ernie'}
+    }, function(err, info) {
+      console.log([err, info]);
+    });
+  
+  @method updateWhere
+  @param {object} o
+  @param {function} callback
+ */
+
+PostgreSQL.prototype.updateWhere = function(o, callback) {
+  var self = this;
+  var args,query, 
+      condition = o.condition || '',
+      params = o.params || [],
+      table = o.table || '',
+      values = o.values || {},
+      appendSql = o.appendSql || '';
+      
+  if (!util.isArray(params)) params = [params];
+  
+  var query = util.format("UPDATE %s SET ", table);
+  
+  query += createInsertParams(values);
+  
+  var vals = _.values(values);
+
+  for (var i=1, len=params.length, vl=vals.length; i <= len; i++) {
+    condition = condition.replace('$'+i, '$'+(i+vl));
+  }
+  
+  query += util.format(" WHERE %s %s", condition, appendSql);
+  
+  this.client.query({
+    text: query,
+    values: vals.concat(params)
+  }, function(err, results) {
+    if (err) callback.call(self, err);
+    else callback.call(self, null, results);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function createInsertParams(values) {
   var out = [];
-  for (var i=1,val,len=values.length; i <= len; i++) {
-    out.push('$' + i);
+  if (values instanceof Array) {
+    for (var i=1,val,len=values.length; i <= len; i++) {
+      out.push('$' + i);
+    }
+  } else {
+    i = 1;
+    for (var key in values) {
+      out.push(util.format('%s=$%d', key, i));
+      i++;
+    }
   }
   return out.join(', ');
 }
