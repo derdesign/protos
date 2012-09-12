@@ -5,15 +5,15 @@ var assert = require('assert'),
 var testData = {
   MySQL: { // pkey constraint, need auto_increment
     insert: [
-      {user: 'user1', pass: 'pass1'},
-      {user: 'user2', pass: 'pass2'},
-      {user: '!@#$%', pass: 'pass3'}] // invalid
+      {username: 'user'+process.pid, password: 'pass1'},
+      {username: 'user2', password: 'pass2'},
+      {username: '!@#$%', password: 'pass3'}] // invalid
   },
   MongoDB: {
     insert: [ // mongodb is more flexible when it comes to id's
-      {id: 1, user: 'user1', pass: 'pass1'},
-      {id: 2, user: 'user2', pass: 'pass2'},
-      {id: 3, user: '!@#$%', pass: 'pass3'}] // invalid
+      {id: 1, username: 'user'+process.pid, password: 'pass1'},
+      {id: 2, username: 'user2', password: 'pass2'},
+      {id: 3, username: '!@#$%', password: 'pass3'}] // invalid
   }
 }
 
@@ -28,29 +28,35 @@ function ModelBatch() {
       'Model API: insert': {
 
         topic: function() {
+          
           var promise = new EventEmitter();
           
-          // Invalidate testmodel:user_cache
-          
-          // ################### QUERY CACHING TESTS [MODELS] #####################
-          
-          // Insert first item
-          multi.queryCached({
-           cacheInvalidate: 'user_cache'
-          }, 'insert', data.insert[0]);
-          
-          // ################### QUERY CACHING TESTS [DRIVER] #####################
-          
-          // Insert second item
-          multi.insert(data.insert[1]);
-          
-          // Attempt to insert data that does not validate => err is returned
-          multi.insert(data.insert[2])
+          // Need to make sure cache is working by flushing the redis cache
+          model.driver.storage.client.flushall(function() {
+            
+            // Invalidate testmodel:user_cache
 
-          multi.exec(function(err, results) {
-            promise.emit('success', err || results);
+            // ################### QUERY CACHING TESTS [MODELS] #####################
+
+            // Insert first item
+            multi.queryCached({
+             cacheInvalidate: 'user_cache'
+            }, 'insert', data.insert[0]);
+
+            // ################### QUERY CACHING TESTS [DRIVER] #####################
+
+            // Insert second item
+            multi.insert(data.insert[1]);
+
+            // Attempt to insert data that does not validate => err is returned
+            multi.insert(data.insert[2])
+
+            multi.exec(function(err, results) {
+              promise.emit('success', err || results);
+            });
+            
           });
-
+          
           return promise;
 
         },
@@ -60,7 +66,7 @@ function ModelBatch() {
           assert.equal(results.length, 3);
           assert.isNull(results[0]);
           assert.isNull(results[1]);
-          assert.equal(results[2].toString(), "Error: TestModel: Unable to validate 'user': !@#$%");
+          assert.equal(results[2].toString(), "Error: TestModel: Unable to validate 'username': !@#$%");
         }
 
       }
@@ -78,7 +84,7 @@ function ModelBatch() {
           multi.queryCached({
             cacheID: 'user_cache'
           }, 'get', {
-            user: 'user1'
+            username: 'user'+process.pid
           });
           
           // integer + model cache store w/ timeout
@@ -99,10 +105,17 @@ function ModelBatch() {
 
         'Returns valid results': function(results) {
           var expected = [
-            [{ user: 'user1', pass: 'pass1', id: 1 }],
-            [{ user: 'user1', pass: 'pass1', id: 1 }],
-            [ [{ user: 'user1', pass: 'pass1', id: 1 }],
-              [{ user: 'user2', pass: 'pass2', id: 2 }] ] ];
+            [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
+            [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
+            [ [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
+              [{ username: 'user2', password: 'pass2', id: 2 }] ] ];
+
+          // var util = require('util');
+          // 
+          // console.log(util.inspect(expected, false, 99));
+          // 
+          // console.exit(util.inspect(results, false, 99));
+          
           assert.deepEqual(results, expected);
         }
 
@@ -129,8 +142,8 @@ function ModelBatch() {
 
         'Returns valid results': function(results) {
           var expected = [ 
-            [ { user: 'user1', pass: 'pass1', id: 1 },
-              { user: 'user2', pass: 'pass2', id: 2 } ] ];
+            [ { username: 'user'+process.pid, password: 'pass1', id: 1 },
+              { username: 'user2', password: 'pass2', id: 2 } ] ];
           
           assert.deepEqual(results, expected);
         }
@@ -147,16 +160,16 @@ function ModelBatch() {
           var promise = new EventEmitter();
 
           // save => success
-          multi.save({id: 1, user: '__user1', pass: '__pass1'});
+          multi.save({id: 1, username: '__user1', password: '__pass1'});
 
           // save + update => success
-          multi.save({id: 1, user: '__user1__', pass: '__pass1__'});
+          multi.save({id: 1, username: '__user1__', password: '__pass1__'});
 
           // partial save => success
-          multi.save({id: 1, user: '__user1__updated'});
+          multi.save({id: 1, username: '__user1__updated'});
 
           // save with data that does not validate => err is returned
-          multi.save({id: 1, user: '!#$%^&*'});
+          multi.save({id: 1, username: '!#$%^&*'});
 
           multi.exec(function(err, results) {
             promise.emit('success', err || results);
@@ -171,7 +184,7 @@ function ModelBatch() {
           assert.isNull(results[0]);
           assert.isNull(results[1]);
           assert.isNull(results[2]);
-          assert.equal(results[3].toString(), "Error: TestModel: Unable to validate 'user': !#$%^&*");
+          assert.equal(results[3].toString(), "Error: TestModel: Unable to validate 'username': !#$%^&*");
         }
 
       }

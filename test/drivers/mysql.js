@@ -21,8 +21,8 @@ var table = config.table;
 var createTable = util.format('\
 CREATE TABLE IF NOT EXISTS %s (\n\
   id INTEGER AUTO_INCREMENT NOT NULL,\n\
-  user VARCHAR(255),\n\
-  pass VARCHAR(255),\n\
+  username VARCHAR(255),\n\
+  password VARCHAR(255),\n\
   PRIMARY KEY (id)\n\
 )', table);
 
@@ -132,8 +132,8 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       mysql.insertInto({
         table: table,
         values: {
-          user: 'user1',
-          pass: 'pass1'
+          username: 'user1',
+          password: 'pass1'
         }
       }, function(err, id) {
         promise.emit('success', err || id);
@@ -165,7 +165,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       
       // sql + params + appendSql
       multi.query({
-        sql: util.format('SELECT id,user FROM %s WHERE id=? OR id=1', table),
+        sql: util.format('SELECT id,username FROM %s WHERE id=? OR id=1', table),
         params: [2],
         appendSql: 'ORDER BY id DESC'
       });
@@ -184,14 +184,14 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.strictEqual(q1.length, 2);
       assert.strictEqual(q1[0].id, 1);
       assert.strictEqual(q1[1].id, 2);
-      assert.deepEqual(Object.keys(q1[0]), ['id', 'user', 'pass']);
+      assert.deepEqual(Object.keys(q1[0]), ['id', 'username', 'password']);
       assert.strictEqual(q2.length, 1);
       assert.strictEqual(q2[0].id, 2);
-      assert.deepEqual(Object.keys(q2[0]), ['id', 'user', 'pass']);
+      assert.deepEqual(Object.keys(q2[0]), ['id', 'username', 'password']);
       assert.strictEqual(q3.length, 2);
       assert.strictEqual(q3[0].id, 2);
       assert.strictEqual(q3[1].id, 1);
-      assert.deepEqual(Object.keys(q3[0]), ['id', 'user']);
+      assert.deepEqual(Object.keys(q3[0]), ['id', 'username']);
     }
     
   }
@@ -220,14 +220,14 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       multi.queryWhere({
         condition: 'id=1',
         table: table,
-        columns: 'user'
+        columns: 'username'
       });
       
       // cond + table + columns + appendSql
       multi.queryWhere({
         condition: 'id in (1,2)',
         table: table,
-        columns: 'user',
+        columns: 'username',
         appendSql: 'ORDER BY id ASC'
       });
       
@@ -245,15 +245,15 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
           q4 = results[3][0];
       assert.strictEqual(q1.length, 1);
       assert.strictEqual(q1[0].id, 1);
-      assert.deepEqual(Object.keys(q1[0]), ['id', 'user', 'pass']);
+      assert.deepEqual(Object.keys(q1[0]), ['id', 'username', 'password']);
       assert.strictEqual(q2.length, 1);
       assert.strictEqual(q2[0].id, 1);
-      assert.deepEqual(Object.keys(q2[0]), ['id', 'user', 'pass']);
+      assert.deepEqual(Object.keys(q2[0]), ['id', 'username', 'password']);
       assert.strictEqual(q3.length, 1);
-      assert.strictEqual(q3[0].user, 'username');
-      assert.deepEqual(Object.keys(q3[0]), ['user']);
+      assert.strictEqual(q3[0].username, 'username');
+      assert.deepEqual(Object.keys(q3[0]), ['username']);
       assert.strictEqual(q4.length, 2);
-      assert.deepEqual(q4, [{user: 'username'}, {user: 'user1'}]);
+      assert.deepEqual(q4, [{username: 'username'}, {username: 'user1'}]);
     }
     
   }
@@ -272,13 +272,13 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       
       // columns + table
       multi.queryAll({
-        columns: 'user',
+        columns: 'username',
         table: table
       });
       
       // columns + table + appendSql
       multi.queryAll({
-        columns: 'user, pass',
+        columns: 'username, password',
         table: table,
         appendSql: 'ORDER BY id DESC'
       });
@@ -297,15 +297,15 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.strictEqual(q1.length, 2);
       assert.strictEqual(q1[0].id, 1);
       assert.strictEqual(q1[1].id, 2);
-      assert.deepEqual(Object.keys(q1[0]), ['id', 'user', 'pass']);
+      assert.deepEqual(Object.keys(q1[0]), ['id', 'username', 'password']);
       assert.strictEqual(q2.length, 2);
-      assert.strictEqual(q2[0].user, 'username');
-      assert.strictEqual(q2[1].user, 'user1');
-      assert.deepEqual(Object.keys(q2[0]), ['user']);
+      assert.strictEqual(q2[0].username, 'username');
+      assert.strictEqual(q2[1].username, 'user1');
+      assert.deepEqual(Object.keys(q2[0]), ['username']);
       assert.strictEqual(q3.length, 2);
-      assert.strictEqual(q3[0].user, 'user1');
-      assert.strictEqual(q3[1].user, 'username');
-      assert.deepEqual(Object.keys(q3[0]), ['user', 'pass']);
+      assert.strictEqual(q3[0].username, 'user1');
+      assert.strictEqual(q3[1].username, 'username');
+      assert.deepEqual(Object.keys(q3[0]), ['username', 'password']);
     }
     
   }
@@ -340,8 +340,8 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       multi.queryById({
         id: [1,2],
         table: table,
-        columns: 'id, user',
-        appendSql: 'ORDER BY user ASC'
+        columns: 'id, username',
+        appendSql: 'ORDER BY username ASC'
       });      
       
       multi.exec(function(err, results) {
@@ -367,7 +367,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.strictEqual(q4.length, 2);
       assert.strictEqual(q4[0].id, 2);
       assert.strictEqual(q4[1].id, 1);
-      assert.deepEqual(Object.keys(q4[0]), ['id', 'user']);
+      assert.deepEqual(Object.keys(q4[0]), ['id', 'username']);
     }
     
   }
@@ -457,7 +457,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       multi.updateWhere({
         condition: 'id=1',
         table: table,
-        values: {user: '__user', pass: '__pass'}
+        values: {username: '__user', password: '__pass'}
       });
 
       // condition + params + table + values
@@ -465,7 +465,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
         condition: 'id=?',
         params: [1],
         table: table,
-        values: {user: '__user1', pass: '__pass1'}
+        values: {username: '__user1', password: '__pass1'}
       });
 
       // condition + params + table + values + appendSql
@@ -473,7 +473,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
         condition: 'id=? OR id=?',
         params: [1, 2],
         table: table,
-        values: {user: 'user', pass: 'pass'},
+        values: {username: 'user', password: 'pass'},
         appendSql: 'LIMIT 1'
       });
 
@@ -506,14 +506,14 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       multi.updateById({
         id: 1,
         table: table,
-        values: {pass: 'p1234'}
+        values: {password: 'p1234'}
       });
       
       // id (array) + table + values + appendSql
       multi.updateById({
         id: [1,2],
         table: table,
-        values: {pass: 'p9999'},
+        values: {password: 'p9999'},
         appendSql: 'LIMIT 1'
       });
       
@@ -541,8 +541,8 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       var promise = new EventEmitter();
 
       // Insert 2 more entries
-      multi.insertInto({table: table, values: {user: 'user3', pass: 'pass3'}});
-      multi.insertInto({table: table, values: {user: 'user4', pass: 'pass4'}});
+      multi.insertInto({table: table, values: {username: 'user3', password: 'pass3'}});
+      multi.insertInto({table: table, values: {username: 'user4', password: 'pass4'}});
 
       // condition + table
       multi.deleteWhere({
@@ -592,8 +592,8 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       var promise = new EventEmitter();
       
       // Insert 2 more entries
-      multi.insertInto({table: table, values: {user: 'user5', pass: 'pass5'}});
-      multi.insertInto({table: table, values: {user: 'user6', pass: 'pass6'}});
+      multi.insertInto({table: table, values: {username: 'user5', password: 'pass5'}});
+      multi.insertInto({table: table, values: {username: 'user6', password: 'pass6'}});
       
       // id + table
       multi.deleteById({
@@ -640,7 +640,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
         cacheInvalidate: 'test_user_query',
       }, 'insertInto', {
         table: table,
-        values: { user: 'test_user1', pass: 'pass_user1' }
+        values: { username: 'test_user1', password: 'pass_user1' }
       });
       
       // Retrieve user 1 + store 'test_user_query' cache with only user1
@@ -649,13 +649,13 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       }, 'queryWhere', {
         condition: '1=1',
         table: table,
-        appendSql: 'ORDER BY user'
+        appendSql: 'ORDER BY username'
       });
       
       // Insert user2
       multi.insertInto({
         table: table,
-        values: { user: 'test_user2', pass: 'pass_user2' }
+        values: { username: 'test_user2', password: 'pass_user2' }
       });
       
       // Retrieve 'test_user_query' cache => Should return only user1, since it's returning from cache
@@ -664,7 +664,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       }, 'queryWhere', {
         condition: '1=1',
         table: table,
-        appendSql: 'ORDER BY user'
+        appendSql: 'ORDER BY username'
       });
       
       // Insert user3 + invalidate 'test_user_query' cache
@@ -672,7 +672,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
         cacheInvalidate: 'test_user_query',
       }, 'insertInto', {
         table: table,
-        values: { user: 'test_user3', pass: 'pass_user3' }
+        values: { username: 'test_user3', password: 'pass_user3' }
       });
       
       // Retrieve 'test_user_query' cache => cache has been invalidated
@@ -684,7 +684,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       }, 'queryWhere', {
         condition: '1=1',
         table: table,
-        appendSql: 'ORDER BY user'
+        appendSql: 'ORDER BY username'
       });
       
       // ################### QUERY CACHING TESTS [DRIVER] #####################
@@ -718,7 +718,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.equal(r2.length, 2);
       assert.instanceOf(r2[0], Array);
       assert.equal(r2[0].length, 1);
-      assert.isTrue(r2[0][0].user == 'test_user1' && r2[0][0].pass == 'pass_user1');
+      assert.isTrue(r2[0][0].username == 'test_user1' && r2[0][0].password == 'pass_user1');
       
       // Insert user2
       assert.equal(r3[0], 8);
@@ -730,7 +730,7 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.equal(r4.length, 2);
       assert.instanceOf(r4[0], Array);
       assert.equal(r4[0].length, 1);
-      assert.isTrue(r4[0][0].user == 'test_user1' && r4[0][0].pass == 'pass_user1');
+      assert.isTrue(r4[0][0].username == 'test_user1' && r4[0][0].password == 'pass_user1');
 
       // Insert user3 + invalidate 'test_user_query' cache
       assert.equal(r5[0], 9);
@@ -743,9 +743,9 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
       assert.equal(r6.length, 2);
       assert.instanceOf(r6[0], Array);
       assert.equal(r6[0].length, 3);
-      assert.isTrue(r6[0][0].user == 'test_user1' && r6[0][0].pass == 'pass_user1');
-      assert.isTrue(r6[0][1].user == 'test_user2' && r6[0][1].pass == 'pass_user2');
-      assert.isTrue(r6[0][2].user == 'test_user3' && r6[0][2].pass == 'pass_user3');
+      assert.isTrue(r6[0][0].username == 'test_user1' && r6[0][0].password == 'pass_user1');
+      assert.isTrue(r6[0][1].username == 'test_user2' && r6[0][1].password == 'pass_user2');
+      assert.isTrue(r6[0][2].username == 'test_user3' && r6[0][2].password == 'pass_user3');
     }
     
   }
