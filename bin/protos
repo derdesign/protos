@@ -30,7 +30,6 @@ var commands = {
   
   create: {
     multiple: ['js', 'css', 'model', 'controller'],
-    switches: ['mustache'],
     single: ['domain'],
     args: 1,
     help: {
@@ -600,10 +599,6 @@ function createApplication(data, libs) {
       });
       
       // Create views
-      if (data.mustache) {
-        viewsBatch.unshift([app, 'main', 'index']);
-      }
-      
       viewsBatch.forEach(function(args) {
         createView.apply(data, args);
       });

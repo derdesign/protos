@@ -59,7 +59,7 @@ vows.describe('Command Line Interface').addBatch({
           results = [];
       
       protos.command('create myapp --domain protos.org --js jquery prototype --css bootstrap --model posts comment --controller admin dashboard');
-      protos.command('create myapp1 --mustache --controller test');
+      protos.command('create myapp1 --controller test');
       
       protos.exec(function(err, results) {
         promise.emit('success', err || results);
@@ -69,8 +69,7 @@ vows.describe('Command Line Interface').addBatch({
     },
     
     "Creates application skeleton": function(results) {
-      var r1 = results[0], 
-          r2 = results[1];
+      var r1 = results[0];
       var expected = '» Successfully created myapp\n» Created myapp/app/models/posts.js\n» \
 Created myapp/app/models/comments.js\n» Created myapp/app/controllers/admin.js\n» \
 Created myapp/app/controllers/dashboard.js\n» Created myapp/app/helpers/admin.js\n» \
@@ -83,19 +82,6 @@ Downloading Prototype JavaScript Framework';
       assert.equal(r1, expected);
       assert.deepEqual(fs.readdirSync('myapp'), skeleton);
       
-      expected = '» Successfully created myapp1\n» Created myapp1/app/controllers/test.js\n» \
-Created myapp1/app/helpers/test.js\n» Created myapp1/app/views/main/main-index.mustache\n» \
-Created myapp1/app/views/test/test-index.mustache';
-      
-      assert.equal(r2, expected);
-      assert.deepEqual(fs.readdirSync('myapp1'), skeleton);
-
-    },
-    
-    "Creates .mustache templates when specified": function() {
-      assert.isFalse(fs.existsSync('myapp1/app/views/main/main-index.html'));
-      assert.isTrue(fs.existsSync('myapp1/app/views/main/main-index.mustache'));
-      assert.isTrue(fs.existsSync('myapp1/app/views/test/test-index.mustache'));
     },
     
     "Downloads assets & libraries": function() {
@@ -120,6 +106,7 @@ Created myapp1/app/views/test/test-index.mustache';
     },
     
     "Creates views": function() {
+      assert.isTrue(fs.existsSync('myapp/app/views/main/main-index.html'));
       assert.isTrue(fs.existsSync('myapp/app/views/admin/admin-index.html'));
       assert.isTrue(fs.existsSync('myapp/app/views/dashboard/dashboard-index.html'));
     }
