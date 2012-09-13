@@ -383,7 +383,7 @@ Created myapp1/app/views/__layout/nice/partial.html';
       return promise;
     },
 
-    "Properly generates layout partials": function(results) {
+    "Properly generates static views": function(results) {
       var r1 = results[0];
       var expected =  '» Created myapp1/app/views/__static/category/post.html\n» Created myapp1/app/views/__static/category/\
 archive.jade\n» Created myapp1/app/views/__static/category/display.html\n» Created myapp1/app/views/__static/about.html\n» \
@@ -406,6 +406,50 @@ Created myapp1/app/views/__static/archive/2009/09/index.html\n» Created myapp1/
       assert.equal(r2, expected);
       assert.isTrue(fs.existsSync('app/views/__static/some/view.jade'));
       assert.isTrue(fs.existsSync('app/views/__static/view.jade'));
+    }
+
+  }
+  
+}).addBatch({
+  
+  'protos restricted': {
+
+    topic: function() {
+      var promise = new EventEmitter();
+
+      protos.command('restricted category/post,archive.jade,display about archive/2009/09/index,display.mustache');
+      protos.command('restricted some/view view --ext jade');
+
+      protos.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+
+      return promise;
+    },
+
+    "Properly generates restricted views": function(results) {
+      var r1 = results[0];
+      var expected =  '» Created myapp1/app/views/__restricted/category/post.html\n» Created myapp1/app/views/__restricted/category/\
+archive.jade\n» Created myapp1/app/views/__restricted/category/display.html\n» Created myapp1/app/views/__restricted/about.html\n» \
+Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created myapp1/app/views/__restricted/archive/2009/09/display\
+.mustache';
+
+      assert.equal(r1, expected);
+      assert.isTrue(fs.existsSync('app/views/__restricted/category/post.html'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/category/archive.jade'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/category/display.html'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/about.html'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/archive/2009/09/index.html'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/archive/2009/09/display.mustache'));
+    },
+
+    "Uses custom extensions when using --ext": function(results) {
+      var r2 = results[1];
+      var expected =  '» Created myapp1/app/views/__restricted/some/view.jade\n» Created myapp1/app/views/__restricted/view.jade';
+
+      assert.equal(r2, expected);
+      assert.isTrue(fs.existsSync('app/views/__restricted/some/view.jade'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/view.jade'));
     }
 
   }

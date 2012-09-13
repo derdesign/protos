@@ -428,6 +428,15 @@ var commands = {
     }
   },
   
+  restricted: {
+    single: ['ext'],
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      recursivelyCreateFiles('__restricted', data);
+    }
+  },
+  
   view: {
     single: ['ext'],
     args: 99,
