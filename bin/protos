@@ -1088,7 +1088,8 @@ var cli = new CommandLine(commands);
 
 cli.help.before = "\
 Usage: protos [action] [arguments]\n\n\
-Actions: \n\nUsage: [create, install, server, deploy, fetch, inspector, lint] \n\n\Components: [controller, helper, model, view, partial, layout, static]\n";
+Actions: \n\nUsage: [create, install, server, deploy, fetch, inspector, lint] \n\n\Components: [controller, helper, model, \
+view, partial, layout, static, restricted]\n";
 
 cli.help.after = "\n\
 Example:\n\n\
