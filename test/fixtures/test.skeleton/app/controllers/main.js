@@ -60,12 +60,12 @@ function MainController(app) {
   /* Response Buffer filter test */
   
   get('/response/buffer', function(req, res) {
-    res.render('#msg', {message: 'HELLO'}, true);
+    res.render('#msg', {message: 'HELLO'});
   });
   
   get('/response/buffer/specific', function(req, res) {
     res.setContext('specific');
-    res.render('#msg', {message: 'WORLD'}, true);
+    res.render('#msg', {message: 'WORLD'});
   });
   
   get('/response/buffer/raw', function(req, res) {

@@ -144,6 +144,8 @@ vows.describe('View Rendering').addBatch({
 
     topic: function() {
 
+      // #{error} and #msg views are always set to raw
+
       app.config.rawViews = false;
 
       var promise = new EventEmitter();
@@ -163,7 +165,7 @@ vows.describe('View Rendering').addBatch({
 
     'Application::notFound works properly': function(results) {
       var res = results[1], buf = res[0].trim(), hdr = res[1];
-      assert.isTrue(buf.indexOf('<!DOCTYPE html>') >= 0);
+      assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
       assert.isTrue(buf.indexOf('<p>HTTP/404: Page not Found</p>') >= 0);
       assert.equal(hdr.status, '404 Not Found');
     },
@@ -177,7 +179,7 @@ vows.describe('View Rendering').addBatch({
 
     'Application::httpMessage works properly': function(results) {
       var res = results[3], buf = res[0].trim(), hdr = res[1];
-      assert.isTrue(buf.indexOf('<!DOCTYPE html>') >= 0);
+      assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
       assert.isTrue(buf.indexOf('<p>{RAW MESSAGE}</p>') >= 0);
       assert.equal(hdr.status, '200 OK');
     }
