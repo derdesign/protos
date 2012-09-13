@@ -253,16 +253,16 @@ vows.describe('Response Misc').addBatch({
       // Override multi, since filters are being restored on each exec
       var multi = new Multi(app);
 
-      app.addFilter('response_buffer', function(data) {
+      app.addFilter('context', function(data) {
         data.buffer = '-- ' + data.buffer + ' --';
         return data;
       });
       
-      // Note: specific_response_buffer is set by doing res.setContext('specific')
+      // Note: specific_context is set by doing res.setContext('specific')
 
-      app.addFilter('specific_response_buffer', function(data) {
+      app.addFilter('specific_context', function(data) {
         data.buffer = new Buffer(data.buffer).toString('base64');
-        data = app.applyFilters('response_buffer', data);
+        data = app.applyFilters('context', data);
         return data;
       });
 
@@ -271,8 +271,8 @@ vows.describe('Response Misc').addBatch({
       multi.curl('/response/buffer/specific');
 
       multi.exec(function(err, results) {
-        app.removeFilter('response_buffer');
-        app.removeFilter('specific_response_buffer');
+        app.removeFilter('context');
+        app.removeFilter('specific_context');
         promise.emit('success', err || results);
       });
 
@@ -284,12 +284,12 @@ vows.describe('Response Misc').addBatch({
       assert.equal(r1, 'THIS SHOULD NOT BE MODIFIED')
     },
 
-    "Applies to the general `response_buffer` filter": function(results) {
+    "Applies to the general `context` filter": function(results) {
       var r2= results[1];
       assert.equal(r2, "-- \n<p>HELLO</p>\n --");
     },
 
-    "Applies to the `specific_response_buffer` filter": function(results) {
+    "Applies to the `specific_context` filter": function(results) {
       var r3 = results[2];
       assert.equal(r3, "-- CjxwPldPUkxEPC9wPgo= --");
     }
