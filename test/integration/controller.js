@@ -125,6 +125,9 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
       // Validation Messages: functions
       multi.curl('-i -G -d "word=cinnamon&num=toast" /test/qstring/messages');
       
+      // Validation Messages: Ajax
+      multi.curl('-i -G -H "X-Requested-With: XMLHttpRequest" -d "word=123&num=123" /test/qstring/messages');
+      
       multi.exec(function(err, results) {
         promise.emit('success', err || results);
       });
@@ -177,6 +180,12 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
       var r = results[7];
       assert.isTrue(r.indexOf('HTTP/1.1 400 Bad Request') >= 0);
       assert.isTrue(r.indexOf("<p>Invalid number: toast</p>") >= 0);
+    },
+    
+    'Invalidation: Responds w/200 + returns dynamic error messages on AJAX': function(results) {
+      var r = results[8];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf("Oops! Invalid word...") >= 0);
     }
     
   }
@@ -216,6 +225,7 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
       // PostData on AJAX Requests
       multi.curl('-i -X POST -H "X-Requested-With: XMLHttpRequest" /test/postdata/messages');
       multi.curl('-X PUT -H "X-Requested-With: XMLHttpRequest" /test/postdata/messages');
+      multi.curl('-i -X PUT -H "X-Requested-With: XMLHttpRequest" -d "user=nobody9012&pass=3456" /test/postdata/messages');
 
       multi.exec(function(err, results) {
         delete app.supports.body_parser; // Remove support for body_parser after tests complete
@@ -262,9 +272,13 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
     
     'Responds with raw data on AJAX Requests': function(results) {
       var r1 = results[6],
-          r2 = results[7];
-      assert.isTrue(r1.indexOf('HTTP/1.1 400 Bad Request') >= 0);
+          r2 = results[7],
+          r3 = results[8];
+      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0); // Ajax errors are returned as 200/OK
+      assert.isTrue(r1.indexOf('Missing required fields') >= 0);
       assert.equal(r2, 'Missing required fields');
+      assert.isTrue(r3.indexOf('HTTP/1.1 200 OK') >= 0); // Ajax errors are returned as 200/OK
+      assert.isTrue(r3.indexOf('Invalid username!') >= 0); // Ajax errors are returned as 200/OK
     }
     
   }

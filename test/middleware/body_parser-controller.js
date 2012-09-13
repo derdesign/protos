@@ -48,6 +48,7 @@ vows.describe('Body Parser (middleware) » Controller Validation').addBatch({
       // PostData on AJAX Requests
       multi.curl('-i -X POST -H "X-Requested-With: XMLHttpRequest" /test/postdata/messages');
       multi.curl('-X PUT -H "X-Requested-With: XMLHttpRequest" /test/postdata/messages');
+      multi.curl('-i -X PUT -H "X-Requested-With: XMLHttpRequest" -d "user=nobody9012&pass=3456" /test/postdata/messages');
 
       multi.exec(function(err, results) {
         delete app.supports.body_parser; // Remove support for body_parser after tests complete
@@ -94,9 +95,14 @@ vows.describe('Body Parser (middleware) » Controller Validation').addBatch({
     
     'Responds with raw data on AJAX Requests': function(results) {
       var r1 = results[6],
-          r2 = results[7];
-      assert.isTrue(r1.indexOf('HTTP/1.1 400 Bad Request') >= 0);
+          r2 = results[7],
+          r3 = results[8];
+      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0); // Ajax errors are returned with 200/OK
+      assert.isTrue(r1.indexOf('Missing required fields') >= 0); 
       assert.equal(r2, 'Missing required fields');
+      assert.isTrue(r3.indexOf('HTTP/1.1 200 OK') >= 0); // Ajax errors are returned with 200/OK
+      assert.isTrue(r3.indexOf('Invalid username!') >= 0);
+      
     }
     
   }
