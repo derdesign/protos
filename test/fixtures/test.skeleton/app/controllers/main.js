@@ -16,6 +16,13 @@ function MainController(app) {
     delete app.globals.testval;
   });
   
+  /* Shortcode filter */
+  
+  get('/shortcode-filter', function(req, res) {
+    res.setContext('numbers_test');
+    res.render('#shortcode-filter', true);
+  });
+  
   /* Request Metadata */
   
   var metadataCallback = function(req, res) {

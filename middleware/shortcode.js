@@ -67,6 +67,24 @@ function Shortcode(config, middleware) {
 }
 
 /**
+  Add a filter to the response buffer of context
+  
+  @param {string} context Response context to filter
+  @param {string|object} ob Object containing the shortcode methods
+  @return {string} modified buffer
+  @public
+ */
+
+Shortcode.prototype.filterContext = function(context, ob) {
+  var filter = context + '_context';
+  var self = this;
+  app.addFilter(filter, function(data) {
+    data.buffer = self.replace(data.buffer, ob);
+    return data;
+  });
+}
+
+/**
   Replaces shortcodes with output from the replacer functions
   
   @param {string} buffer
