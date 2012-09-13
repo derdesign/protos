@@ -159,6 +159,13 @@ Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin
       assert.isTrue(fs.existsSync('app/views/blog/blog-index.html'));
       assert.isTrue(fs.existsSync('app/views/admin/admin-index.html'));
       
+      var expectedBuf = fs.readFileSync('app/controllers/blog.js', 'utf8').trim();
+      
+      var controllerBuf = 'function BlogController(app) {\n\n  get(\'/\', function(req, res) {\n    \
+res.render(\'index\');\n  });\n\n}\n\nmodule.exports = BlogController;';
+      
+      assert.equal(expectedBuf, controllerBuf);
+      
     },
     
     "Skips helpers when using --nohelper": function(results) {
@@ -182,6 +189,7 @@ Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin
         var promise = new EventEmitter();
 
         protos.command('model posts comments');
+        protos.command('model books --driver mongodb:books --context bookstore');
 
         protos.exec(function(err, results) {
           promise.emit('success', err || results);
@@ -197,6 +205,21 @@ Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin
         assert.equal(r1, expected);
         assert.isTrue(fs.existsSync('app/models/posts.js'));
         assert.isTrue(fs.existsSync('app/models/comments.js'));
+        assert.isTrue(fs.existsSync('app/models/books.js'));
+        
+        var modelBuf = 'function BooksModel(app) {\n\n  this.driver = "mongodb:books";\n\n  this.context = "bookstore";\
+\n\n  this.properties = {\n\n  }\n\n}\n\nmodule.exports = BooksModel;';
+        
+        var expectedBuf = fs.readFileSync('app/models/books.js','utf8').trim();
+
+        assert.equal(expectedBuf, modelBuf);
+
+        modelBuf = 'function PostsModel(app) {\n\n  this.driver = "default";\n\n  this.context = "posts";\n\n  \
+this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
+        
+        expectedBuf = fs.readFileSync('app/models/posts.js', 'utf8').trim();
+        
+        assert.equal(expectedBuf, modelBuf);
 
       }
 

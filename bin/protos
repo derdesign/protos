@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var _ = require('underscore'),
+    _s = require('underscore.string'),
     fs = require('fs'),
     cp = require('child_process'),
     util = require('util'),
@@ -492,8 +493,13 @@ var commands = {
   },
   
   model: {
+    single: ['driver', 'context'],
     args: 99,
     validate: validateApp,
+    help: {
+      driver: 'Driver to use by the model',
+      context: 'Model context to set'
+    },
     run: function(data) {
        
        var app = pathModule.basename(process.cwd());
@@ -502,7 +508,7 @@ var commands = {
        
        // Create models
        data.args.forEach(function(model) {
-         createModel(app, model);
+         createModel(app, model, data);
        });
        
     },
@@ -711,12 +717,21 @@ function downloadAsset(lib, callback) {
 }
 
 
-function createModel(app, name) {
+function createModel(app, name, opts) {
+  
+  if (!opts) opts = {};
+  
   // Note: names will be pluralized
   name = inflect.pluralize(name.toLowerCase().replace(/(-|_)?model$/,''));
-  model = inflect.camelize(name) + 'Model';
+  
+  var model = inflect.camelize(name) + 'Model';
+  
   var tpl = "\n\
 function %s(app) {\n\
+\n\
+  this.driver = \"%s\";\n\
+\n\
+  this.context = \"%s\";\n\
 \n\
   this.properties = {\n\
 \n\
@@ -726,9 +741,7 @@ function %s(app) {\n\
 \n\
 module.exports = %s;\n\
 ";
-  tpl = util.format(tpl, model, model);
-  
-  // console.exit(tpl);
+  tpl = util.format(tpl, model, (opts.driver || 'default'), (opts.context || getModelContext(model)), model);
   
   var file = util.format('%s/app/models/%s.js', app, name);
   
@@ -1058,6 +1071,13 @@ function recursivelyCreateFiles(target, data) {
     if (err) console.exit(err);
   });
   
+}
+
+function getModelContext(string) {
+  return _s.dasherize(string)
+  .slice(1)
+  .replace(/-/g,'_')
+  .replace(/_model$/, '');
 }
 
 var cli = new CommandLine(commands);
