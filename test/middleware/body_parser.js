@@ -1,9 +1,4 @@
 
-// TODO: Implement a method to retrieve uploaded files
-
-// Use the /upload route on controllers/test_controller.js
-
-/*
 var app = require('../fixtures/bootstrap'),
     vows = require('vows'),
     util = require('util'),
@@ -82,5 +77,3 @@ vows.describe('Body Parser (middleware)').addBatch({
   }
   
 }).export(module);
-
-*/

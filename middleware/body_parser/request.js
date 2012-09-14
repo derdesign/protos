@@ -16,6 +16,19 @@ var FileManager = require('./file_manager.js');
   @private
  */
 
+IncomingMessage.prototype.getRequestData = function(callback) {
+  var data = this.requestData;
+  callback.call(this, data.fields, data.files);
+}
+
+/**
+  Gets POST data & files
+
+  @private
+  @method parseBodyData
+  @param {function} callback
+ */
+
 IncomingMessage.prototype.parseBodyData = function(callback) {
   var form, req = this,
       res = this.response;
@@ -38,8 +51,10 @@ IncomingMessage.prototype.parseBodyData = function(callback) {
 /**
   Checks if the upload limit has exceeded
 
-  @returns {boolean}
   @private
+  @method exceededUploadLimit
+  @returns {boolean}
+  
  */
 
 IncomingMessage.prototype.exceededUploadLimit = function() {

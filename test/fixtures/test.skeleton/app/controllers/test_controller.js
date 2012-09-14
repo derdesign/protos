@@ -47,14 +47,16 @@ function TestController(app) {
   // Upload Limits & Messages
   var uploadCb;
   post('/upload', uploadCb = function(req, res) {
-    // this.getRequestData(req, function(fields, files) {
-    //       if ( files.expect('**file') ) { // File should be present, and not empty
-    //         var f = files.get('file');
-    //         res.sendHeaders();
-    //         res.end(inspect(f));
-    //         files.removeAll();
-    //       } else res.httpMessage(400);
-    //      });
+    req.getRequestData(function(fields, files) {
+      if ( files.expect('**file') ) { // File should be present, and not empty
+        var f = files.get('file');
+        res.sendHeaders();
+        res.end(inspect(f));
+        files.removeAll();
+      } else {
+        res.httpMessage(400);
+      }
+    });
   }, 'put'); // Also register for PUT requests
 }
 
