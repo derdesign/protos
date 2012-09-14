@@ -97,7 +97,7 @@ IncomingMessage.prototype.exceededUploadLimit = function() {
       res.setHeaders({ Connection: 'close' });
       res.httpMessage({
         statusCode: 413, // HTTP/1.1 413 Request Entity Too Large
-        message: "Upload limit exceeded: " + (uploadSize / (1024 * 1024)) + " MB",
+        message: protos.i18n.uploadLimitExceeded + (uploadSize / (1024 * 1024)) + " MB",
         raw: true
       });
       return true;
