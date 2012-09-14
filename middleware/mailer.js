@@ -83,8 +83,8 @@ Mailer.prototype.renderMessage = function(partial, locals) {
   
   // Return object containing rendered template
   return {
-    html: mailHtml,
-    text: mailText
+    html: mailHtml.trim(),
+    text: mailText.trim()
   }
 }
 

@@ -41,8 +41,8 @@ vows.describe('Mailer Middleware').addBatch({
     "Properly renders messages using view partials": function(mailer) {
       
       var expected = {
-        html: '<p>Hello John Doe &amp; Jane Doe!</p>\n',
-        text: 'Hello John Doe & Jane Doe!\n' 
+        html: '<p>Hello John Doe &amp; Jane Doe!</p>',
+        text: 'Hello John Doe & Jane Doe!' 
       };
       
       var message = mailer.renderMessage('mailer_template', {
