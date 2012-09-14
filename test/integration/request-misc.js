@@ -12,6 +12,33 @@ multi.on('post_exec', app.restoreFilters);
 
 vows.describe('Request Misc').addBatch({
   
+  'Query Data': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      multi.curl('-i -X GET -G -d "name=der" -d "age=29" /request/query-data');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+      
+    },
+    
+    'Properly handles GET Query Fields': function(results) {
+      var r = results[0];
+      var expected = '{"name":"der","age":"29"}';
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf(expected) >= 0);
+    }
+    
+  }
+  
+}).addBatch({
+  
   'Page Title': {
     
     topic: function() {

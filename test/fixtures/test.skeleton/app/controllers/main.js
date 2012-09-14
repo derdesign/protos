@@ -169,6 +169,12 @@ function MainController(app) {
   get('/route-chain-b', cb1, [[cb2], [cb3]], 'post', 'put');
   
   /* Request Misc */
+
+  get('/request/query-data', function(req, res) {
+    req.getQueryData(function(fields) {
+      res.json(fields);
+    });
+  });
   
   get('/request/title', {msg: 'alpha_dashes'}, function(req, res) {
     var msg = req.queryData.msg;
