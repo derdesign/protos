@@ -13,7 +13,6 @@
 var app = protos.app;
 
 require('./request.js');
-require('./controller.js');
 
 function BodyParser(config, middleware) {
   
