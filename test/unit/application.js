@@ -497,6 +497,27 @@ vows.describe('lib/application.js').addBatch({
   
 }).addBatch({
   
+  'Application::uuid': {
+    
+    topic: function() {
+      return [app.uuid(), app.uuid(), app.uuid()];
+    },
+    
+    "Returns valid UUIDs": function(results) {
+      var re = app.regex.uuid;
+      var u1 = results[0],
+          u2 = results[1],
+          u3 = results[2];
+      assert.isTrue(u1 !== u2 && u2 !== u3 && u1 !== u3);
+      assert.isTrue(re.test(u1));
+      assert.isTrue(re.test(u2));
+      assert.isTrue(re.test(u3));
+    }
+
+  }
+  
+}).addBatch({
+  
   'Application::escapeJson': {
     
     topic: function() {

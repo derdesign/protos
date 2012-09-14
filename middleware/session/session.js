@@ -24,7 +24,6 @@ var app = protos.app;
 
 var _ = require('underscore'),
     util = require('util'),
-    node_uuid = protos.requireDependency('node-uuid', 'Session Middleware', 'session'),
     slice = Array.prototype.slice;
 
 require('./request.js');
@@ -426,7 +425,7 @@ Session.prototype.getFingerprint = function(req, sessId) {
 */
 
 Session.prototype.createHash = function(userAgent, guest) {
-    var sessId = app.md5(node_uuid());
+    var sessId = app.md5(app.uuid());
     if (guest) {
       return {sessId: sessId};
     } else {
