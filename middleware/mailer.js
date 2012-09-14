@@ -48,6 +48,47 @@ function Mailer(config, middleware) {
 }
 
 /**
+  Renders the html & plain text version of a message, using a view partial
+  
+  The view partial should provide output depending on the situation:
+  
+  a) Render the HTML version when the 'html' view local is true
+  b) Render the Text version when the 'text' view local is true
+  
+  @method renderMessage
+  @param {string} partial View partial name to render
+  @param {object} locals Locals object to pass to the partial
+  @return {object} Object containing {text, html}
+  @public
+ */
+
+Mailer.prototype.renderMessage = function(partial, locals) {
+  
+  var mailHtml, mailText;
+  var mail_template = app.views.partials[partial];
+
+  // Set html boolean
+  locals.html = true;
+  delete locals.text;
+
+  // Render html template
+  mailHtml = mail_template(locals);
+
+  // Set plain boolean
+  locals.text = true;
+  delete locals.html;
+  
+  // Create registration email text
+  mailText = mail_template(locals);
+  
+  // Return object containing rendered template
+  return {
+    html: mailHtml,
+    text: mailText
+  }
+}
+
+/**
   Sends mail using the default transport
   
   @param {object} data

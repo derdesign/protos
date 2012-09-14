@@ -92,6 +92,7 @@ vows.describe('lib/application.js').addBatch({
         'main_haml',
         'main_hamlcoffee',
         'main_handlebars',
+        'mailer_template',
         'main_hogan',
         'main_jade',
         'main_jazz',

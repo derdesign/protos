@@ -34,8 +34,23 @@ vows.describe('Mailer Middleware').addBatch({
     },
     
     "The sendMail method uses the default transport": function(mailer) {
-      assert.isFunction(app.mailer.sendMail);
-      assert.isTrue(app.mailer.sendMail.toString().indexOf('return this.default.sendMail(data, callback);') >= 0);
+      assert.isFunction(mailer.sendMail);
+      assert.isTrue(mailer.sendMail.toString().indexOf('return this.default.sendMail(data, callback);') >= 0);
+    },
+    
+    "Properly renders messages using view partials": function(mailer) {
+      
+      var expected = {
+        html: '<p>Hello John Doe &amp; Jane Doe!</p>\n',
+        text: 'Hello John Doe & Jane Doe!\n' 
+      };
+      
+      var message = mailer.renderMessage('mailer_template', {
+        one: 'John Doe',
+        two: 'Jane Doe'
+      });
+      
+      assert.deepEqual(message, expected);
     }
 
   }
