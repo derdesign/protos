@@ -34,7 +34,7 @@
   		"formidable"        : ">= 1.0.11"
   	},
   	"mailer": {
-  		"nodemailer"        : ">= 0.3.14"
+  		"nodemailer"        : ">= 0.3.27"
   	},
   	"markdown": {
   		"marked"            : ">= 0.2.5"
