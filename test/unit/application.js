@@ -164,7 +164,7 @@ vows.describe('lib/application.js').addBatch({
   'Application::url': {
 
     'Returns proper url when no args provided': function() {
-      assert.equal(app.url(), util.format('http://%s:%s/', app.hostname, protos.config.server.listenPort));
+      assert.equal(app.url(), util.format('http://%s:%s', app.hostname, protos.config.server.listenPort));
     },
 
     'Returns proper url when run with path argument': function() {
