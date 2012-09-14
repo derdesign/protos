@@ -212,8 +212,6 @@ vows.describe('Response Misc').addBatch({
       var promise = new EventEmitter();
       
       // Display a raw JSON response, to make assertions easier
-      app.config.json.pretty = false;
-      
       multi.curl('-i -G -d "name=ernie" -d "age=28" /hello.json');
       multi.curl('-i -G -d "name=ernie" -d "age=28" -d "jsoncallback=myCoolFunc" /hello.json');
       

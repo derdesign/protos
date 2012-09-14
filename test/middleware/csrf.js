@@ -8,7 +8,7 @@ var app = require('../fixtures/bootstrap.js'),
     
 var multi = new Multi(app);
 
-var sessionBackup, sessionSupport;
+var sessionBackup, sessionSupport, sess, token;
 
 vows.describe('CSRF (middleware)').addBatch({
   
@@ -35,12 +35,12 @@ vows.describe('CSRF (middleware)').addBatch({
       app.curl('-i /csrf', function(err, buf) {
         if (err) throw err;
         else {
-          var sess = buf.match(/_sess=(.*?);/)[1];
+          sess = buf.match(/_sess=(.*?);/)[1];
       
           app.curl(util.format('-i --cookie "_sess=%s" /csrf/test', sess), function(err, buf) {
             if (err) throw err;
             else {
-              var token = buf.match(/[a-f0-9]{32}/)[0];
+              token = buf.match(/[a-f0-9]{32}/)[0];
               
               /* GET TESTS */
               
@@ -51,7 +51,7 @@ vows.describe('CSRF (middleware)').addBatch({
               multi.curl(util.format('-i --cookie "_sess=%s" -G -d "protect_key=INVALID" /csrf/check/get', sess));
               
               // GET Csrf check + valid token (200)
-              multi.curl(util.format('-i --cookie "_sess=%s" -G -d "protect_key=%s" /csrf/check/get', sess, token));
+              multi.curl(util.format('-i --cookie "_sess=%s" -G -d "protect_key=%s" -d "name=ernie" -d "age=29" /csrf/check/get', sess, token));
               
               /* POST TESTS */
               
@@ -62,7 +62,7 @@ vows.describe('CSRF (middleware)').addBatch({
               multi.curl(util.format('-i -X POST --cookie "_sess=%s" -d "protect_key=INVALID" /csrf/check/post', sess));
               
               // POST Csrf check + valid token (200)
-              multi.curl(util.format('-i -X POST --cookie "_sess=%s" -d "protect_key=%s" /csrf/check/post', sess, token));
+              multi.curl(util.format('-i -X POST --cookie "_sess=%s" -d "protect_key=%s" -d "name=ernie" -d "age=29" /csrf/check/post', sess, token));
               
               /* PUT TESTS */
               
@@ -73,7 +73,7 @@ vows.describe('CSRF (middleware)').addBatch({
               multi.curl(util.format('-i -X PUT --cookie "_sess=%s" -d "protect_key=INVALID" /csrf/check/post', sess));
               
               // POST Csrf check + valid token (200)
-              multi.curl(util.format('-i -X PUT --cookie "_sess=%s" -d "protect_key=%s" /csrf/check/post', sess, token));
+              multi.curl(util.format('-i -X PUT --cookie "_sess=%s" -d "protect_key=%s" -d "name=ernie" -d "age=29" /csrf/check/post', sess, token));
               
               multi.exec(function(err, results) {
                 delete app.supports.session;
@@ -102,7 +102,9 @@ vows.describe('CSRF (middleware)').addBatch({
     
     "Responds with HTTP/200 on valid token (GET)": function(results) {
       var r = results[2];
+      var expected = util.format('{"protect_key":"%s","name":"ernie","age":"29"}', token);
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf(expected) >= 0);
     },
     
     //////////////// POST
@@ -119,7 +121,9 @@ vows.describe('CSRF (middleware)').addBatch({
     
     "Responds with HTTP/200 on valid token (POST)": function(results) {
       var r = results[5];
+      var expected = util.format('{"protect_key":"%s","name":"ernie","age":"29"}', token);
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf(expected) >= 0);
     },
     
     //////////////// PUT
@@ -136,7 +140,9 @@ vows.describe('CSRF (middleware)').addBatch({
     
     "Responds with HTTP/200 on valid token (PUT)": function(results) {
       var r = results[8];
+      var expected = util.format('{"protect_key":"%s","name":"ernie","age":"29"}', token);
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf(expected) >= 0);
     },
 
   }

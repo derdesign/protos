@@ -111,6 +111,7 @@ var protos = Protos.bootstrap(testSkeleton, {
 var app = protos.app;
 
 app.logging = false;
+app.config.json.pretty = false;
 
 // -- Async tasks --
 
