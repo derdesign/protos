@@ -4,7 +4,7 @@
 var app = protos.app,
     http = require('http'),
     IncomingMessage = http.IncomingMessage;
-  
+
 /**
   Creates or retrieves a csrf Token
   

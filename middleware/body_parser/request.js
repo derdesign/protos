@@ -10,15 +10,72 @@ var app = protos.app,
 var FileManager = require('./file_manager.js');
 
 /**
-  Gets POST data & files
+  Retrieves POST/PUT Data & Optionally checks for CSRF Token
 
+  @public
+  @method getRequestData
+  @param {string} token
   @param {function} callback
-  @private
  */
 
-IncomingMessage.prototype.getRequestData = function(callback) {
-  var data = this.requestData;
-  callback.call(this, data.fields, data.files);
+IncomingMessage.prototype.getRequestData = function(token, callback) {
+  
+  var data = this.requestData,
+      fields = data.fields,
+      files = data.files;
+  
+  if (typeof callback == 'undefined') {
+    callback = token;
+    token = null;
+  }
+  
+  if (token) {
+    if (app.csrf.checkToken(this, token, fields)) {
+      // Token verified, proceed
+      callback.call(this, fields, files);
+    } else {
+      // Token can't be verified, remove files and send 400
+      data.files.removeAll();
+      this.response.httpMessage(400);
+    }
+  } else {
+    // No token available, proceed
+    callback.call(this, fields, files);
+  }
+  
+}
+
+/**
+  Retrieves GET data & Optionally checks for CSRF Token
+
+  @public
+  @method getQueryData
+  @param {string} token
+  @param {function} callback
+*/
+
+IncomingMessage.prototype.getQueryData = function(token, callback) {
+  
+  var fields = this.queryData;
+  
+  if (typeof callback == 'undefined') {
+    callback = token;
+    token = null;
+  }
+  
+  if (token) {
+    if (app.csrf.checkToken(this, token, fields)) {
+      // Token verified, proceed
+      callback.call(this, fields);
+    } else {
+      // Token can't be verified, send 400
+      this.response.httpMessage(400);
+    }
+  } else {
+    // No token available, proceed
+    callback.call(this, fields);
+  }
+  
 }
 
 /**

@@ -51,7 +51,6 @@ function Csrf(config, middleware) {
   // Middleware configuration
   config = protos.extend({
     tokenSuffix: '_key',
-    onFailure: 400
   }, config);
   
   // Add non-enumerable config
@@ -64,11 +63,19 @@ function Csrf(config, middleware) {
   
 }
 
-// Events
+/**
+  Checks the CSRF Token for a given form
+  
+  @param {object} req
+  @param {string} token
+  @param {object} fields
+  @returns {boolean} Whether or not the token is valid 
+  @public
+ */
 
-app.on('csrf_check', function(req, token, fields) {
+Csrf.prototype.checkToken = function(req, token, fields) {
   // Accessing `this` is faster than accessing `app` in outer closure
-  token += this.csrf.config.tokenSuffix;
+  token += this.config.tokenSuffix;
   
   // These conditions must be satisfied:
   // a) Token is available in received fields
@@ -76,11 +83,9 @@ app.on('csrf_check', function(req, token, fields) {
   // c) If fields token matches session token
   var isValid = (token in fields) && (token in req.session) && (fields[token] === req.session[token]);
   
-  if (!isValid) {
-    req.stopRoute(); // In plain english: "I'll handle the request from here..."
-    req.response.httpMessage(this.csrf.config.onFailure);
-  }
-});
+  // Return valid value
+  return isValid;
+}
 
 /**
   Retrieves and/or sets a csrf token
