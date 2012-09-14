@@ -211,12 +211,32 @@ vows.describe('Response Misc').addBatch({
     topic: function() {
       var promise = new EventEmitter();
       
+      // NOTE: For testing purposes, JSON responses have pretty=false on the entire tests suite
+      // This is set on text/fixtures/bootstrap.js. The tests below assume a non-pretty response.
+      
       // Display a raw JSON response, to make assertions easier
       multi.curl('-i -G -d "name=ernie" -d "age=28" /hello.json');
       multi.curl('-i -G -d "name=ernie" -d "age=28" -d "jsoncallback=myCoolFunc" /hello.json');
       
       multi.exec(function(err, results) {
-        promise.emit('success', err || results);
+        
+        if (err) promise.emit('success', err);
+        
+        // And now, pretty responses
+        
+        app.config.json.pretty = true;
+        
+        multi.curl('-i -G -d "name=ernie" -d "age=28" /hello.json');
+        multi.curl('-i -G -d "name=ernie" -d "age=28" -d "jsoncallback=myCoolFunc" /hello.json');
+        
+        multi.exec(function(e, r) {
+          promise.emit('success', e || results.concat(r));
+          
+          // NOTE: Setting JSON responses to non-pretty back again (for testing purposes)
+          app.config.json = false;
+          
+        });
+        
       });
       
       return promise;
@@ -234,6 +254,35 @@ vows.describe('Response Misc').addBatch({
       var r = results[1];
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
       assert.isTrue(r.indexOf('myCoolFunc({"name":"ernie","age":"28","jsoncallback":"myCoolFunc","file":"hello.json"})') >= 0);
+    },
+    
+    'Are successfully sent with proper headers (pretty=true)': function(results) {
+      var r = results[2];
+      
+      var expected = '{\n\
+  "name": "ernie",\n\
+  "age": "28",\n\
+  "file": "hello.json"\n\
+}';
+      
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('Content-Type: ' + app.config.json.contentType) >= 0);
+      assert.isTrue(r.indexOf('Connection: ' + app.config.json.connection) >= 0);
+      assert.isTrue(r.indexOf(expected) >= 0);
+    },
+    
+    'Optionally displays JSON Callback (pretty=true)': function(results) {
+      var r = results[3];
+      
+      var expected = 'myCoolFunc({\n\
+  "name": "ernie",\n\
+  "age": "28",\n\
+  "jsoncallback": "myCoolFunc",\n\
+  "file": "hello.json"\n\
+})';
+      
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf(expected) >= 0);
     }
     
   }
