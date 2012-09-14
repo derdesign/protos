@@ -8,7 +8,7 @@
   
   » References:
   
-    http://www.nodemailer.org/
+    http://github.com/andris9/nodemailer
 
   » SMTP Example:
   
