@@ -28,15 +28,53 @@ function uploadExceedsLimit(r) {
 
 vows.describe('Body Parser (middleware)').addBatch({
   
-  'File Uploads': {
-    
+  'Request Data': {
+
     topic: function() {
       
       app.use('body_parser', {
         maxFieldSize: 64 * 1024,  // 64kb
         maxUploadSize: 128 * 1024 // 128kb
       });
+
+      var promise = new EventEmitter();
+
+      multi.curl('-i -X POST -d "name=der" -d "age=29" /test/body-parser/request-data');
+      multi.curl('-i -X PUT -d "name=der" -d "age=29" /test/body-parser/request-data');
+
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+
+      return promise;
+
+    },
+
+    'Properly handles POST/PUT Request Fields': function(results) {
+
+      var expected = '{"fields":{"name":"der","age":"29"},"files":{"length":0,"fileKeys":[]}}';
+
+      var r1 = results[0],
+          r2 = results[1];
+
+      // POST
+      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r1.indexOf(expected) >= 0);
+
+      // PUT
+      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r2.indexOf(expected) >= 0);
+
+    }
+
+  }
+
+}).addBatch({
+  
+  'File Uploads': {
     
+    topic: function() {
+      
       var promise = new EventEmitter();
       
       // Successful file upload (POST)
@@ -77,3 +115,29 @@ vows.describe('Body Parser (middleware)').addBatch({
   }
   
 }).export(module);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

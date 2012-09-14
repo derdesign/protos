@@ -42,6 +42,17 @@ function TestController(app) {
     res.end(inspect(params) + ' ' + inspect(req.queryData));
   });
   
+  /* GET REQUEST DATA */
+  
+  post('/body-parser/request-data', function(req, res) {
+    req.getRequestData(function(fields, files) {
+      res.end(JSON.stringify({
+        fields: fields,
+        files: files
+      }));
+    });
+  }, 'put');
+  
   /* FILE UPLOADS */
   
   // Upload Limits & Messages
