@@ -12,6 +12,28 @@ multi.on('post_exec', app.restoreFilters);
 
 vows.describe('Request Misc').addBatch({
   
+  'Referer URI': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      app.curl('-e "http://domain.com?search= some bad @ url" /request/referer-test', function(err, buf) {
+        promise.emit('success', err || buf);
+      });
+      
+      return promise;
+      
+    },
+    
+    'Is auto encoded when available': function(ref) {
+      assert.equal(ref, 'http://domain.com?search=%20some%20bad%20@%20url');
+    }
+    
+  }
+  
+}).addBatch({
+  
   'Query Data': {
     
     topic: function() {

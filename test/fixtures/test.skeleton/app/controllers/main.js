@@ -182,6 +182,10 @@ function MainController(app) {
     res.render('page-title', true);
   });
   
+  get('/request/referer-test', function(req, res) {
+    res.end(req.headers.referer);
+  });
+  
 }
 
 module.exports = MainController;
