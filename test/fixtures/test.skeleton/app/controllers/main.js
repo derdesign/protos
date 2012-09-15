@@ -49,9 +49,17 @@ function MainController(app) {
   
   /* View Engine Tests */
   
-  get('/:engine.:ext', {engine: app.engineRegex, ext: /^[a-z]+(\.[a-z]+)?$/}, function(req, res) {
-    var engine = req.params.engine,
-        ext = req.params.ext;
+  get('/:engine.:ext', {engine: app.engineRegex, ext: /^[a-z]+$/}, function(req, res, params) {
+    var engine = params.engine,
+        ext = params.ext;
+    var view = 'main/' + engine + '.' + ext;
+    // console.exit(view);
+    res.render(view, {prefix: 'Rendered Partial:'}, true);
+  });
+  
+  get('/:engine.:ext1.:ext2', {engine: app.engineRegex, ext1: /^[a-z]+$/, ext2: /^[a-z]+$/}, function(req, res, params) {
+    var engine = params.engine,
+        ext = params.ext1 + '.' + params.ext2;
     var view = 'main/' + engine + '.' + ext;
     // console.exit(view);
     res.render(view, {prefix: 'Rendered Partial:'}, true);
