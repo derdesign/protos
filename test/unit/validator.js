@@ -77,11 +77,13 @@ vows.describe('lib/validator.js').addBatch({
       
       ////////////////
       
+      // NOTE: The validator automatically trims the values
+      
       var fields = {
-        first: "John Doe",
+        first: "                       John Doe                  ",
         last: "Jane Doe",
-        email: '1@2.com',
-        msg: "MyMessage",
+        email: '1@2.com            ',
+        msg: "            MyMessage",
         some: 'c',
         count: 101,
         extra1: 102,
@@ -93,6 +95,8 @@ vows.describe('lib/validator.js').addBatch({
       assert.isNull(validator.validate(fields));
       
       // Removes unwanted options from validation when {cleanup: true}
+      // NOTE: the altered object should have trimmed values
+      
       assert.deepEqual(fields, {
         first: "John Doe",
         last: "Jane Doe",
@@ -101,7 +105,7 @@ vows.describe('lib/validator.js').addBatch({
         some: 'c',
         count: 101,
       });
-
+      
       ////////////////
 
       validator = app.validator({cleanup: false}).add({number: 'integer'});
