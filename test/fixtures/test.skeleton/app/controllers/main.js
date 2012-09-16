@@ -197,7 +197,6 @@ function MainController(app) {
   /* Handle any route from a controller */
   
   get('/:route/handled-by-main', {route: /^(blog|private|session)$/}, function(req, res) {
-    res.setHeader('X-Verified', 'true');
     res.json({success: 'true', url: req.url});
   });
   
