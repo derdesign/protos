@@ -44,10 +44,10 @@ function FileManager(files) {
   
     if ( fm.expect('fileA', 'fileB', '*fileC', '**fileD') ) {
       fm.forEach(function(file) {
-        console.log(file);
+       res.json(file);
       });
     } else {
-      console.exit('400 Bad Request');
+      res.end('400 Bad Request');
     }
   
   Any files that are not expected will be automatically removed as a security measure.

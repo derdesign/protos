@@ -20,6 +20,16 @@ function TestController(app) {
     }
   }
   
+  /* ROUTES */
+  
+  get('/routes/:integer', function(req, res, params) {
+    res.json(params);
+  });
+  
+  get('/routes/:some/:route', function(req, res, params) {
+    res.json(params);
+  });
+  
   /* GET */
   
   // Parameter validation: valid

@@ -40,7 +40,7 @@
       }
     });
   
-    console.exit(buffer); // returns: "Lorem IPSUM dolor sit QU1FVA== et sempis"
+    res.end(buffer); // returns: "Lorem IPSUM dolor sit QU1FVA== et sempis"
   
  */
 
