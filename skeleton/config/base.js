@@ -19,10 +19,6 @@ module.exports = {
     partialExt: 'html'
   },
   
-  server: {
-    strictRouting: true,
-  },
-  
   cacheControl: {
     maxAge: 10 * 365 * 24 * 60 * 60,
     static: 'public',
