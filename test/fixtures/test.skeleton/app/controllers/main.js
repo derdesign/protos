@@ -42,14 +42,14 @@ function MainController(app) {
   
   /* JSON Response */
   
-  get('/:name.json', {name: 'alpha_dashes'}, function(req, res, params) {
-    req.queryData.file = params.name + '.json';
+  get('/:file', {file: /^[a-z_]+\.json$/}, function(req, res, params) {
+    req.queryData.file = params.file;
     res.json(req.queryData, req.queryData.jsoncallback);
   });
   
   /* View Engine Tests */
   
-  get('/:engine.:ext', {engine: app.engineRegex, ext: /^[a-z]+$/}, function(req, res, params) {
+  get('/:engine/:ext', {engine: app.engineRegex, ext: /^[a-z]+$/}, function(req, res, params) {
     var engine = params.engine,
         ext = params.ext;
     var view = 'main/' + engine + '.' + ext;
@@ -57,7 +57,7 @@ function MainController(app) {
     res.render(view, {prefix: 'Rendered Partial:'}, true);
   });
   
-  get('/:engine.:ext1.:ext2', {engine: app.engineRegex, ext1: /^[a-z]+$/, ext2: /^[a-z]+$/}, function(req, res, params) {
+  get('/:engine/:ext1/:ext2', {engine: app.engineRegex, ext1: /^[a-z]+$/, ext2: /^[a-z]+$/}, function(req, res, params) {
     var engine = params.engine,
         ext = params.ext1 + '.' + params.ext2;
     var view = 'main/' + engine + '.' + ext;
@@ -67,8 +67,8 @@ function MainController(app) {
   
   /* Response Caching Tests */
   
-  get('/response-:cache/:id', {cache: /^(cache|nocache)$/, id: 'integer'}, function(req, res) {
-    if (req.params.cache == 'cache') res.useCache('test_cache');
+  get('/:cache/:id', {cache: /^response\-(cache|nocache)$/, id: 'integer'}, function(req, res) {
+    if (req.params.cache == 'response-cache') res.useCache('test_cache');
     res.render('response-cache');
   });
   

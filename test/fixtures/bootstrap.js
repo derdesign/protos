@@ -196,6 +196,8 @@ app.addEnginePartials = function(current, data, repl) {
 
 app.createEngineBatch = function(className, engine, testUrl, __module__) {
 
+  testUrl = testUrl.replace(/\./g, '/');
+  
   vows.describe(className + ' Rendering Engine').addBatch({
 
     '': {
