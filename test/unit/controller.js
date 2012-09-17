@@ -11,8 +11,33 @@ vows.describe('lib/controller.js').addBatch({
   'Integrity Checks': {
     
     'Routing functions are set': function() {
-      var routeGet = app.controller.constructor.get;
-      assert.isFunction(routeGet);
+      
+      var Controller = protos.lib.controller;
+      var routeMethods = [ 'get',
+        'public_get',
+        'private_get',
+        'post',
+        'public_post',
+        'private_post',
+        'put',
+        'public_put',
+        'private_put',
+        '_delete',
+        'public_delete',
+        'private_delete',
+        'options',
+        'public_options',
+        'private_options',
+        'trace',
+        'public_trace',
+        'private_trace' ];
+        
+      assert.deepEqual(Controller.prototype.routeMethods, routeMethods);
+
+      routeMethods.forEach(function(method) {
+        assert.isFunction(Controller[method]);
+      });
+
     }
     
   },

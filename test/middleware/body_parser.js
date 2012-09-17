@@ -36,12 +36,14 @@ vows.describe('Body Parser (middleware)').addBatch({
         maxFieldSize: 64 * 1024,  // 64kb
         maxUploadSize: 128 * 1024 // 128kb
       });
+      
+      // protos.enableDebugger();
 
       var promise = new EventEmitter();
 
       multi.curl('-i -X POST -d "name=der" -d "age=29" /test/body-parser/request-data');
       multi.curl('-i -X PUT -d "name=der" -d "age=29" /test/body-parser/request-data');
-
+      
       multi.exec(function(err, results) {
         promise.emit('success', err || results);
       });

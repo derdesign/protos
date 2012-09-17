@@ -30,6 +30,11 @@ function assert200(r, k, t) {
   assert.isTrue(r.indexOf(util.format('{%s}', k)) >= 0);
 }
 
+function assert404(r, k, t) {
+  assert.isTrue(r.indexOf('HTTP/1.1 404 Not Found') >= 0);
+  assert.isTrue(r.indexOf('<p>HTTP/404: Page not Found</p>') >= 0);
+}
+
 function assert405(r, k, t) {
   assert.isTrue(r.indexOf('HTTP/1.1 405 Method Not Allowed') >= 0);
   assert.isFalse(r.indexOf(util.format('{%s}', k)) >= 0);
@@ -38,13 +43,24 @@ function assert405(r, k, t) {
 function testRouteMethod(tmethod, rfunc) {
   for (var expRes, method, i=0; i < httpMethods.length; i++) {
     method = httpMethods[i];
-    expRes = (method == tmethod) ? 200 : 405;
+    expRes = (method == tmethod) ? 200 : (tmethod != 'GET' && method == 'GET') ? 404 : 405;
+    
+    // console.log([tmethod, method, expRes]);
+    
     multi.curl(util.format('-i -X %s /test/%s', method, rfunc));
+    
     (function(k, t, cm, rm, er) { // k => key, t => total, cm => current method,   rm => route method, n => numeric response
       currentBatch[util.format('Controller::%s responds w/%d for %s requests', k, er, cm)] = function(results) {
+        
+        // console.log([k, er, cm]);
+        
         var r = results[t];
+        
+        // console.log(r);
+        
         switch(er) {
           case 200: assert200(r, k, t); break;
+          case 404: assert404(r, k, t); break;
           case 405: assert405(r, k, t); break;
           default:
             throw new Error("Response not expected: " + er);

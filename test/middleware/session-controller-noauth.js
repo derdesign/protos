@@ -37,6 +37,11 @@ function assert302(r, k, t) {
   assert.isTrue(r.indexOf('Location: ' + loginUrl) >= 0);
 }
 
+function assert404(r, k, t) {
+  assert.isTrue(r.indexOf('HTTP/1.1 404 Not Found') >= 0);
+  assert.isTrue(r.indexOf('<p>HTTP/404: Page not Found</p>') >= 0);
+}
+
 function assert405(r, k, t) {
   assert.isTrue(r.indexOf('HTTP/1.1 405 Method Not Allowed') >= 0);
   assert.isFalse(r.indexOf(util.format('{%s}', k)) >= 0);
@@ -49,7 +54,7 @@ function testRouteMethod(tmethod, rfunc) {
     var isPrivate = (rfunc.indexOf('private') >= 0),
         isPublic = (rfunc.indexOf('public') >= 0);
     
-    if (method != tmethod) expRes = 405;   
+    if (method != tmethod) expRes = (tmethod != 'GET' && method == 'GET') ? 404 : 405;
     else if (isPrivate) expRes = 302;
     else if (isPublic) expRes = 200;
     else expRes = 302;
@@ -61,6 +66,7 @@ function testRouteMethod(tmethod, rfunc) {
         switch(er) {
           case 200: assert200(r, k, t); break;
           case 302: assert302(r, k, t); break;
+          case 404: assert404(r, k, t); break;
           case 405: assert405(r, k, t); break;
           default:
             throw new Error("Response not expected: " + er);

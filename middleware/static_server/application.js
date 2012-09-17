@@ -44,7 +44,7 @@ Application.prototype._serveStaticFile = function(path, req, res) {
 
   path = path.replace(multiSlashes, '/').trim();
   
-  req.__handledRoute = true;
+  req.__handled = true;
   
   if ( pathModule.basename(path).charAt(0) == '.' ) {
     
