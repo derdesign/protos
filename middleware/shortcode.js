@@ -76,11 +76,9 @@ function Shortcode(config, middleware) {
  */
 
 Shortcode.prototype.filterContext = function(context, ob) {
-  var filter = context + '_context';
   var self = this;
-  app.addFilter(filter, function(data) {
-    data.buffer = self.replace(data.buffer, ob);
-    return data;
+  app.addFilter(context + '_context', function(buffer) {
+    return self.replace(buffer, ob);
   });
 }
 

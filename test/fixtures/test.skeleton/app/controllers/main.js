@@ -87,6 +87,11 @@ function MainController(app) {
     res.end('THIS SHOULD NOT BE MODIFIED');
   });
   
+  get('/response/buffer/multiple', function(req, res) {
+    res.setContext('specific', 'another', 'sweet');
+    res.render('#msg', {message: 'MULTIPLE'});
+  });
+  
   /* Header Tests */
   
   get('/setheaders', function(req, res, params) {

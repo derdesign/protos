@@ -300,22 +300,28 @@ vows.describe('Response Misc').addBatch({
       // Override multi, since filters are being restored on each exec
       var multi = new Multi(app);
 
-      app.addFilter('context', function(data) {
-        data.buffer = '-- ' + data.buffer + ' --';
-        return data;
+      app.addFilter('context', function(buffer, locals) {
+        return '-- ' + buffer + ' --';
       });
       
       // Note: specific_context is set by doing res.setContext('specific')
 
-      app.addFilter('specific_context', function(data) {
-        data.buffer = new Buffer(data.buffer).toString('base64');
-        data = app.applyFilters('context', data);
-        return data;
+      app.addFilter('specific_context', function(buffer, locals) {
+        return new Buffer(buffer).toString('base64');
+      });
+      
+      app.addFilter('another_context', function(buffer, locals) {
+        return buffer + ' <<ANOTHER CONTEXT>>';
+      });
+      
+      app.addFilter('sweet_context', function(buffer, locals) {
+        return buffer + ' <<SWEET CONTEXT>>';
       });
 
       multi.curl('/response/buffer/raw');
       multi.curl('/response/buffer');
       multi.curl('/response/buffer/specific');
+      multi.curl('/response/buffer/multiple');
 
       multi.exec(function(err, results) {
         app.removeFilter('context');
@@ -326,19 +332,24 @@ vows.describe('Response Misc').addBatch({
       return promise;
     },
 
-    "Do not apply on `res.end` calls": function(results) {
+    "Does not apply on `res.end` calls": function(results) {
       var r1 = results[0];
       assert.equal(r1, 'THIS SHOULD NOT BE MODIFIED')
     },
 
-    "Applies to the general `context` filter": function(results) {
+    "Applies to the general context filter": function(results) {
       var r2= results[1];
       assert.equal(r2, "-- \n<p>HELLO</p>\n --");
     },
 
-    "Applies to the `specific_context` filter": function(results) {
+    "Applies to a specific filter": function(results) {
       var r3 = results[2];
-      assert.equal(r3, "-- CjxwPldPUkxEPC9wPgo= --");
+      assert.equal(r3, "LS0gCjxwPldPUkxEPC9wPgogLS0=");
+    },
+    
+    "Applies to multiple filters": function(results) {
+      var r4 = results[3];
+      assert.equal(r4, "LS0gCjxwPk1VTFRJUExFPC9wPgogLS0= <<ANOTHER CONTEXT>> <<SWEET CONTEXT>>");
     }
 
   }
