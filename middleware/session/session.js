@@ -114,8 +114,9 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
   multi.expire(hashes.sessId, expires);
 
   multi.exec(function(err, replies) {
-    if (err) app.log(err);
-    else {
+    if (err) {
+      app.serverError(res, err);
+    } else {
 
       // Expires has been calculated a few lines back
       res.setCookie(self.config.sessCookie, hashes.sessId, {
@@ -131,10 +132,14 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
       }
 
       data = self.typecast(data);
+      
       req.session = data;
+      
       req.__origSessionState = _.extend({}, data);
       req.__jsonSession = JSON.stringify(data);
+      
       app.emit('load_session', hashes.sessId, req.session);
+      
       callback.call(self, req.session, hashes, expires);
     }
   });
@@ -158,8 +163,9 @@ Session.prototype.destroy = function(req, res, callback) {
     
     if (fingerprint == req.session.fpr) {
       this.storage.delete(sessId, function(err) {
-        if (err) app.serverError(res, err);
-        else {
+        if (err) {
+          app.serverError(res, err);
+        } else {
           res.removeCookies(self.config.sessCookie, self.config.hashCookie);
           callback.call(self);
         }
@@ -225,10 +231,15 @@ Session.prototype.loadSession = function(req, res, callback) {
     // Get the session data from storage
     
     this.storage.getHash(sessId, function(err, data) {
-      var expires, guest, hashes, multi, newHash, newSess, ua_md5, userAgent;
+      
+      var expires, guest, hashes, multi, newHash, 
+          newSess, ua_md5, userAgent;
 
-      // If errors retrieving session data, respond with HTTP/500 & log error
-      if (err) { app.serverError(res, err); return;}
+      if (err) { 
+        // If errors retrieving session data,
+        // respond with HTTP/500 & log error
+        return app.serverError(res, err);
+      }
 
       // If it's not a user session, it's a guest session
       
