@@ -72,6 +72,12 @@ function MainController(app) {
     res.render('response-cache');
   });
   
+  /* Ajax Response */
+  
+  get('/response/ajax-response', function(req, res) {
+    res.ajaxResponse('SUCCESS!');
+  });
+  
   /* Response Buffer filter test */
   
   get('/response/buffer', function(req, res) {

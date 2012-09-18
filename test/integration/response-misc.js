@@ -289,6 +289,39 @@ vows.describe('Response Misc').addBatch({
   
 }).addBatch({
   
+  'AJAX Response': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      multi.curl('-i -H "X-Requested-With: XMLHttpRequest" /response/ajax-response');
+      multi.curl('-i /response/ajax-response');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+      
+    },
+    
+    "Responds with plain text on AJAX Requests": function(results) {
+      var r = results[0];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('\r\nSUCCESS!') >= 0);
+    },
+    
+    "Responds with the #msg template on non-AJAX Requests": function(results) {
+      var r = results[1];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('<p>SUCCESS!</p>') >= 0);
+    }
+    
+  }
+  
+}).addBatch({
+  
   'Response Context & Filter': {
 
     topic: function() {
@@ -326,6 +359,8 @@ vows.describe('Response Misc').addBatch({
       multi.exec(function(err, results) {
         app.removeFilter('context');
         app.removeFilter('specific_context');
+        app.removeFilter('another_context');
+        app.removeFilter('sweet_context');
         promise.emit('success', err || results);
       });
 
