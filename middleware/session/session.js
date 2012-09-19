@@ -218,6 +218,7 @@ Session.prototype.loadSession = function(req, res, callback) {
   var fingerprint, sessHash, sessId, self;
 
   if (req.__loadedSession === true) {
+    app.debug("Trying to load session when it's already loaded...");
     callback.call(this);
     return;
   } else {
