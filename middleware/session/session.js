@@ -28,7 +28,7 @@ var _ = require('underscore'),
 
 require('./request.js');
 require('./response.js');
-  
+
 function Session(config, middleware) {
 
   // Automatically load cookie_parser module dependency
@@ -43,7 +43,8 @@ function Session(config, middleware) {
     guestSessions: false,
     regenInterval: 5 * 60,
     permanentExpires: 30 * 24 * 3600,
-    temporaryExpires: 24 * 3600,
+    defaultExpires: 24*3600,
+    temporaryExpires: 24*3600,
     guestExpires: 7 * 24 * 3600,
     typecastVars: [],
     autoTypecast: true,
@@ -99,6 +100,8 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
     // Otherwise, timeout should be temporaryExpires (browser session)
     expires = (persistent ? this.config.permanentExpires : this.config.temporaryExpires);
     
+    if (!expires) expires = this.config.defaultExpires;
+    
     data = _.extend(data, {
       fpr: hashes.fingerprint,
       ua_md5: userAgentMd5,
@@ -111,6 +114,7 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
     multi.delete(req.getCookie(this.config.sessCookie));
   }
   multi.setHash(hashes.sessId, data);
+  
   multi.expire(hashes.sessId, expires);
 
   multi.exec(function(err, replies) {
@@ -330,6 +334,8 @@ Request Headers: \n%s\n", req.socket.remoteAddress, sessId, sessHash, req.method
               */
 
               expires = self.config[(data.pers ? 'permanentExpires' : (data.user ? 'temporaryExpires' : 'guestExpires'))];
+              
+              if (!expires) expires = this.config.defaultExpires;
 
               multi = self.storage.multi();
               multi.updateHash(sessId, {fpr: newHash});
