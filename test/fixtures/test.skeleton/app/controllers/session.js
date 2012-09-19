@@ -19,6 +19,17 @@ function SessionController(app) {
     res.end('{SESSION CONTROLLER}');
   });
   
+  get('/create/browser-session', function(req, res) {
+    var config = app.session.config;
+    var te = config.temporaryExpires;
+    config.temporaryExpires = 0; // Set a browser session
+    app.session.create(req, res, {user: 'der'}, false, function() {
+      config.temporaryExpires = te;
+      res.sendHeaders();
+      res.end('{SUCCESS}');
+    });
+  });
+  
   get('/create/:user', {user: 'alpha'}, loadSession, function(req, res, params) {
     var pers = req.queryData.persistent == '1';
     app.session.create(req, res, {user: params.user}, pers, function(session, hashes, expires) {

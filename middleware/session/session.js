@@ -10,6 +10,7 @@
     {int} regenInterval: Interval to regenerate the sessionId (seconds)
     {int} permanentExpires: Permanent sessions timeout (seconds)
     {int} temporaryExpires: Temporary (browser) sessions timeout (seconds)
+    {int} defaultExpires: Default number for browser sessions to live on the storage backend (seconds)
     {int} guestExpires: Guest sessions timeout (seconds)
     {array} typecastVars: Session properties to automatically typecast when loading session data
     {string} sessCookie: Default session cookie name
@@ -110,7 +111,7 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
   }
 
   multi = this.storage.multi();
-  if (!guest && req.session.guest && req.hasCookie(this.config.sessCookie)) {
+  if (!guest && req.session && req.session.guest && req.hasCookie(this.config.sessCookie)) {
     multi.delete(req.getCookie(this.config.sessCookie));
   }
   multi.setHash(hashes.sessId, data);

@@ -427,4 +427,51 @@ vows.describe('Session (middleware)').addBatch({
     }
   }
   
+}).addBatch({
+
+  'Browser Sessions': {
+
+    topic: function() {
+
+      var promise = new EventEmitter();
+
+      var sessCmd = util.format('-i --cookie "%s=%s; %s=%s" ', sess, sessId, shash, sessHash);
+
+      var results = [];
+
+      app.curl('-i /session/create/browser-session', function(err, buf) {
+        
+        results.push(err || buf);
+
+        var sessCmd = util.format('-i --cookie "%s=%s; %s=%s" ', sess, sessId, shash, sessHash);
+
+        storage.client.ttl(sessId, function(err, ttl) {
+          
+          results.push(err || ttl);
+          
+          promise.emit('success', err || results);
+          
+        });
+          
+
+      });
+
+      return promise;
+
+    },
+
+    'Browser Cookies are properly set': function(results) {
+      var r = results[0];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf(util.format('Set-Cookie: _sess=%s; path=/', sessId)) >= 0); // Browser session cookie
+      assert.isTrue(r.indexOf(util.format('Set-Cookie: _shash=%s; path=/; expires=', sessHash)) >= 0);
+    },
+
+    'Uses defaultExpires as expiration (ttl check)': function(results) { // when temporaryExpires is set to zero
+      var r = results[1];
+      assert.isTrue(r <= (app.session.config.defaultExpires));
+    }
+
+  }
+
 }).export(module);
