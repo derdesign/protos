@@ -9,6 +9,8 @@ var vows = require('vows'),
     ObjectID = mongodb.ObjectID,
     Multi = require('multi'),
     EventEmitter = require('events').EventEmitter;
+    
+var _ = require('underscore');
 
 var multi = new Multi(app.model);
 
@@ -58,6 +60,37 @@ vows.describe('Model Relationships').addBatch({
         assert.isTrue(method in app.model);
         assert.equal(app.model[method].toString().indexOf('model[key].apply(model, arguments);'), 22);
       }
+    },
+    
+    "Properly sets ModelObject prototype": function(models) {
+      var users = models.users;
+      var modelObjectProto = users.modelObjectProto;
+      var expectedMethods = [ 
+        'createMulti',
+        'delete',
+        'destroy',
+        'getUsername',  // Added using UsersModel.methods
+        'greeting',     // Added using UsersModel.methods
+        'queryCached',
+        'remove',
+        'save',
+        'sync',
+        'update' ];
+        
+      // Test model methods
+      assert.deepEqual(_.methods(modelObjectProto), expectedMethods);
+      expectedMethods.forEach(function(method) {
+        assert.isFunction(modelObjectProto[method]);
+      });
+      
+      // Create sample users model
+      var testUser = app.usersModel.createModel({id: 999999, user: 'ernie'});
+      
+      // Test custom model methods
+      assert.equal(testUser.constructor.name, 'ModelObject');
+      assert.strictEqual(testUser.generator, app.usersModel);
+      assert.equal(testUser.greeting(), "Hello World!");
+      assert.equal(testUser.getUsername(), "ernie");
     }
     
   }
@@ -95,8 +128,12 @@ vows.describe('Model Relationships').addBatch({
         password: 'javascript'
       });
       
-      multi.exec(function(err, results) {
-        promise.emit('success', err || results);
+      app.onReady(function() {
+        
+        multi.exec(function(err, results) {
+          promise.emit('success', err || results);
+        });
+
       });
       
       return promise;

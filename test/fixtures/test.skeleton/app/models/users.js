@@ -21,4 +21,19 @@ function UsersModel(app) {
 
 }
 
+// Set extra methods for model objects
+
+UsersModel.methods = {
+  
+  greeting: function() {
+    return "Hello World!";
+  },
+  
+  getUsername: function() {
+    return this.user;
+  }
+  
+}
+
+
 module.exports = UsersModel;

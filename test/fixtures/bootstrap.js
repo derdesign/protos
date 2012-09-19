@@ -121,6 +121,10 @@ setTimeout(function() {
   app.flushAsyncTask();
 }, 100);
 
+app.onReady(function() {
+  app.__readyCallbackFired = true;
+});
+
 app.on('ready', function() {
   app.__readyEventFired = true;
 });
