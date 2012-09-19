@@ -31,7 +31,9 @@ function MainController(app) {
   }
   
   get('/request/metadata', metadataCallback, function(req, res) {
-    res.end(req.get('secret'));
+    res.render('#request-metadata-test', {
+      passed_secret: req.get('secret')
+    }, true);
   });
   
   /* File Download */

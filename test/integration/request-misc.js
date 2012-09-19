@@ -93,9 +93,9 @@ vows.describe('Request Misc').addBatch({
       assert.equal(r, '{My Application &raquo; Hello World}');
     },
     
-    "Gets & Sets metadata": function(results) {
+    "Gets & Sets metadata/view locals": function(results) {
       var r = results[2];
-      assert.equal(r, 'HELLO WORLD!');
+      assert.equal(r, 'View local: [HELLO WORLD!]\nPassed: [HELLO WORLD!]');
     }
     
   }
