@@ -142,19 +142,21 @@ vows.describe('Session (middleware)').addBatch({
   'Guest Sessions enabled': {
     
     topic: function() {
-      var promise = new EventEmitter(),
-          md5re = /\=([a-f0-9]{32});/;
-      
+      var promise = new EventEmitter();
+          
       app.session.config.guestSessions = true;
       storage = app.session.storage;
       sess = app.session.config.sessCookie;
       shash = app.session.config.hashCookie;
       
+      var sessRegex = new RegExp(sess + '\=(.+)\;');
+      
       // Response should include session cookies
       multi.curl('-i /session');
       
       multi.exec(function(err, results) {
-        var matches = results[0].match(md5re);
+        var matches = results[0].match(sessRegex);
+        
         if (matches) {
           guestCookie = matches[1];
           storage.getHash(guestSessId, function(err, data) {
@@ -316,8 +318,11 @@ vows.describe('Session (middleware)').addBatch({
           // Detect new Session ID
           var matches;
           results[1].split(/\r\n/).forEach(function(line) {
-            var re = new RegExp(util.format('Set-Cookie: %s=([a-f0-9]{32});', sess));
+            
+            var re = new RegExp(util.format('Set-Cookie: %s\=(.+);', sess));
+            
             matches = line.match(re);
+            
             if (matches) {
               sessId = matches[1];
               results.push(sessId);

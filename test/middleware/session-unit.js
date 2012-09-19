@@ -11,10 +11,9 @@ vows.describe('Session (middleware) » Unit Tests').addBatch({
     
     'Returns valid {sessId} for guest sessions': function() {
       var ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.75',
-          hash = app.session.createHash(ua, true),
-          md5Regex = protos.regex.md5_hash;
+          hash = app.session.createHash(ua, true)
       var props = Object.getOwnPropertyNames(hash);
-      assert.isTrue(props.length === 1 && props[0] == 'sessId' && md5Regex.test(hash.sessId));
+      assert.isTrue(props.length === 1 && props[0] == 'sessId' && app.regex.uuid.test(hash.sessId));
     }
     
   },

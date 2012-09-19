@@ -434,6 +434,14 @@ Session.prototype.getFingerprint = function(req, sessId) {
 }
 
 /**
+  Generates a session ID
+  
+  @private
+*/
+
+Session.prototype.generateSid = app.uuid;
+
+/**
   Creates a session hash
 
   @param {string} userAgent
@@ -443,7 +451,7 @@ Session.prototype.getFingerprint = function(req, sessId) {
 */
 
 Session.prototype.createHash = function(userAgent, guest) {
-    var sessId = app.md5(app.uuid());
+    var sessId = this.generateSid();
     if (guest) {
       return {sessId: sessId};
     } else {

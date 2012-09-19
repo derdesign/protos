@@ -42,7 +42,7 @@ function SessionController(app) {
     });
   });
   
-  get('/destroy/:sid', {sid: 'md5_hash'}, loadSession, function(req, res, params) {
+  get('/destroy/:sid', {sid: 'uuid'}, loadSession, function(req, res, params) {
     app.session.destroy(req, res, function() {
       res.sendHeaders();
       res.end('{SUCCESS}');
