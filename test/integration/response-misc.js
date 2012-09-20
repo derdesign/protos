@@ -309,12 +309,14 @@ vows.describe('Response Misc').addBatch({
     "Responds with plain text on AJAX Requests": function(results) {
       var r = results[0];
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('Content-Type: text/plain; charset=utf-8') >= 0);
       assert.isTrue(r.indexOf('\r\nSUCCESS!') >= 0);
     },
     
     "Responds with the #msg template on non-AJAX Requests": function(results) {
       var r = results[1];
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('Content-Type: text/html') >= 0);
       assert.isTrue(r.indexOf('<p>SUCCESS!</p>') >= 0);
     }
     
