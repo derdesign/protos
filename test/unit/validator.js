@@ -138,6 +138,23 @@ vows.describe('lib/validator.js').addBatch({
         other: null
       });
       
+      ////////////////
+
+      validator = app.validator()
+        .addOptional({tag: 'alpha'});
+
+      // Doesn't return errors on optional values
+      assert.isNull(validator.validate({}));
+
+      ////////////////
+
+      validator = app.validator()
+        .add({name: 'alpha'})
+        .addOptional({tag: 'alpha'});
+
+      // Returns errors if required values missing
+      assert.equal(validator.validate({}), "Missing Required Fields");
+      
     }
     
   }
