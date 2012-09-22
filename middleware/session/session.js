@@ -339,7 +339,7 @@ Request Headers: \n%s\n", req.socket.remoteAddress, sessId, sessHash, req.method
               expires = self.config[(data.pers ? 'permanentExpires' : (data.user ? 'temporaryExpires' : 'guestExpires'))];
               
               // Set defaultExpires if expires is zero
-              if (!expires) expires = this.config.defaultExpires;
+              if (!expires) expires = self.config.defaultExpires;
 
               multi = self.storage.multi();
               multi.updateHash(sessId, {fpr: newHash});
