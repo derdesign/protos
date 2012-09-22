@@ -25,15 +25,19 @@ IncomingMessage.prototype.saveSessionState = function(callback) {
   }
 
   var self = this,
-  session = this.session,
-  multi = app.session.storage.multi(),
-  sessId = this.getCookie(app.session.config.sessCookie);
+      session = this.session,
+      multi = app.session.storage.multi(),
+      sessId = this.getCookie(app.session.config.sessCookie);
 
+  // Calculate expires
   if (session.user != null) {
     expires = (session.pers ? app.session.config.permanentExpires : app.session.config.temporaryExpires);
   } else {
     expires = app.session.config.guestExpires;
   }
+  
+  // Set defaultExpires if expires is zero
+  if (!expires) expires = app.session.config.defaultExpires;
 
   multi.setHash(sessId, session);
 

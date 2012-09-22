@@ -101,6 +101,7 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
     // Otherwise, timeout should be temporaryExpires (browser session)
     expires = (persistent ? this.config.permanentExpires : this.config.temporaryExpires);
     
+    // Set default expires if expires is zero
     if (!expires) expires = this.config.defaultExpires;
     
     data = _.extend(data, {
@@ -337,6 +338,7 @@ Request Headers: \n%s\n", req.socket.remoteAddress, sessId, sessHash, req.method
 
               expires = self.config[(data.pers ? 'permanentExpires' : (data.user ? 'temporaryExpires' : 'guestExpires'))];
               
+              // Set defaultExpires if expires is zero
               if (!expires) expires = this.config.defaultExpires;
 
               multi = self.storage.multi();
