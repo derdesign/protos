@@ -475,8 +475,37 @@ vows.describe('Session (middleware)').addBatch({
     'Uses defaultExpires as expiration (ttl check)': function(results) { // when temporaryExpires is set to zero
       var r = results[1];
       assert.isTrue(r <= (app.session.config.defaultExpires));
+      assert.isTrue(r > (app.session.config.defaultExpires - 10));
     }
 
   }
 
+}).addBatch({
+  
+  'Static View Sessions': {
+
+    topic: function() {
+      
+      var promise = new EventEmitter();
+
+      var sessCmd = util.format('-i --cookie "%s=%s; %s=%s" ', sess, sessId, shash, sessHash);
+
+      multi.curl(sessCmd + '-i /session-test');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+
+      return promise;
+      
+    },
+    
+    'Are properly loaded': function(results) {
+      var r = results[0];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('VerifyPID: ' + process.pid) >= 0);
+    }
+    
+  }
+  
 }).export(module);

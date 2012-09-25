@@ -23,7 +23,8 @@ function SessionController(app) {
     var config = app.session.config;
     var te = config.temporaryExpires;
     config.temporaryExpires = 0; // Set a browser session
-    app.session.create(req, res, {user: 'der'}, false, function() {
+    app.session.create(req, res, {user: 'der', staticVal: process.pid}, false, function() {
+      // Note: staticVal will be used for testing session loading in static views
       config.temporaryExpires = te;
       res.sendHeaders();
       res.end('{SUCCESS}');
