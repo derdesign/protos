@@ -6,7 +6,7 @@ var app =require('../fixtures/bootstrap'),
 
 vows.describe('lib/validator.js').addBatch({
   
-  'Validator Class': {
+  '': {
     
     topic: function() {
       
@@ -156,6 +156,39 @@ vows.describe('lib/validator.js').addBatch({
       assert.equal(validator.validate({}), "Missing Required Fields");
       
     }
+    
+  },
+  
+  'Properly applies filters': function() {
+    
+    var validator = app.validator()
+      .add({name: 'alpha'})
+      .add({age: 'integer'})
+      .add({some: 'anything'})
+      .filter({
+        name: function(val) {
+          return new Buffer(val).toString('base64')
+        },
+        age: function(val) {
+          return app.md5(val.toString());
+        }
+      });
+      
+    var fields = {
+      name: 'Ernie',
+      age: 29,
+      some: '--UNCHANGED--'
+    }
+    
+    validator.validate(fields);
+    
+    var expected = { 
+      name: 'RXJuaWU=',                             // Affected by base64 filter
+      age: '6ea9ab1baa0efb9e19094440c317e21b',      // Affected by md5 filter
+      some: '--UNCHANGED--'                         // Remains unchanged (no filter)
+    }
+    
+    assert.deepEqual(fields, expected);
     
   }
   
