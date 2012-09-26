@@ -155,6 +155,19 @@ vows.describe('lib/validator.js').addBatch({
       // Returns errors if required values missing
       assert.equal(validator.validate({}), "Missing Required Fields");
       
+      fields = {
+        name: 'ernie',
+        tag: ''
+      }
+      
+      // Accepts empty optional values
+      assert.isNull(validator.validate(fields));
+      
+      assert.deepEqual(fields, {
+        name: 'ernie',
+        tag: null
+      });
+      
     }
     
   },
