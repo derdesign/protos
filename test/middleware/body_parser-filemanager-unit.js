@@ -93,7 +93,7 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
       // Globally restricts on mimeType
       createFiles();
       fm = new FileManager(files);
-      fm.allow('image/png', 'image/jpg').expect({
+      fm.allow('image/png').allow(['image/jpg', 'image/tiff']).expect({
         alpha: {
           type: ['text/javascript', 'text/plain', 'text/css']
         },

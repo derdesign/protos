@@ -162,9 +162,12 @@ FileManager.prototype.maxFilesize = function(size) {
   @return {object} instance;
  */
 
-FileManager.prototype.allow = function() {
-  var args = slice.call(arguments, 0);
-  this.defaults.mimeTypes = _.unique(this.defaults.mimeTypes.concat(args));
+FileManager.prototype.allow = function(mime) {
+  if (typeof mime == 'string') mime = [mime];
+  else if (mime.constructor !== Array) {
+    throw new Error("Invalid argument");
+  }
+  this.defaults.mimeTypes = _.unique(this.defaults.mimeTypes.concat(mime));
   return this;
 }
 
