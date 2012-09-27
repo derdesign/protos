@@ -31,6 +31,8 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
     
     topic: function() {
 
+      app.logging = false;
+
       var results = [];
 
       createFiles();
@@ -332,6 +334,9 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
           }
           
           fsm.exec(function(err, results) {
+            
+            app.logging = true;
+            
             promise.emit('success', {
               fm: fm,
               existResults: arguments,
