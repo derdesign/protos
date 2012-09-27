@@ -16,20 +16,17 @@ require('./request.js');
 
 function BodyParser(config, middleware) {
   
+  // Attach to app
+  app[middleware] = this;
+  
   // Middleware configuration
-  config = protos.extend({
+  this.config = protos.extend({
     maxFieldSize: 2 * 1024 * 1024,
     maxUploadSize: 2 * 1024 * 1024,
     keepUploadExtensions: true
   }, config);
   
-  // Attach config to application
-  app.config.uploads = config;
-  
-  // Register middleware resources
-  app.resources[middleware] = {
-    file_manager: require('./file_manager.js')
-  }
+  this.FileManager = require('./file_manager.js');
   
 }
 

@@ -27,20 +27,37 @@ var loggingStatus;
 
 vows.describe('Body Parser (middleware) » FileManager').addBatch({
   
+  'Integrity Checks': {
+    
+    topic: function() {
+      
+      app.logging = false;
+
+      if (!app.supports.body_parser) app.use('body_parser');
+      
+      FileManager = app.body_parser.FileManager;
+      
+      return true;
+      
+    },
+    
+    'maxFilesize defaults to maxUploadSize config setting': function() {
+      var fm = new FileManager({});
+      assert.equal(fm.defaults.maxFilesize, app.body_parser.config.maxUploadSize);
+    }
+    
+  }
+  
+}).addBatch({
+  
   'FileManager::expect': {
     
     topic: function() {
 
-      app.logging = false;
-
       var results = [];
 
       createFiles();
-
-      if (!app.supports.body_parser) app.use('body_parser');
-
-      FileManager = app.resources.body_parser.file_manager;
-
+      
       // File expected not present (required)
       var fm = new FileManager(files);
       fm.expect({

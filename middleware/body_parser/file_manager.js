@@ -18,7 +18,7 @@ function FileManager(files) {
   
   Object.defineProperty(this, 'defaults', {
     value: {
-      maxFilesize: 0,
+      maxFilesize: app.body_parser.config.maxUploadSize,
       mimeTypes: [],
       noEmptyFiles: true
     },

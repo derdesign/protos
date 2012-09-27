@@ -65,9 +65,9 @@ IncomingMessage.prototype.parseBodyData = function(callback) {
   if (req.headers['content-type'] != null) {
     form = req.__incomingForm = new IncomingForm();
     form.uploadDir = app.path + '/' + app.paths.upload.replace(app.regex.startOrEndSlash, '') + '/';
-    form.maxFieldsSize = app.config.uploads.maxFieldSize;
+    form.maxFieldsSize = app.body_parser.config.maxFieldSize;
     form.encoding = 'utf-8';
-    form.keepExtensions = app.config.uploads.keepUploadExtensions;
+    form.keepExtensions = app.body_parser.config.keepUploadExtensions;
     form.parse(req, function(err, fields, files) {
       if (err) app.serverError(res, err);
       else callback.call(req, fields, new FileManager(files));
@@ -90,7 +90,7 @@ IncomingMessage.prototype.exceededUploadLimit = function() {
   var res = this.response;
   if (this.headers['content-length'] != null) {
     var bytesExpected = parseInt(this.headers['content-length'], 10),
-      uploadSize = app.config.uploads.maxUploadSize;
+      uploadSize = app.body_parser.config.maxUploadSize;
     if (bytesExpected > uploadSize) {
       app.emit('upload_limit_exceeded', this, res);
       if (this.__stopRoute === true) return true;
