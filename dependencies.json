@@ -36,6 +36,9 @@
   	"mailer": {
   		"nodemailer"        : ">= 0.3.27"
   	},
+  	"magick": {
+  	  "node-imagemagick"  : ">= 0.1.7"
+  	},
   	"markdown": {
   		"marked"            : ">= 0.2.5"
   	},
