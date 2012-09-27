@@ -16,7 +16,6 @@ IncomingMessage.prototype.__saveSession = null;
 */
 
 IncomingMessage.prototype.saveSessionState = function(callback) {
-
   var expires;
 
   if (! app.supports.session) {

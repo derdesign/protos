@@ -22,13 +22,12 @@
  */
 
 var app = protos.app;
+var slice = Array.prototype.slice;
 
 var _ = require('underscore'),
-    util = require('util'),
-    slice = Array.prototype.slice;
-
+    util = require('util');
+    
 require('./request.js');
-require('./response.js');
 
 function Session(config, middleware) {
 
@@ -53,22 +52,43 @@ function Session(config, middleware) {
     hashCookie: "_shash",
     defaultUserAgent: "Mozilla",
     salt: null
-    }, config);
+  }, config);
     
-    if (typeof config.salt != 'string') throw new Error("Session: you must specify a salt");
+  if (typeof config.salt != 'string') throw new Error("Session: you must specify a salt");
 
-    if (typeof config.storage == 'object') this.storage = config.storage;
-    else if (typeof config.storage == 'string') this.storage = app._getResource('storages/' + config.storage);
-    else throw new Error("The 'session' middleware requires a storage to be passed in config.");
+  if (typeof config.storage == 'object') this.storage = config.storage;
+  else if (typeof config.storage == 'string') this.storage = app._getResource('storages/' + config.storage);
+  else throw new Error("The 'session' middleware requires a storage to be passed in config.");
 
-    this.className = this.constructor.name;
+  this.className = this.constructor.name;
 
-    protos.util.onlySetEnumerable(this, ['className', 'storage']);
+  protos.util.onlySetEnumerable(this, ['className', 'storage']);
     
+}
+
+Session.prototype.storage = null;
+
+/**
+  Method that overrides OutgoingMessage::end, to automatically
+  save sessions when changed.
+
+  @private
+  @method endResponse
+ */
+
+Session.prototype.endResponse = function() {
+  var self = this;
+  var req = this.request;
+  var args = slice.call(arguments, 0);
+  var end = this.constructor.prototype.end;
+  if (req.sessionChanged()) {
+    req.saveSessionState(function() {
+      end.apply(self, args);
+    });
+  } else {
+    end.apply(this, args);
   }
-
-  Session.prototype.storage = null;
-
+}
 
 /**
   Creates a session
