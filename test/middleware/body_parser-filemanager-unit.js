@@ -3,16 +3,17 @@ var app = require('../fixtures/bootstrap'),
     vows = require('vows'),
     fs = require('fs'),
     assert = require('assert'),
-    EventEmitter = require('events').EventEmitter;
+    EventEmitter = require('events').EventEmitter,
+    Multi = protos.require('multi');
 
 var FileManager;
 
-var t = 100; // Time to wait for Disk I/O to complete
-
 var files = {
-  fileA: {path: app.fullPath('/incoming/a.txt'), size: 16},
-  fileB: {path: app.fullPath('/incoming/b.txt'), size: 0},
-  fileC: {path: app.fullPath('/incoming/c.txt'), size: 0},
+  alpha: {path: app.fullPath('incoming/alpha.txt'), size: 16, type: 'text/plain'},
+  beta: {path: app.fullPath('incoming/beta.jpg'), size: 16, type: 'image/jpg'},
+  gamma: {path: app.fullPath('incoming/gamma.gif'), size: 16, type: 'image/gif'},
+  epsilon: {path: app.fullPath('incoming/epsilon.txt'), size: 0, type: 'text/plain'},
+  delta: {path: app.fullPath('incoming/delta.png'), size: 5, type: 'image/png'},
 }
 
 // Simulates file uploads
@@ -30,123 +31,280 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
     
     topic: function() {
 
-      app.use('body_parser');
-      
+      var results = [];
+
+      createFiles();
+
+      if (!app.supports.body_parser) app.use('body_parser');
+
       FileManager = app.resources.body_parser.file_manager;
+
+      // File expected not present (required)
+      var fm = new FileManager(files);
+      fm.expect({
+        other: {}
+      });
+      results.push(fm);
       
-      loggingStatus = app.logging;
-      
-      app.logging = false;
-      
-      var fm, results = [],
-          promise = new EventEmitter();
-      
-      // Using setTimeout to compensate for Disk I/O
-      
-      // Returns true + removes files not expected for optional files
+      // File expected not present (not required)
       createFiles();
       fm = new FileManager(files);
-      fm.__expectResult = fm.expect('fileC', 'fileX', {
-        name: 'fileA', 
-        required: true, 
-        notEmpty: true
-      },{
-        name: 'fileB',
-        required: true
+      fm.expect({
+        other: {}
       });
+      results.push(fm);
       
-      setTimeout(function() {
-        fm.__existChecks = [
-          fs.existsSync(files.fileA.path),
-          fs.existsSync(files.fileB.path),
-          fs.existsSync(files.fileC.path)];
-        results.push(fm);
-        
-        // Returns false + removes all files when required file not present
-        createFiles();
-        fm = new FileManager(files);
-        fm.__expectResult = fm.expect('*fileX', 'fileA', 'fileB');
-        
-        setTimeout(function() {
-          fm.__existChecks = [
-            fs.existsSync(files.fileA.path),
-            fs.existsSync(files.fileB.path),
-            fs.existsSync(files.fileC.path)];
-          results.push(fm);
-          
-          // Returns false + removes all files when required file empty
-          createFiles();
-          fm = new FileManager(files);
-          fm.__expectResult = fm.expect('*fileA', '**fileB');
-
-          setTimeout(function() {
-            fm.__existChecks = [
-              fs.existsSync(files.fileA.path),
-              fs.existsSync(files.fileB.path),
-              fs.existsSync(files.fileC.path)];
-            results.push(fm);
-            
-            promise.emit('success', results);
-          }, t);
-          
-        }, t);
-        
-      }, t);
+      // File expected present
+      createFiles();
+      fm = new FileManager(files);
+      fm.expect({
+        alpha: {}
+      });
+      results.push(fm);
       
-      return promise;
+      // Expected files with wrong mimetypes and size
+      createFiles();
+      fm = new FileManager(files);
+      fm.expect({
+        alpha: {
+          maxFilesize: 10     // will fail, its size is 16 bytes
+        },
+        beta: {
+          required: true,
+          type: 'text/plain'  // will fail, it's mimetype is image/jpg
+        }
+      });
+      results.push(fm);
+      
+      // Globally restricts on maxFilesize
+      createFiles();
+      fm = new FileManager(files);
+      fm.maxFilesize(10).expect({
+        alpha: {
+          maxFilesize: 20   // overrides restriction
+        },
+        beta: {},
+        gamma: {},
+        epsilon: {},
+        delta: {}
+      });
+      results.push(fm);
+      
+      // Globally restricts on mimeType
+      createFiles();
+      fm = new FileManager(files);
+      fm.allow('image/png', 'image/jpg').expect({
+        alpha: {
+          type: ['text/javascript', 'text/plain', 'text/css']
+        },
+        beta: {},
+        gamma: {},
+        epsilon: {},
+        delta: {}
+      });
+      results.push(fm);
+      
+      // Globally restricts on mimeType and maxFilesize (only delta matches)
+      createFiles();
+      fm = new FileManager(files);
+      fm.maxFilesize(5).allow('image/png', 'image/jpg').expect({
+        alpha: {
+          type: ['text/javascript', 'text/plain', 'text/css']
+        },
+        beta: {},
+        gamma: {},
+        epsilon: {},
+        delta: {}
+      });
+      results.push(fm);
+      
+      // Allows empty files if fm.config.noEmptyFiles is false
+      createFiles();
+      fm = new FileManager(files);
+      fm.allowEmpty().expect({
+        epsilon: {}
+      });
+      results.push(fm);
+      
+      // Removes empty files automatically
+      createFiles();
+      fm = new FileManager(files);
+      fm.expect({
+        epsilon: {}
+      });
+      results.push(fm);
+      
+      return results;
+      
     },
     
-    'Returns true + removes files not expected for optional files': function(results) {
+    'Required File expected n/a => removes all files': function(results) {
+      
       var fm = results[0];
-      assert.isTrue(fm.__expectResult);
-      assert.equal(fm.length,3);
-      assert.deepEqual(Object.keys(fm.files), ['fileA', 'fileB', 'fileC']);
-      assert.deepEqual(fm.__existChecks, [true, true, true]);
+      assert.equal(fm.length, 0);
+      assert.deepEqual(fm.removed, ['alpha', 'beta', 'gamma', 'epsilon', 'delta']);  // All files removed
     },
     
-    'Returns false + removes all files when required file not present': function(results) {
+    'Optional File expected n/a => removes all files': function(results) {
       var fm = results[1];
-      assert.isFalse(fm.__expectResult);
       assert.equal(fm.length, 0);
-      assert.deepEqual(Object.keys(fm.files), []);
-      assert.deepEqual(fm.__existChecks, [false, false, false]);
+      assert.deepEqual(fm.removed, ['alpha', 'beta', 'gamma', 'epsilon', 'delta']);  // All files removed
     },
     
-    'Returns false + removes all files when required file empty': function(results) {
+    'File expected present => removes all except required': function(results) {
       var fm = results[2];
-      assert.isFalse(fm.__expectResult);
+      assert.equal(fm.length, 1);
+      assert.deepEqual(fm.removed, ['beta', 'gamma', 'epsilon', 'delta']);  // All files except 'alpha' removed
+    },
+    
+    'Removes files not matching filesize and mimetype requirements': function(results) {
+      var fm = results[3];
       assert.equal(fm.length, 0);
-      assert.deepEqual(Object.keys(fm.files), []);
-      assert.deepEqual(fm.__existChecks, [false, false, false]);
+      assert.deepEqual(fm.removed, ['alpha', 'beta', 'gamma', 'epsilon', 'delta']); // All files removed
+    },
+    
+    'Successfully executes restrictions on maxFilesize': function(results) {
+      var fm = results[4];
+      assert.equal(fm.length, 2);
+      assert.deepEqual(fm.removed, ['beta', 'gamma', 'epsilon']); // All files removed except 'alpha' and 'delta'
+    },
+    
+    'Successfully executes restrictions on mimeType': function(results) {
+      var fm = results[5];
+      assert.equal(fm.length, 3);
+      assert.deepEqual(fm.removed, ['gamma', 'epsilon']); // All files removed except 'alpha', 'beta' and 'delta'
+    },
+    
+    'Successfully restricts on maxFilesize and mimeType': function(results) {
+      var fm = results[6];
+      assert.equal(fm.length, 1);
+      assert.deepEqual(fm.removed, ['alpha', 'beta', 'gamma', 'epsilon']); // All files removed except 'delta'
+    },
+    
+    'Allows empty files if config.noEmptyFiles is false': function(results) {
+      var fm = results[7];
+      assert.equal(fm.length, 1);
+      assert.deepEqual(fm.removed, ['alpha', 'beta', 'gamma', 'delta']);
+      assert.deepEqual(fm.files, {
+        epsilon: files.epsilon
+      });
+    },
+    
+    'Removes empty files by default': function(results) {
+      var fm = results[8];
+      assert.equal(fm.length, 0);
+      assert.deepEqual(fm.removed, ['epsilon', 'alpha', 'beta', 'gamma', 'delta']);
+      assert.deepEqual(fm.files, {});
+    },
+    
+    'Returns object with files (filtered)': function() {
+      var fm = new FileManager(files);
+      assert.isTrue(fm.files === fm.expect({}));
     }
     
   } 
     
 }).addBatch({
   
-  'FileManager::removeEmpty': {
+  'FileManager::get': {
     
     topic: function() {
-      var promise = new EventEmitter();
+      
+      var results = [];
       
       createFiles();
       var fm = new FileManager(files);
-      fm.removeEmpty();
       
-      setTimeout(function() {
-        fm.__existChecks = [
-          fs.existsSync(files.fileA.path),
-          fs.existsSync(files.fileB.path),
-          fs.existsSync(files.fileC.path) ];
-        promise.emit('success', fm);
-      }, t);
+      fm.expect({
+        gamma: {
+          type: 'image/gif'
+        }
+      });
       
-      return promise;
+      return fm;
+      
     },
     
-    'Removes all empty files': function(fm) {
-      assert.equal(fm.length, 1);
-      assert.deepEqual(fm.__existChecks, [true, false, false]);
+    'Returns the file object if it exists': function(fm) {
+      assert.deepEqual(fm.get('gamma'), files.gamma);
+    },
+    
+    'Returns null if file not present': function(fm) {
+      assert.isNull(fm.get('hello'));
+    }
+    
+  }
+  
+}).addBatch({
+  
+  'FileManager::removeFile': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      var testFilePath = app.fullPath('incoming/test-file.txt');
+      
+      fs.writeFileSync(testFilePath, '', 'utf-8');
+      
+      var fm = new FileManager({
+        test_file: {
+          path: testFilePath,
+          size: 16,
+          type: 'text/plain'
+        }
+      });
+      
+      var results = [fm.removed.concat([])]; // Using concat to get a copy of the array
+      
+      fm.removeFile('test_file', function(err) {
+        
+        results.push(err);
+        
+        fs.exists(testFilePath, function(exists) {
+          
+          results.push(exists);
+          
+          results.push(fm.removed);
+          
+          promise.emit('success', results);
+          
+        });
+        
+      });
+      
+      return promise;
+      
+    },
+    
+    'Successfully removes files': function(results) {
+      assert.deepEqual(results[0], [])              // removed array empty
+      assert.isNull(results[1]);                    // null   => no errors found removing file
+      assert.isFalse(results[2]);                   // false  => file does not exist
+      assert.deepEqual(results[3], ['test_file']);  // removed array contains removed file
+    }
+
+  }
+  
+}).addBatch({
+  
+  'FileManager::forEach': {
+    
+    topic: function() {
+      
+      var fm = new FileManager(files);
+      
+      var results = {};
+      
+      fm.forEach(function(file, data) {
+        results[file] = data;
+      });
+      
+      return results;
+      
+    },
+    
+    'Properly iterates over files': function(results) {
+      assert.deepEqual(results, files);
     }
     
   }
@@ -156,71 +314,46 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
   'FileManager::removeAll': {
     
     topic: function() {
+      
       var promise = new EventEmitter();
-
-      var fm = new FileManager(files);
-      fm.removeAll();
-
-      setTimeout(function() {
-        fm.__existChecks = [
-          fs.existsSync(files.fileA.path),
-          fs.existsSync(files.fileB.path),
-          fs.existsSync(files.fileC.path) ];
-        promise.emit('success', fm);
-      }, t);
-
-      return promise;
-    },
-
-    'Removes all files': function(fm) {
-      assert.equal(fm.length, 0);
-      assert.deepEqual(fm.__existChecks, [false, false, false]);
-    }
-    
-  }
-  
-}).addBatch({
-  
-  'FileManager::get': {
-    
-    topic: function() {
-      var results = [];
-      var fm = new FileManager(files);
-      results.push(fm.get('fileA'));
-      results.push(fm.get('fileX'));
-      return results;
-    },
-    
-    'Returns valid file object for existing files': function(results) {
-      var r = results[0];
-      assert.deepEqual(r, files.fileA);
-    },
-    
-    'Returns undefined for inexistent files': function(results) {
-      var r = results[1];
-      assert.isUndefined(r);
-    }
-    
-  }
-  
-}).addBatch({
-  
-  'FileManager::forEach': {
-    
-    topic: function() {
       
-      app.logging = loggingStatus;
-      
-      var results = [];
+      createFiles();
       var fm = new FileManager(files);
-      fm.forEach(function(file) {
-        results.push(file);
+      var unlinkErrors = [];
+      
+      fm.removeAll(function(err) {
+        unlinkErrors.push(err);
+        if (unlinkErrors.length == 5) {
+          
+          var fsm = new Multi(fs);
+          
+          for (var file in files) {
+            fsm.exists(files[file].path);
+          }
+          
+          fsm.exec(function(err, results) {
+            promise.emit('success', {
+              fm: fm,
+              existResults: arguments,
+              unlinkErrors: unlinkErrors
+            })
+          });
+          
+        }
       });
-      return results;
+      
+      return promise;
+      
     },
     
-    'Iterates over the files contained': function(results) {
-      assert.deepEqual(results, [files.fileA, files.fileB, files.fileC]);
+    'Removes all files': function(results) {
+      assert.deepEqual(results.fm.files, {});
+      assert.deepEqual(results.fm.length, 0);
+      assert.deepEqual(results.fm.fileKeys, []);
+      assert.deepEqual(results.fm.removed, ['alpha', 'beta', 'gamma', 'epsilon', 'delta']);
+      assert.deepEqual(results.unlinkErrors, [null, null, null, null, null ]);
+      assert.isNull(results.existResults[0]);
+      assert.deepEqual(results.existResults[1], ['OK', 'OK', 'OK', 'OK', 'OK']); // Exists is false => no err => 'OK'
     }
     
   }

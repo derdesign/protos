@@ -69,8 +69,11 @@ function TestController(app) {
   var uploadCb;
   post('/upload', uploadCb = function(req, res) {
     req.getRequestData(function(fields, files) {
-      if ( files.expect('**file') ) { // File should be present, and not empty
-        var f = files.get('file');
+      files.expect({
+        file: {}
+      });
+      var f = files.get('file');
+      if ( f ) { // File should be present, and not empty
         res.sendHeaders();
         res.end(inspect(f));
         files.removeAll();
