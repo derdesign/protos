@@ -196,7 +196,9 @@ vows.describe('View Rendering').addBatch({
       
       app.__eventSuccess = false;
 
-      app.once('static_view', function(url) {
+      app.once('static_view', function(req, res, url) {
+        app.__staticViewRequest = req;
+        app.__staticViewResponse = res;
         app.__eventSuccess = url;
       });
       
@@ -217,6 +219,8 @@ vows.describe('View Rendering').addBatch({
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
       assert.isTrue(r.indexOf('[STATIC VIEW EVENT]') >= 0);
       assert.equal(app.__eventSuccess, '/static-view-event');
+      assert.equal(app.__staticViewRequest.constructor.name, 'IncomingMessage');
+      assert.equal(app.__staticViewResponse.constructor.name, 'ServerResponse');
     }
     
   }
