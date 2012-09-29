@@ -186,4 +186,66 @@ vows.describe('View Rendering').addBatch({
 
   }
 
+}).addBatch({
+  
+  'Static View Events': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      app.__eventSuccess = false;
+
+      app.once('static_view', function(url) {
+        app.__eventSuccess = url;
+      });
+      
+      var multi = new Multi(app);
+      
+      multi.curl('-i /static-view-event');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+      
+    },
+    
+    "Properly emits the 'static_view' event": function(results) {
+      var r = results[0];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.equal(app.__eventSuccess, '/static-view-event');
+    }
+    
+  }
+  
 }).export(module);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

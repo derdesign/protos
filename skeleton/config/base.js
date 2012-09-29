@@ -8,6 +8,8 @@ module.exports = {
   encoding: 'utf-8',
   rawViews: false,
   
+  pageTitle: '%s &raquo; %s', // 
+  
   headers: {
     'Content-Type': function(req, res) { return "text/html; charset=" + this.config.encoding; },
     'Status': function(req, res) {  return res.statusCode + " " + this.httpStatusCodes[res.statusCode]; },
