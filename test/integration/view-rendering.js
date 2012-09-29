@@ -215,6 +215,7 @@ vows.describe('View Rendering').addBatch({
     "Properly emits the 'static_view' event": function(results) {
       var r = results[0];
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('[STATIC VIEW EVENT]') >= 0);
       assert.equal(app.__eventSuccess, '/static-view-event');
     }
     
