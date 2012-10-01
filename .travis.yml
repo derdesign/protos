@@ -16,3 +16,4 @@ notifications:
   
 services:
   - rabbitmq
+  - mongodb
