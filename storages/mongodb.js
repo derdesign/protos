@@ -84,9 +84,6 @@ function MongoStorage(app, config) {
    // Set db
    self.db = new Db(config.database, new Server(config.host, config.port, {}));
 
-   // Add async task
-   app.addAsyncTask();
-
    // Get client
    self.db.open(function(err, client) {
      
@@ -131,11 +128,6 @@ function MongoStorage(app, config) {
        });
 
      }
-   });
-   
-   // Flush async task
-   this.events.on('init', function() {
-     app.flushAsyncTask();
    });
    
    // Set enumerable properties

@@ -69,9 +69,6 @@ function MongoDB(app, config) {
     // Set db
     self.db = new Db(config.database, new Server(config.host, config.port, {}));
     
-    // Add async task
-    app.addAsyncTask();
-    
     // Get client
     self.db.open(function(err, client) {
       
@@ -117,11 +114,6 @@ function MongoDB(app, config) {
       }
     });
     
-    // Flush async task
-    this.events.once('init', function() {
-      app.flushAsyncTask();
-    });
-
     // Only set important properties enumerable
     protos.util.onlySetEnumerable(this, ['className', 'db']);
 }
