@@ -93,12 +93,6 @@ function SocketIO(config, middleware) {
     options.environments.debug = options.environments.development;
   }
   
-  // Add socket.io client resource
-  app.addClientScript({
-    name: 'socket.io',
-    path: options.clientScript
-  });
-  
   // Defaults has been extended with config
   initSockets(options);
 }

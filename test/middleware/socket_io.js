@@ -49,11 +49,6 @@ vows.describe('SocketIO (middleware)').addBatch({
       assert.equal(app.sockets.main.constructor.name, 'SocketNamespace');
       assert.equal(app.sockets.chat.constructor.name, 'SocketNamespace');
       assert.equal(app.sockets.news.constructor.name, 'SocketNamespace');
-    },
-    
-    'Properly registers client script': function() {
-      var script = app.getClientResource('scripts', 'socket.io');
-      assert.equal(script.name, 'socket.io');
     }
     
   }

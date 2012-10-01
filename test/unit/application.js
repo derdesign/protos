@@ -351,61 +351,6 @@ vows.describe('lib/application.js').addBatch({
 
   },
 
-  'Application::addClientResource': {
-
-    "Properly sets client resources": function() {
-      app.addClientResource('custom', {
-        name: 'custom.resource',
-        path: '/custom/resource.txt'
-      });
-      assert.isTrue(app.client.custom[0] && app.client.custom[0].name == 'custom.resource');
-    }
-
-  },
-
-  'Application::getClientResource': {
-
-    "Properly gets client resources": function() {
-      var data = app.getClientResource('custom', 'custom.resource');
-      assert.typeOf(data, 'object');
-      assert.equal(data.name, 'custom.resource');
-      assert.equal(data.path, '/custom/resource.txt');
-    }
-
-  },
-
-  'Application::addClientScript': {
-
-    "Properly gets client scripts": function() {
-      var script, descriptor = {
-        name: 'jquery',
-        path: 'http://code.jquery.com/jquery-1.7.1.min.js'
-      }
-
-      app.addClientScript(descriptor);
-
-      script = app.getClientResource('scripts', 'jquery');
-      assert.deepEqual(script, descriptor);
-    }
-
-  },
-
-  'Application::addClientStylesheet': {
-
-    "Properly gets client stylesheets": function() {
-      var stylesheet, descriptor = {
-        name: 'blueprint',
-        path: 'http://blueprintcss.org/blueprint/screen.css'
-      }
-
-      app.addClientStylesheet(descriptor);
-
-      stylesheet = app.getClientResource('stylesheets', 'blueprint');
-      assert.deepEqual(stylesheet, descriptor);
-    }
-
-  }
-
 }).addBatch({
 
   'Application::getResource': {
