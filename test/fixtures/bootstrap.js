@@ -125,7 +125,7 @@ app.onReady(function() {
   app.__readyCallbackFired = true;
 });
 
-app.on('ready', function() {
+app.once('ready', function() {
   app.__readyEventFired = true;
 });
 
