@@ -21,8 +21,6 @@ app.onInitialize(function() {
   beforeInitCheck = true;
 });
 
-app.libExtensions();
-
 vows.describe('lib/application.js').addBatch({
 
   'Integrity Checks': {
@@ -123,11 +121,6 @@ vows.describe('lib/application.js').addBatch({
         assert.isFunction(app.views.partials[key]);
       }
 
-    },
-    
-    'Properly loads extensions in lib/': function() {
-      assert.equal(app.hello, 99);
-      assert.equal(protos.hello, 101);
     },
     
     'Properly runs application event hooks': function() {

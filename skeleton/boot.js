@@ -36,9 +36,6 @@ Protos.bootstrap(__dirname, {
     init: function(app) {
       // Load middleware
       app.use('logger');
-      
-      // Load extensions in lib/
-      app.libExtensions();
     }
   }
   
