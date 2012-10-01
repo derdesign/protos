@@ -674,6 +674,16 @@ vows.describe('lib/application.js').addBatch({
   
 }).addBatch({
   
+   'Async Queue and "ready" event': {
+     
+     "The 'ready' event is fired after flushing all queues": function() {
+       assert.isTrue(app.__readyEventFired);
+     },
+     
+   }
+
+}).addBatch({
+  
   'Application::onReady': {
     
     topic: function() {
@@ -689,10 +699,6 @@ vows.describe('lib/application.js').addBatch({
 
       return promise;
       
-    },
-    
-    "The 'ready' event is fired after flushing all queues": function() {
-      assert.isTrue(app.__readyEventFired);
     },
     
     "Successfully runs callbacks before 'ready' event": function(results) {
