@@ -680,11 +680,15 @@ vows.describe('lib/application.js').addBatch({
       
       var promise = new EventEmitter();
       
-      var results = [app.__readyCallbackFired];
+      app.onInitialize(function() {
+        
+        var results = [app.__readyCallbackFired];
 
-      app.onReady(function() {
-        results.push(true);
-        promise.emit('success', results);
+        app.onReady(function() {
+          results.push(true);
+          promise.emit('success', results);
+        });
+        
       });
 
       return promise;
