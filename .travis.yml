@@ -3,15 +3,10 @@ language: node_js
 node_js:
   - 0.8
 
-mysql:
-  adapter: mysql2
-  database: test_db
-  username: root
-  encoding: utf8
-
 before_script:
   - "make deps-all"
   - "mysql -e 'create database test_db;'"
+  - "psql -c 'create database test_db;' -U postgres"
 
 script:
   - "NODE_ENV=travis make tests"
@@ -21,3 +16,4 @@ notifications:
   
 services:
   - rabbitmq
+  - mongodb
