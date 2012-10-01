@@ -672,4 +672,41 @@ vows.describe('lib/application.js').addBatch({
     
   }
   
+}).addBatch({
+  
+  'Application::onReady': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      app.onInitialize(function() {
+        
+        var results = [app.__readyCallbackFired];
+
+        app.onReady(function() {
+          results.push(true);
+          promise.emit('success', results);
+        });
+        
+      });
+
+      return promise;
+      
+    },
+    
+    "The 'ready' event is fired after flushing all queues": function() {
+      assert.isTrue(app.__readyEventFired);
+    },
+    
+    "Successfully runs callbacks before 'ready' event": function(results) {
+      assert.isTrue(results[0]);
+    },
+    
+    "Successfully runs callbacks after 'ready' event": function(results) {
+      assert.isTrue(results[1]);
+    }
+    
+  }
+  
 }).export(module);

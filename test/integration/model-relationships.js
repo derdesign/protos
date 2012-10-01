@@ -128,10 +128,14 @@ vows.describe('Model Relationships').addBatch({
         password: 'javascript'
       });
       
-      multi.exec(function(err, results) {
-        promise.emit('success', err || results);
-      });
+      app.onReady(function() {
+        
+        multi.exec(function(err, results) {
+          promise.emit('success', err || results);
+        });
 
+      });
+      
       return promise;
     },
     
