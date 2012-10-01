@@ -90,14 +90,14 @@ var protos = Protos.bootstrap(testSkeleton, {
                 
             // Override mysql configuration on travis
 
-            mysql.host = '0.0.0.0';
+            mysql.host = '127.0.0.1 ';
             mysql.user = 'root';
             mysql.password = '';
             
             var postgres = app.config.drivers.postgres;
 
-            postgres.host = '0.0.0.0';
-            postgres.user = 'root';
+            postgres.host = '127.0.0.1';
+            postgres.user = 'postgres';
             postgres.password = '';
 
             // Note: Redis uses default settings, no need to configure
