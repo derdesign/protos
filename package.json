@@ -1,10 +1,10 @@
 {
   "name"                : "protos",
   "description"         : "Web Application Framework",
-  "version"             : "0.1.4",
+  "version"             : "0.2.0",
   "homepage"            : "http://derdesign.github.com/protos/",
   "repository"          : "https://github.com/derdesign/protos",
-  "author"              : "Ernesto Méndez <der.kunstler@gmail.com>",
+  "author"              : "Ernesto Méndez <der@der-design.com>",
   "license"             : "MIT",
   "main"                : "lib/protos",
   "preferGlobal"        : "true",
