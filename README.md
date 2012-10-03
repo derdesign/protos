@@ -67,7 +67,7 @@ deployment, maintainability and security. Runs on UNIX-like systems such as **Li
 
 ## Resources
 
-- [API Documentation](docs/index.html)
+- [API Documentation](http://derdesign.github.com/protos/docs/index.html)
 - [Google Groups Discussion](https://groups.google.com/group/protos-web-framework)
 - [Github Repository](http://github.com/derdesign/protos)
 
