@@ -4,8 +4,11 @@
   "version"           : "0.0.0",
   "main"              : "boot.js",
   "private"           : "true",
-  "engines"           : { "node": ">= 0.8.0" },
+  "engines"           : {
+    "node": "0.8.x",
+    "npm" : "1.1.x"
+  },
   "dependencies"      : {
-    "protos"          : ">= 0.1.0"
+    "protos"          : "0.2.x"
   }
 }
