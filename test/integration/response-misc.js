@@ -289,14 +289,127 @@ vows.describe('Response Misc').addBatch({
   
 }).addBatch({
   
+  'HTTP Message': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      multi.curl('-i /response/http-message/scode-msg'); // 0
+      multi.curl('-i -G -d "ob=1" /response/http-message/scode-msg'); // 1
+      
+      multi.curl('-i /response/http-message/scode-msg-raw'); // 2
+      multi.curl('-i -G -d "raw=1&ob=1" /response/http-message/scode-msg-raw'); // 3
+      
+      multi.curl('-i /response/http-message/scode-raw'); // 4
+      multi.curl('-i -G -d "raw=1&ob=1" /response/http-message/scode-raw'); // 5
+      
+      multi.curl('-i /response/http-message/scode'); // 6
+      multi.curl('-i -G -d "ob=1" /response/http-message/scode'); // 7
+      
+      multi.curl('-i /response/http-message/msg'); // 8
+      multi.curl('-i -G -d "ob=1" /response/http-message/msg'); // 9
+       
+      multi.curl('-i /response/http-message/msg-raw'); // 10
+      multi.curl('-i -G -d "raw=1&ob=1" /response/http-message/msg-raw'); // 11
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+      
+    },
+    
+    "Properly parses arguments and sends responses": function(results) {
+      var r0 = results[0];
+          r1 = results[1],
+          r2 = results[2],
+          r3 = results[3],
+          r4 = results[4],
+          r5 = results[5],
+          r6 = results[6],
+          r7 = results[7],
+          r8 = results[8],
+          r9 = results[9],
+          r10 = results[10],
+          r11 = results[11];
+
+      // scode-msg
+      assert.isTrue(r0.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r0.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r0.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
+
+      // scode-msg [ob]
+      assert.isTrue(r1.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r1.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r1.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
+      
+      // scode-msg-raw
+      assert.isTrue(r2.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r2.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r2.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
+      
+      // scode-msg-raw [ob, raw]
+      assert.isTrue(r3.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r3.indexOf('Content-Type: text/plain') >= 0);
+      assert.isTrue(r3.indexOf('\n{{SUCCESS}}') >= 0);
+      
+      // scode-raw
+      assert.isTrue(r4.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r4.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r4.indexOf('\n<p>202 Accepted</p>\n') >= 0);
+      
+      // scode-raw [ob, raw]
+      assert.isTrue(r5.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r5.indexOf('Content-Type: text/plain') >= 0);
+      assert.isTrue(r5.indexOf('\n202 Accepted\n') >= 0);
+      
+      // scode
+      assert.isTrue(r6.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r6.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r6.indexOf('\n<p>202 Accepted</p>\n') >= 0);
+      
+      // scode [ob]
+      assert.isTrue(r7.indexOf('HTTP/1.1 202 Accepted') >= 0);
+      assert.isTrue(r7.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r7.indexOf('\n<p>202 Accepted</p>\n') >= 0);
+      
+      // msg
+      assert.isTrue(r8.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r8.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r8.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
+      
+      // msg [ob]
+      assert.isTrue(r9.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r9.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r9.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
+      
+      // msg-raw
+      assert.isTrue(r10.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r10.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r10.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
+      
+      // msg-raw [ob, raw]
+      assert.isTrue(r11.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r11.indexOf('Content-Type: text/plain') >= 0);
+      assert.isTrue(r11.indexOf('\n{{SUCCESS}}') >= 0);
+      
+    },
+    
+  }
+  
+}).addBatch({
+  
   'AJAX Response': {
     
     topic: function() {
       
       var promise = new EventEmitter();
       
-      multi.curl('-i -H "X-Requested-With: XMLHttpRequest" /response/ajax-response');
+      multi.curl('-i -H "X-Requested-With: XMLHttpRequest" /response/ajax-response?statusCode=202'); // Should ignore statusCode
       multi.curl('-i /response/ajax-response');
+      multi.curl('-i /response/ajax-response?statusCode=202');
       
       multi.exec(function(err, results) {
         promise.emit('success', err || results);
@@ -316,6 +429,13 @@ vows.describe('Response Misc').addBatch({
     "Responds with the #msg template on non-AJAX Requests": function(results) {
       var r = results[1];
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r.indexOf('<p>SUCCESS!</p>') >= 0);
+    },
+    
+    "Accepts custom status codes to be sent on non-AJAX Requests": function(results) {
+      var r = results[2];
+      assert.isTrue(r.indexOf('HTTP/1.1 202 Accepted') >= 0);
       assert.isTrue(r.indexOf('Content-Type: text/html') >= 0);
       assert.isTrue(r.indexOf('<p>SUCCESS!</p>') >= 0);
     }

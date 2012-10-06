@@ -73,11 +73,60 @@ function MainController(app) {
     if (req.params.cache == 'response-cache') res.useCache('test_cache');
     res.render('response-cache');
   });
+
+  /* HTTP Message */
+  
+  get('/response/http-message/:arg', {arg: 'anything'}, function(req, res, params) {
+    var raw = req.queryData.raw ? true : false;
+    var ob = req.queryData.ob ? true : false;
+    var msg = '{{SUCCESS}}';
+    var scode = 202;
+    switch (params.arg) {
+      case 'scode-msg':
+        ob ? res.httpMessage({
+          statusCode: scode,
+          message: msg
+        }) : res.httpMessage(scode, msg);
+        break;
+      case 'scode-msg-raw':
+        ob ? res.httpMessage({
+          statusCode: scode,
+          message: msg,
+          raw: raw
+        }) : res.httpMessage(scode, msg, raw);
+        break;
+      case 'scode-raw':
+        ob ? res.httpMessage({
+          statusCode: scode,
+          raw: raw
+        }) : res.httpMessage(scode, raw);
+        break;
+      case 'scode':
+        ob ? res.httpMessage({
+          statusCode: scode
+        }) : res.httpMessage(scode);
+        break;
+      case 'msg':
+        ob ? res.httpMessage({
+          message: msg
+        }) : res.httpMessage(msg);
+        break;
+      case 'msg-raw':
+        ob ? res.httpMessage({
+          message: msg, 
+          raw: raw
+        }) : res.httpMessage(msg, raw);
+        break;
+      default:
+        console.exit('ERROR: not handled: ' + params.arg);
+        break;
+    }
+  });
   
   /* Ajax Response */
   
   get('/response/ajax-response', function(req, res) {
-    res.ajaxResponse('SUCCESS!');
+    res.ajaxResponse('SUCCESS!', req.queryData.statusCode);
   });
   
   /* Response Buffer filter test */
