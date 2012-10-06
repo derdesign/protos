@@ -22,8 +22,10 @@ function successfulUpload(r) {
 
 function uploadExceedsLimit(r) {
   assert.isTrue(r.indexOf('HTTP/1.1 100 Continue') >= 0);
+  assert.isTrue(r.indexOf('Connection: close') >= 0);
+  assert.isTrue(r.indexOf('X-Upload-Limit-Exceeded', 'true') >= 0); // Set on 'upload_limit_exceeded' event
   assert.isTrue(r.indexOf('HTTP/1.1 413 Request Entity Too Large') >= 0);
-  assert.isTrue(r.indexOf('Upload limit exceeded: 0.125 MB') >= 0);
+  assert.isTrue(r.indexOf('\n413 Request Entity Too Large\n') >= 0);
 }
 
 vows.describe('Body Parser (middleware)').addBatch({
@@ -112,34 +114,8 @@ vows.describe('Body Parser (middleware)').addBatch({
     
     'Forbids uploads that exceed maxUploadSize (PUT)': function(results) {
       uploadExceedsLimit(results[3]);
-    },
+    }
     
   }
   
 }).export(module);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

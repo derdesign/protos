@@ -94,12 +94,10 @@ IncomingMessage.prototype.exceededUploadLimit = function() {
     if (bytesExpected > uploadSize) {
       app.emit('upload_limit_exceeded', this, res);
       if (this.__stopRoute === true) return true;
-      res.setHeaders({ Connection: 'close' });
-      res.httpMessage({
-        statusCode: 413, // HTTP/1.1 413 Request Entity Too Large
-        message: protos.i18n.uploadLimitExceeded + (uploadSize / (1024 * 1024)) + " MB",
-        raw: true
-      });
+      // HTTP/1.1 413 Request Entity Too Large
+      // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.14
+      res.setHeader('Connection', 'close');
+      res.httpMessage(413, true);
       return true;
     } else {
       return false;

@@ -65,6 +65,10 @@ function TestController(app) {
   
   /* FILE UPLOADS */
   
+  app.on('upload_limit_exceeded', function(req, res) {
+    res.setHeader('X-Upload-Limit-Exceeded', req.response === res);
+  });
+  
   // Upload Limits & Messages
   var uploadCb;
   post('/upload', uploadCb = function(req, res) {
