@@ -37,6 +37,8 @@ vows.describe('View Rendering').addBatch({
 
     'Returns valid paths for aliases & filenames': function(res) {
       assert.strictEqual(res.getViewPath('index'), vPath('main/main-index.html'));
+      assert.strictEqual(res.getViewPath('main-index'), vPath('main/main-index.html'));
+      assert.strictEqual(res.getViewPath('main-index.html'), vPath('main/main-index.html'));
       assert.strictEqual(res.getViewPath('index.html'), vPath('main/index.html'));
     },
 
