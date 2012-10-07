@@ -4,7 +4,7 @@
   @namespace driver
  */
  
-var pg = protos.require('pg', "PostgreSQL Driver"),
+var pg = protos.requireDependency('pg', "PostgreSQL Driver"),
     _ = require('underscore'),
     Client = pg.Client,
     util = require('util');
