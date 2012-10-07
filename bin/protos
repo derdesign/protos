@@ -981,16 +981,17 @@ function validateApp(data, noexit, callback) {
 function startServer(path, data, callback) {
   var bootFile = path + '/boot.js';
   var logPath = data.logpath;
+  if (data.port) process.env.PORT_OVERRIDE = data.port;
   if (data.fork) {
     if (!logPath) console.exit("--fork has to be used with --logpath");
     var cmd = util.format("nohup node %s >> %s 2>&1", bootFile, logPath);
-    cp.exec(cmd);
+    cp.exec(cmd, {env: process.env});
     if (data.args.length <= 1) {
       console.log("Saving all output to " + logPath);
       process.exit(); // Only exit on single app
     }
   } else {
-    var cmd = cp.spawn('node', [bootFile], {setsid: true});
+    var cmd = cp.spawn('node', [bootFile], {env: process.env});
     var log = function(data) { console.log(data.toString('utf8').trimRight()); }
     cmd.stdout.on('data', log);
     cmd.stderr.on('data', log);
