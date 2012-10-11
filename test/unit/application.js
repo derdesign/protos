@@ -331,13 +331,13 @@ vows.describe('lib/application.js').addBatch({
       var ob = {
         self: true,
         method: function() {
-          if (this.self) return '{OK}';
+          if (this.self === true) return '{OK}';
           else return '{FAIL}';
         }
       }
 
-      app.registerViewHelper('$method', ob.method);
-      app.registerViewHelper('$method_with_context', ob.method, ob);
+      app.registerViewHelper('method', ob.method);
+      app.registerViewHelper('method_with_context', ob.method, ob);
 
       return ob;
     },
@@ -345,8 +345,8 @@ vows.describe('lib/application.js').addBatch({
     "Properly registers view helpers": function(ob) {
       var partials = app.views.partials,
           src = partials.$method_with_context.toString();
-      assert.equal(partials.$method.toString(), ob.method);
-      assert.isTrue(src.indexOf('return func.apply(context, slice.call(arguments, 0));') >= 0);
+      assert.equal(partials.$method(), '{FAIL}');
+      assert.equal(partials.$method_with_context(), '{OK}');
     }
 
   },

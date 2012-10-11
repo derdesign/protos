@@ -100,7 +100,7 @@ Markdown.prototype.parse = function(str, sanitize) {
 
 function registerViewHelpers(markdown) {
   // Expose markdown.parse as `$markdown`
-  app.registerViewHelper('$markdown', markdown.parse, markdown);
+  app.registerViewHelper('markdown', markdown.parse, markdown);
 }
 
 module.exports = Markdown;
