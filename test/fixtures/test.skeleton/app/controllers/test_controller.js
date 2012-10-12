@@ -4,6 +4,12 @@ var inspect = require('util').inspect;
 
 function TestController(app) {
 
+  /* Controller Handlers */
+  
+  app.handlerTests.test = {
+    'handler.js': this.handler('handler.js')
+  }
+
   /* Dynamic routes, covering all route methods */
   
   var routeMethods = this.prototype.routeMethods;

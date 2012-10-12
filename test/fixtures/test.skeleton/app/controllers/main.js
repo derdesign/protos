@@ -3,6 +3,13 @@
 function MainController(app) {
   
   var util = require('util');
+
+  /* Handler Tests */
+  
+  app.handlerTests.main = {
+    'test.js': this.handler('test.js'),
+    'test-dir/another.js': this.handler('test-dir/another.js')
+  }
   
   get('/', function(req, res) {
     res.render('index');
@@ -15,7 +22,7 @@ function MainController(app) {
     res.render('view-locals.html', true);
     delete app.globals.testval;
   });
-  
+
   /* Shortcode filter */
   
   get('/shortcode-filter', function(req, res) {

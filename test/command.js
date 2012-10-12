@@ -456,6 +456,43 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created mya
   
 }).addBatch({
   
+    'protos handler': {
+
+      topic: function() {
+        var promise = new EventEmitter();
+
+        protos.command('handler category/some/nested/directory/handler main/hello,world');
+
+        protos.exec(function(err, results) {
+          
+          results.push(fs.readFileSync('app/handlers/main/hello.js', 'utf8'));
+          
+          promise.emit('success', err || results);
+        });
+
+        return promise;
+      },
+
+      "Properly generates controller handlers": function(results) {
+        var r1 = results[0];
+        var expected =  '» Created myapp1/app/handlers/category/some/nested/directory/handler.js\n\
+» Created myapp1/app/handlers/main/hello.js\n\
+» Created myapp1/app/handlers/main/world.js';
+        
+        assert.equal(r1, expected);
+        assert.isTrue(fs.existsSync('app/handlers/category/some/nested/directory/handler.js'));
+        assert.isTrue(fs.existsSync('app/handlers/main/hello.js'));
+        assert.isTrue(fs.existsSync('app/handlers/main/world.js'));
+        
+        var buf = results[1];
+        var expectedBuf = '\n/* [handler] main/hello.js */\n\nvar app = protos.app;\n\nmodule.exports = function(req, res, params) {\n  \n}\n';
+        assert.equal(buf, expectedBuf);
+      }
+
+    }
+  
+}).addBatch({
+  
   'protos fetch': {
 
     topic: function() {

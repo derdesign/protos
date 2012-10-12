@@ -53,6 +53,10 @@ var protos = Protos.bootstrap(testSkeleton, {
           'jazz', 'jqtpl', 'jshtml', 'kernel', 'liquor', 'swig', 'whiskers');
         },
         pre_init: function(app) {
+          
+          // Handler tests
+          app.handlerTests = {};
+          
           // Test skeleton properties
           app.skelDir = skelDir;
           app.__initBootstrapEvent = true;

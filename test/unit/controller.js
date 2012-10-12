@@ -42,6 +42,17 @@ vows.describe('lib/controller.js').addBatch({
     
   },
   
+  'Controller::handler': {
+    
+    'Returns valid callbacks for each controller': function() {
+      // NOTE: Asserting that we've got the same `app.handlers` object, we
+      // are sure that the this.handler method of controllers works as expected,
+      // since exactly the same functions are returned
+      assert.deepEqual(app.handlers, app.handlerTests);
+    }
+    
+  },
+  
   'Controller::getControllerByAlias': {
     
     'Returns the correct controler': function() {
