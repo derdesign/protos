@@ -417,10 +417,12 @@ var commands = {
       var template = "\n\
 /* [handler] {{comment}} */\n\
 \n\
-var app = protos.app;\n\
+module.exports = function() {\n\
 \n\
-module.exports = function(req, res, params) {\n\
-  \n\
+  return function(req, res) {\n\
+\n\
+  }\n\
+\n\
 }\n";
       
       var cwd = process.cwd() + '/app/handlers/';

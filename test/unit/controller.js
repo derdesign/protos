@@ -45,10 +45,25 @@ vows.describe('lib/controller.js').addBatch({
   'Controller::handler': {
     
     'Returns valid callbacks for each controller': function() {
-      // NOTE: Asserting that we've got the same `app.handlers` object, we
-      // are sure that the this.handler method of controllers works as expected,
-      // since exactly the same functions are returned
-      assert.deepEqual(app.handlers, app.handlerTests);
+      
+      // Verify that handlerTests has valid functions
+      assert.isFunction(app.handlerTests.blog['some/handler/dir/file.js']);
+      assert.isFunction(app.handlerTests.main['test.js']);
+      assert.isFunction(app.handlerTests.main['test-dir/another.js']);
+      assert.isFunction(app.handlerTests.test['handler.js']);
+      
+      // Test handler with multiple arguments
+      var callback1 = app.controllers.main.handler('test.js', 1, 2, 3);
+      var callback2 = app.controllers.main.handler('test.js');
+      
+      // Callback should be a function
+      assert.isFunction(callback1);
+      assert.isFunction(callback2);
+      assert.isTrue(callback1 !== callback2); // a different callback is executed each time handler runs
+      
+      // Running callback, will have access to the arguments passed by the handler method
+      assert.deepEqual(callback1(), [1, 2, 3]);
+      assert.deepEqual(callback2(), [undefined, undefined, undefined]);
     }
     
   },
