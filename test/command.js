@@ -485,7 +485,7 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created mya
         assert.isTrue(fs.existsSync('app/handlers/main/world.js'));
         
         var buf = results[1];
-        var expectedBuf = '\n/* [handler] main/hello.js */\n\nmodule.exports = function() {\n\n  return function(req, res) {\n\n  }\n\n}\n';
+        var expectedBuf = '\n/* [handler] main/hello.js */\n\nmodule.exports = function() {\n\n  var app = protos.app;\n\n  return function(req, res) {\n\n  }\n\n}\n';
         
         assert.equal(buf, expectedBuf);
       }

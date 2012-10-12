@@ -419,6 +419,8 @@ var commands = {
 \n\
 module.exports = function() {\n\
 \n\
+  var app = protos.app;\n\
+\n\
   return function(req, res) {\n\
 \n\
   }\n\
