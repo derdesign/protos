@@ -20,7 +20,7 @@ vows.describe('CSRF (middleware)').addBatch({
       
       console.log("    Note: using HTTP/403 as the response for testing purposes (default is HTTP/400).");
       console.log("    This prevents any confusion between the regular HTTP/400 errors and the CSRF ones.\n")
-      console.log("    These tests cover req.getRequestData() with CSRF tokens.\n");
+      console.log("    These tests cover req.getQueryData() and req.getPostData() with CSRF tokens.\n");
       
       sessionBackup = app.session;
       sessionSupport = app.supports.session;
@@ -59,10 +59,10 @@ vows.describe('CSRF (middleware)').addBatch({
               multi.curl(util.format('-i -X POST --cookie "_sess=%s" /csrf/check/post', sess));
               
               // POST Csrf check + invalid token (400)
-              multi.curl(util.format('-i -X POST --cookie "_sess=%s" -F "protect_key=INVALID" /csrf/check/post', sess));
+              multi.curl(util.format('-i -X POST --cookie "_sess=%s" -d "protect_key=INVALID" /csrf/check/post', sess));
               
               // POST Csrf check + valid token (200)
-              multi.curl(util.format('-i -X POST --cookie "_sess=%s" -F "protect_key=%s" -F "name=ernie" -F "age=29" /csrf/check/post', sess, token));
+              multi.curl(util.format('-i -X POST --cookie "_sess=%s" -d "protect_key=%s" -d "name=ernie" -d "age=29" /csrf/check/post', sess, token));
               
               /* PUT TESTS */
               
@@ -70,10 +70,10 @@ vows.describe('CSRF (middleware)').addBatch({
               multi.curl(util.format('-i -X PUT --cookie "_sess=%s" /csrf/check/post', sess));
               
               // POST Csrf check + invalid token (400)
-              multi.curl(util.format('-i -X PUT --cookie "_sess=%s" -F "protect_key=INVALID" /csrf/check/post', sess));
+              multi.curl(util.format('-i -X PUT --cookie "_sess=%s" -d "protect_key=INVALID" /csrf/check/post', sess));
               
               // POST Csrf check + valid token (200)
-              multi.curl(util.format('-i -X PUT --cookie "_sess=%s" -F "protect_key=%s" -F "name=ernie" -F "age=29" /csrf/check/post', sess, token));
+              multi.curl(util.format('-i -X PUT --cookie "_sess=%s" -d "protect_key=%s" -d "name=ernie" -d "age=29" /csrf/check/post', sess, token));
               
               multi.exec(function(err, results) {
                 delete app.supports.session;

@@ -20,43 +20,34 @@ var FileManager = require('./file_manager.js');
 
 IncomingMessage.prototype.getRequestData = function(token, callback) {
   
-  if (this.exceededUploadLimit()) {
-
-    return; // Response automatically sent
-
-  } else {
-    
-    this.parseBodyData(function(fields, files) {
-      
-      var app = this.app;
-
-      if (typeof callback == 'undefined') {
-        callback = token;
-        token = null;
-      }
-
-      if (token) {
-        if (app.supports.csrf) {
-          if (app.csrf.checkToken(this, token, fields)) {
-            // Token verified, proceed
-            callback.call(this, fields, files);
-          } else {
-            // Token can't be verified, remove files and send 400
-            files.removeAll();
-            this.response.httpMessage(400);
-          }
-        } else {
-          throw new Error("Unable to validate CSRF Token: Middleware not loaded.");
-        }
-      } else {
-        // No token provided, proceed
-        callback.call(this, fields, files);
-      }
-
-    });
-    
+  var data = this.requestData,
+      fields = data.fields,
+      files = data.files,
+      app = this.app;
+  
+  if (typeof callback == 'undefined') {
+    callback = token;
+    token = null;
   }
   
+  if (token) {
+    if (app.supports.csrf) {
+      if (app.csrf.checkToken(this, token, fields)) {
+        // Token verified, proceed
+        callback.call(this, fields, files);
+      } else {
+        // Token can't be verified, remove files and send 400
+        data.files.removeAll();
+        this.response.httpMessage(400);
+      }
+    } else {
+      throw new Error("Trying to validate token when CSRF middleware not loaded.");
+    }
+  } else {
+    // No token available, proceed
+    callback.call(this, fields, files);
+  }
+
 }
 
 /**
