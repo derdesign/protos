@@ -381,8 +381,8 @@ var validation = {
     invalid: ['340,282,366,920,938,463,463,374,607,431,768,211,4561', '340,282,366,920,938,463,463,374,607,431,768,211,45', '']
   },
   url: {
-    regex: /^(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:~\+#]*[\w\-\@?\^=%&amp;~\+#])?$/i,
-    valid: ['http://google.com', 'ftp://nine.com:8080', 'https://hello.com?search=24&some=%20&there=%4'],
+    regex: /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/i,
+    valid: ['http://google.com', 'ftp://nine.com:8080', 'https://hello.com?search=24&some=%20&there=%4', 'http://some.test.domain.com/cool.html'],
     invalid: ['http:/google.com', 'google.com', 'some:8080', '']
   },
   email: {
