@@ -129,6 +129,14 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
       // Query String values + param validation
       multi.curl('-i -G -d "alpha=4&bravo=5&charlie=6" /test/qstring/abc/123');
       
+      // Query string values on all methods
+      multi.curl('-i -G -d "test=true" /test/qstring');
+      multi.curl('-X POST -i -G -d "test=true" /test/qstring');
+      multi.curl('-X PUT -i -G -d "test=true" /test/qstring');
+      multi.curl('-X DELETE -i -G -d "test=true" /test/qstring');
+      multi.curl('-X OPTIONS -i -G -d "test=true" /test/qstring');
+      multi.curl('-X TRACE -i -G -d "test=true" /test/qstring');
+      
       multi.exec(function(err, results) {
         promise.emit('success', err || results);
       });
@@ -158,6 +166,36 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
       assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
       assert.isTrue(r.indexOf("{ rule1: 'abc', rule2: '123' } { alpha: '4', bravo: '5', charlie: '6' }") >= 0);
     },
+    
+    'Properly parses query string on all requests': function(results) {
+      var get = results[4],
+          post = results[5],
+          put = results[6],
+          del = results[7],
+          opts = results[8],
+          trace = results[9];
+      
+      var expected = "{ test: 'true' }";
+      
+      assert.isTrue(get.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(get.indexOf(expected) >= 0);
+      
+      assert.isTrue(post.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(post.indexOf(expected) >= 0);
+      
+      assert.isTrue(put.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(put.indexOf(expected) >= 0);
+      
+      assert.isTrue(del.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(del.indexOf(expected) >= 0);
+      
+      assert.isTrue(opts.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(opts.indexOf(expected) >= 0);
+      
+      assert.isTrue(trace.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(trace.indexOf(expected) >= 0);
+      
+    }
 
   }
   

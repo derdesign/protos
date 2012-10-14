@@ -50,7 +50,7 @@ function TestController(app) {
   get('/qstring', function(req, res) {
     res.sendHeaders();
     res.end(inspect(req.queryData));
-  });
+  }, 'post', 'put', 'delete', 'trace', 'options');
   
   // Query String values + param validation 
   get('/qstring/:rule1/:rule2', {rule1: 'alpha', rule2: 'integer'}, function(req, res, params) {
