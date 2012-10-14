@@ -62,6 +62,14 @@ FileManager.prototype.expect = function(defs) {
    if (err) (app.errorLog || app.log)(err);
   }
   
+  // On empty arg, will expect all files present
+  if (typeof defs == 'undefined') {
+    defs = {};
+    for (var key in this.files) {
+      defs[key] = {};
+    }
+  }
+  
   // Iterate over each definition
   for (var file in defs) {
 

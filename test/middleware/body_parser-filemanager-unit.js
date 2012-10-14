@@ -153,8 +153,12 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
       });
       results.push(fm);
       
+      // Automatically expects all given files when expect() run without arguments
+      createFiles();
+      fm = new FileManager(files);
+      fm.expect();
+      results.push(fm);
       return results;
-      
     },
     
     'Required File expected n/a => removes all files': function(results) {
@@ -216,10 +220,22 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
       assert.deepEqual(fm.files, {});
     },
     
+    'Automatically expects all files when running expect() w/o arguments': function(results) {
+      var fm = results[9];
+      assert.equal(fm.length, 4);
+      assert.deepEqual(fm.removed, ['epsilon']);
+      assert.deepEqual(fm.files, {
+        alpha: files.alpha,
+        beta: files.beta,
+        gamma: files.gamma,
+        delta: files.delta
+      });
+    },
+    
     'Returns object with files (filtered)': function() {
       var fm = new FileManager(files);
       assert.isTrue(fm.files === fm.expect({}));
-    }
+    },
     
   } 
     
