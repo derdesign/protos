@@ -28,16 +28,20 @@ var eventObjects = {
   delete: null
 }
 
-app.usersModel.on('create', function(err, mod) {
+app.usersModel.on('create', function(mod) {
   eventObjects.create = mod;
 });
 
-app.usersModel.on('save', function(err, mod) {
-  eventObjects.save = mod;
+app.usersModel.on('before_save', function(mod) {
+  eventObjects.before_save = mod;
+});
+
+app.usersModel.on('after_save', function(err, mod) {
+  eventObjects.after_save = [err, mod];
 });
 
 app.usersModel.on('delete', function(err, mod) {
-  eventObjects.delete = mod;
+  eventObjects.delete = [err, mod];
 });
 
 var tdate = 1330529734000; // Wed Feb 29 2012 15:35:34 AST
@@ -344,7 +348,7 @@ vows.describe('Models').addBatch({
   
 }).addBatch({
   
-  'Model EventEmitter': {
+  'Model Events': {
     
     "Emits the 'create' event": function() {
       var mod = eventObjects.create;
@@ -353,15 +357,28 @@ vows.describe('Models').addBatch({
       assert.equal(mod.user, 'NODE');
     },
     
-    "Emits the 'save' event": function() {
-      var mod = eventObjects.save;
+    "Emits the 'before_save' event": function() {
+      var mod = eventObjects.before_save;
+      assert.isNotNull(mod);
+      assert.equal(mod.constructor.name, 'ModelObject');
+      assert.equal(mod.user, 'NODE');
+    },
+    
+    "Emits the 'after_save' event": function() {
+      var args = eventObjects.after_save;
+      var err = args[0];
+      var mod = args[1];
+      assert.isNull(err);
       assert.isNotNull(mod);
       assert.equal(mod.constructor.name, 'ModelObject');
       assert.equal(mod.user, 'NODE');
     },
     
     "Emits the 'delete' event": function() {
-      var mod = eventObjects.delete;
+      var args = eventObjects.delete;
+      var err = args[0];
+      var mod = args[1];
+      assert.isNull(err);
       assert.isNotNull(mod);
       assert.equal(mod.constructor.name, 'ModelObject');
       assert.equal(mod.user, 'NODE');
