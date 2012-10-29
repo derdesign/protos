@@ -271,7 +271,6 @@ Session.prototype.loadSession = function(req, res, callback) {
       }
 
       // If it's not a user session, it's a guest session
-      
       guest = (data && data.user == null);
 
       if (_.isEmpty(data)) { // If data is empty
@@ -343,61 +342,76 @@ Request Headers: \n%s\n", req.socket.remoteAddress, sessId, sessHash, req.method
 
           } else { // Else (session hash not detected)
 
-            userAgent = req.headers['user-agent'] || self.config.defaultUserAgent;
-            ua_md5 = app.md5(userAgent);
+            if (req.__noSessionRegenerate) { // Don't regenerate session (if set)
 
-            if (ua_md5 == data.ua_md5) { // If user agent's md5 matches the one in session
-              hashes = self.createHash(userAgent);
-              newSess = hashes.sessId;
-              newHash = hashes.fingerprint;
-
-              /*
-              Is data persistent ? => use permanentExpires
-              Otherwise:
-              -- Is it a user session ? => use temporaryExpires
-              -- Otherwise => use guestExpires
-              */
-
-              expires = self.config[(data.pers ? 'permanentExpires' : (data.user ? 'temporaryExpires' : 'guestExpires'))];
+              // Load user session
+              app.debug('Loading session (no regeneration)');
+              req.session = data;
+              req.__origSessionState = _.extend({}, data);
+              req.__jsonSession = JSON.stringify(data);
+              app.emit('load_session', sessId, req.session);
+              callback.call(self);
               
-              // Set defaultExpires if expires is zero
-              if (!expires) expires = self.config.defaultExpires;
-
-              multi = self.storage.multi();
-              multi.updateHash(sessId, {fpr: newHash});
-              multi.rename(sessId, newSess);
-              multi.expire(newSess, expires);
+            } else { // Session should be regenerated
               
-              multi.exec(function(err, replies) {
-                if (err) {
-                  app.serverError(res, err);
-                } else {
-                  res.setCookie(self.config.sessCookie, newSess, {
-                    expires: data.pers ? expires : null,
-                    httpOnly: true
-                  });
-                  res.setCookie(self.config.hashCookie, newHash, {
-                    expires: self.config.regenInterval,
-                    httpOnly: true
-                  });
-                  req.cookies[self.config.sessCookie.toLowerCase()] = newSess;
-                  data.fpr = req.cookies[self.config.hashCookie.toLowerCase()] = newHash;
-                  req.session = data;
-                  req.__origSessionState = _.extend({}, data);
-                  req.__jsonSession = JSON.stringify(data);
-                  app.emit('load_session', sessId, req.session);
-                  app.debug('Regenerating session');
-                  callback.call(self);
-                }
-              });
+              userAgent = req.headers['user-agent'] || self.config.defaultUserAgent;
+              ua_md5 = app.md5(userAgent);
 
-            } else { // Else (if user agent doesn't match the one in session)
+              if (ua_md5 == data.ua_md5) { // If user agent's md5 matches the one in session
+                hashes = self.createHash(userAgent);
+                newSess = hashes.sessId;
+                newHash = hashes.fingerprint;
 
-              // => Remove cookies from client, and redirect to login
-              res.removeCookies(self.config.sessCookie, self.config.hashCookie);
-              app.login(res);
+                /*
+                Is data persistent ? => use permanentExpires
+                Otherwise:
+                -- Is it a user session ? => use temporaryExpires
+                -- Otherwise => use guestExpires
+                */
 
+                expires = self.config[(data.pers ? 'permanentExpires' : (data.user ? 'temporaryExpires' : 'guestExpires'))];
+
+                // Set defaultExpires if expires is zero
+                if (!expires) expires = self.config.defaultExpires;
+
+                multi = self.storage.multi();
+                multi.updateHash(sessId, {fpr: newHash});
+                multi.rename(sessId, newSess);
+                multi.expire(newSess, expires);
+
+                multi.exec(function(err, replies) {
+                  if (err) {
+                    app.serverError(res, err);
+                  } else {
+                    res.setCookie(self.config.sessCookie, newSess, {
+                      expires: data.pers ? expires : null,
+                      httpOnly: true
+                    });
+                    res.setCookie(self.config.hashCookie, newHash, {
+                      expires: self.config.regenInterval,
+                      httpOnly: true
+                    });
+                    req.cookies[self.config.sessCookie.toLowerCase()] = newSess;
+                    data.fpr = req.cookies[self.config.hashCookie.toLowerCase()] = newHash;
+                    req.session = data;
+                    req.__origSessionState = _.extend({}, data);
+                    req.__jsonSession = JSON.stringify(data);
+                    app.emit('load_session', sessId, req.session);
+                    app.debug('Regenerating session');
+                    callback.call(self);
+                  }
+                });
+
+              } else { // Else (if user agent doesn't match the one in session)
+
+                // => Remove cookies from client, and redirect to login
+                res.removeCookies(self.config.sessCookie, self.config.hashCookie);
+                app.login(res);
+
+              }
+              
             }
+
           }
         }
 

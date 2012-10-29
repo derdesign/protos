@@ -8,6 +8,10 @@ var app = protos.app,
 
 IncomingMessage.prototype.__saveSession = null;
 
+IncomingMessage.prototype.noSessionRegenerate = function() {
+  this.__noSessionRegenerate = true;
+}
+
 /**
   Saves the session if it has changed
 

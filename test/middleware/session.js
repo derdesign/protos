@@ -332,15 +332,21 @@ vows.describe('Session (middleware)').addBatch({
       // Set verify token in session
       multi.curl(sessCmd + '/session/set/token/abc123');
       
+      // Access session without a session hash (no session regeneration)
+      multi.curl(noSessHash + '/session/noregen');
+      
       // Access session without a session hash (will force session regeneration)
       multi.curl(noSessHash + '/session');
       
       multi.exec(function(err, results) {
-        if (err) promise.emit('success', err);
-        else {
+        if (err) {
+          promise.emit('success', err);
+        } else {
+          
           // Detect new Session ID
           var matches;
-          results[1].split(/\r\n/).forEach(function(line) {
+          
+          results[2].split(/\r\n/).forEach(function(line) {
             
             var re = new RegExp(util.format('Set-Cookie: %s\=([^;]+);', sess));
             
@@ -365,9 +371,16 @@ vows.describe('Session (middleware)').addBatch({
     'Session regenerates successfully': function(results) {
       var r1 = results[0],
           r2 = results[1],
-          sid = results[2],
-          token = results[3];
-
+          r3 = results[2],
+          sid = results[3],
+          token = results[4];
+          
+      // console.log(r1);
+      // console.log('--');
+      // console.log(r2);
+      // console.log('--');
+      // console.log(r3);
+          
       // Since we're reusing the previous test case session (in which we created a temporary 
       // session) we need to compare against the temporaryExpires value instead of permanentExpires.
 
@@ -376,13 +389,18 @@ vows.describe('Session (middleware)').addBatch({
       // Store request
       assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
       assert.isTrue(r1.indexOf('{OK}') >= 0);
+      
+      // Session should be loaded without regenerating
+      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r2.indexOf('Set-Cookie:') === -1);
+      assert.isTrue(r2.indexOf('{SESSION CONTROLLER}') >= 0);
 
       // Regenerate request
-      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r2.indexOf('{SESSION CONTROLLER}') >= 0);
+      assert.isTrue(r3.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r3.indexOf('{SESSION CONTROLLER}') >= 0);
       
       // Verify that regenerated session expires correctly
-      assert.isTrue(r2.indexOf(util.format('Set-Cookie: _sess=%s; path=/; httpOnly\r\n', sid)) >= 0);
+      assert.isTrue(r3.indexOf(util.format('Set-Cookie: _sess=%s; path=/; httpOnly\r\n', sid)) >= 0);
       
       // Verify that the token is on the new session
       assert.equal(token, 'abc123');

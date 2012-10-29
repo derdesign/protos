@@ -19,6 +19,14 @@ function SessionController(app) {
     res.end('{SESSION CONTROLLER}');
   });
   
+  get('/noregen', function(req, res) {
+    req.noSessionRegenerate();
+    app.session.load(req, res);
+  }, function(req, res) {
+    res.sendHeaders();
+    res.end('{SESSION CONTROLLER}');
+  });
+  
   get('/create/browser-session', function(req, res) {
     var config = app.session.config;
     var te = config.temporaryExpires;

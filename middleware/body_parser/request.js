@@ -24,7 +24,7 @@ IncomingMessage.prototype.getRequestData = function(token, callback) {
       fields = data.fields,
       files = data.files,
       app = this.app;
-  
+      
   if (typeof callback == 'undefined') {
     callback = token;
     token = null;
@@ -69,8 +69,12 @@ IncomingMessage.prototype.parseBodyData = function(callback) {
     form.encoding = 'utf-8';
     form.keepExtensions = app.body_parser.config.keepUploadExtensions;
     form.parse(req, function(err, fields, files) {
-      if (err) app.serverError(res, err);
-      else callback.call(req, fields, new FileManager(files));
+      if (err) {
+        app.serverError(res, err);
+      } else {
+        // Run callback
+        callback.call(req, fields, new FileManager(files));
+      }
     });
   } else {
     callback.call(req, {}, new FileManager({}));
