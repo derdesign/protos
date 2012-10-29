@@ -71,7 +71,7 @@ function createUserSessionBatch(persistent) {
         r.split(/\r\n/).forEach(function(line) {
           var expires, hashExpire, sessExpire, shouldExpire;
           if (line.indexOf('=' + sessHash) >= 0) {
-            expires = line.slice(line.lastIndexOf('=')+1);
+            expires = line.slice(line.lastIndexOf('=')+1).replace('; httpOnly', '');
             hashExpire = new Date(expires).toString();
             hashExpire = hashExpire.slice(0, hashExpire.lastIndexOf(':')); // Second precision
             shouldExpire = new Date(Date.now() + app.session.config.regenInterval*1000).toString();
@@ -79,7 +79,7 @@ function createUserSessionBatch(persistent) {
             assert.equal(hashExpire, shouldExpire);   // Check if Expiration matches config
             success = true;
           } else if (line.indexOf('=' + sessId) >= 0) {
-            expires = line.slice(line.lastIndexOf('=')+1);
+            expires = line.slice(line.lastIndexOf('=')+1).replace('; httpOnly', '');
             sessExpire = new Date(expires).toString();
             sessExpire = sessExpire.slice(0, sessExpire.lastIndexOf(':')); // Second precision
             shouldExpire = new Date(Date.now() + app.session.config.permanentExpires*1000).toString();
@@ -93,7 +93,8 @@ function createUserSessionBatch(persistent) {
         
         // Non-persistent
         var sessID = r.match(/X-Session-Id: (.+)\s+/)[1];
-        var targetLine = util.format('Set-Cookie: _sess=%s; path=/', sessID);
+        var targetLine = util.format('Set-Cookie: _sess=%s; path=/; httpOnly', sessID);
+        
         r.split(/\r\n/).forEach(function(line) {
           if (line === targetLine) {
             success = true;
@@ -200,7 +201,7 @@ vows.describe('Session (middleware)').addBatch({
           shouldExpire = shouldExpire.slice(0, shouldExpire.lastIndexOf(':')); // Second precision
           assert.equal(hashExpire, shouldExpire);  // Cookie should have expired
         } else if (line.indexOf('=' + guestSessId) >= 0) {
-          expires = line.slice(line.lastIndexOf('=')+1);
+          expires = line.slice(line.lastIndexOf('=')+1).replace('; httpOnly', '');
           sessExpire = new Date(expires).toString();
           sessExpire = sessExpire.slice(0, sessExpire.lastIndexOf(':')); // Second precision
           shouldExpire = new Date(Date.now() + app.session.config.guestExpires*1000).toString();
@@ -319,17 +320,13 @@ vows.describe('Session (middleware)').addBatch({
           var matches;
           results[1].split(/\r\n/).forEach(function(line) {
             
-            var re = new RegExp(util.format('Set-Cookie: %s\=(.+);', sess));
+            var re = new RegExp(util.format('Set-Cookie: %s\=([^;]+);', sess));
             
             matches = line.match(re);
             
             if (matches) {
-              sessId = matches[1];
+              sessId = matches[1].split(';')[0];
               results.push(sessId);
-              
-              var expireDate = line.slice(line.lastIndexOf('=') + 1);
-              expireDate = new Date(expireDate);
-              results.push(expireDate);
               
               storage.getHash(sessId, function(err, data) {
                 results.push(err || data.token);
@@ -347,8 +344,7 @@ vows.describe('Session (middleware)').addBatch({
       var r1 = results[0],
           r2 = results[1],
           sid = results[2],
-          expireDate = results[3],
-          token = results[4];
+          token = results[3];
 
       // Since we're reusing the previous test case session (in which we created a temporary 
       // session) we need to compare against the temporaryExpires value instead of permanentExpires.
@@ -364,7 +360,7 @@ vows.describe('Session (middleware)').addBatch({
       assert.isTrue(r2.indexOf('{SESSION CONTROLLER}') >= 0);
       
       // Verify that regenerated session expires correctly
-      assert.isTrue(r2.indexOf(util.format('Set-Cookie: _sess=%s; path=/\r\n', sid)) >= 0);
+      assert.isTrue(r2.indexOf(util.format('Set-Cookie: _sess=%s; path=/; httpOnly\r\n', sid)) >= 0);
       
       // Verify that the token is on the new session
       assert.equal(token, 'abc123');

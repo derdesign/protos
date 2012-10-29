@@ -146,14 +146,16 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
 
       // Expires has been calculated a few lines back
       res.setCookie(self.config.sessCookie, hashes.sessId, {
-        expires: persistent ? expires : null
+        expires: persistent ? expires : null,
+        httpOnly: true
       });
 
       if (guest) {
         data.guest = parseInt(data.guest, 10);
       } else {
         res.setCookie(self.config.hashCookie, hashes.fingerprint, {
-          expires: self.config.regenInterval
+          expires: self.config.regenInterval,
+          httpOnly: true
         });
       }
 
@@ -371,10 +373,12 @@ Request Headers: \n%s\n", req.socket.remoteAddress, sessId, sessHash, req.method
                   app.serverError(res, err);
                 } else {
                   res.setCookie(self.config.sessCookie, newSess, {
-                    expires: data.pers ? expires : null
+                    expires: data.pers ? expires : null,
+                    httpOnly: true
                   });
                   res.setCookie(self.config.hashCookie, newHash, {
-                    expires: self.config.regenInterval
+                    expires: self.config.regenInterval,
+                    httpOnly: true
                   });
                   req.cookies[self.config.sessCookie.toLowerCase()] = newSess;
                   data.fpr = req.cookies[self.config.hashCookie.toLowerCase()] = newHash;
