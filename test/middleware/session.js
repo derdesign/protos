@@ -71,7 +71,14 @@ function createUserSessionBatch(persistent) {
         r.split(/\r\n/).forEach(function(line) {
           var expires, hashExpire, sessExpire, shouldExpire;
           if (line.indexOf('=' + sessHash) >= 0) {
-            expires = line.slice(line.lastIndexOf('=')+1).replace('; httpOnly', '');
+            expires = line.slice(line.lastIndexOf('=')+1);
+            
+            if (expires.indexOf('; httpOnly') > 0) {
+              expires = expires.replace('; httpOnly', '');
+            } else {
+              throw new Error("Sessions are expected to use httpOnly cookies");
+            }
+            
             hashExpire = new Date(expires).toString();
             hashExpire = hashExpire.slice(0, hashExpire.lastIndexOf(':')); // Second precision
             shouldExpire = new Date(Date.now() + app.session.config.regenInterval*1000).toString();
@@ -79,7 +86,14 @@ function createUserSessionBatch(persistent) {
             assert.equal(hashExpire, shouldExpire);   // Check if Expiration matches config
             success = true;
           } else if (line.indexOf('=' + sessId) >= 0) {
-            expires = line.slice(line.lastIndexOf('=')+1).replace('; httpOnly', '');
+            expires = line.slice(line.lastIndexOf('=')+1);
+            
+            if (expires.indexOf('; httpOnly') > 0) {
+              expires = expires.replace('; httpOnly', '');
+            } else {
+              throw new Error("Sessions are expected to use httpOnly cookies");
+            }
+            
             sessExpire = new Date(expires).toString();
             sessExpire = sessExpire.slice(0, sessExpire.lastIndexOf(':')); // Second precision
             shouldExpire = new Date(Date.now() + app.session.config.permanentExpires*1000).toString();
@@ -201,7 +215,15 @@ vows.describe('Session (middleware)').addBatch({
           shouldExpire = shouldExpire.slice(0, shouldExpire.lastIndexOf(':')); // Second precision
           assert.equal(hashExpire, shouldExpire);  // Cookie should have expired
         } else if (line.indexOf('=' + guestSessId) >= 0) {
-          expires = line.slice(line.lastIndexOf('=')+1).replace('; httpOnly', '');
+          
+          expires = line.slice(line.lastIndexOf('=')+1);
+          
+          if (expires.indexOf('; httpOnly') > 0) {
+            expires = expires.replace('; httpOnly', '');
+          } else {
+            throw new Error("Sessions are expected to use httpOnly cookies");
+          }
+          
           sessExpire = new Date(expires).toString();
           sessExpire = sessExpire.slice(0, sessExpire.lastIndexOf(':')); // Second precision
           shouldExpire = new Date(Date.now() + app.session.config.guestExpires*1000).toString();
