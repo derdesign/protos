@@ -69,6 +69,7 @@ vows.describe('Model Relationships').addBatch({
         'createMulti',
         'delete',
         'destroy',
+        'getUpdatedFields',
         'getUsername',  // Added using UsersModel.methods
         'greeting',     // Added using UsersModel.methods
         'queryCached',

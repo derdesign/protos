@@ -687,7 +687,7 @@ PostgreSQL.prototype.__modelMethods = {
   save: function(o, callback) {
     var id, self = this;
     
-    // // Get id, and prepare update data
+    // Get id, and prepare update data
     id = o.id; 
     delete o.id;
     
