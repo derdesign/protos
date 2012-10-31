@@ -208,6 +208,20 @@ vows.describe('lib/application.js').addBatch({
     "Properly emits the 'queue_job' event": function() {
       assert.deepEqual(events.queue_job, ['my_immed_job', 'my_job', 'my_immed_job', 'my_job', 'my_immed_job', 'my_job']); // Should catch 6 events
       assert.deepEqual(events.remove_job, ['my_immed_job', 'my_job']); // Should catch 2 events only (doesn't do nothing after removal)
+    },
+    
+    "Properly removes job data": function() {
+      var jobIntervalIDs = app.__jobIntervalIDs;
+      var jobExecutionState = app.__jobExecutionState;
+      var jobNextCallTime = app.__jobNextCallTime;
+      
+      assert.isFalse('my_job' in jobIntervalIDs);
+      assert.isFalse('my_job' in jobExecutionState);
+      assert.isFalse('my_job' in jobNextCallTime);
+      
+      assert.isFalse('my_immed_job' in jobIntervalIDs);
+      assert.isFalse('my_immed_job' in jobExecutionState);
+      assert.isFalse('my_immed_job' in jobNextCallTime);
     }
     
   }
