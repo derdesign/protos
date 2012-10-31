@@ -84,6 +84,40 @@ vows.describe('lib/application.js').addBatch({
     'Runs job callback when runImmed is true': function() {
       assert.equal(state.immedJob, true); // Runs callback
       assert.equal(state.myImmedJobCounter, 1); // Callback runs one time
+    },
+    
+    'Properly sets job timestamps': function() {
+      
+      var now = Date.now();
+      
+      var myJobDateTimestamp = app.getJobNextCallTime('my_job');
+      var myImmedJobDateTimestamp = app.getJobNextCallTime('my_immed_job');
+      
+      var myJobDate = new Date(myJobDateTimestamp);
+      var myImmedJobDate = new Date(myImmedJobDateTimestamp);
+      
+      assert.isTrue(typeof myJobDateTimestamp == 'number');
+      assert.isTrue(myJobDateTimestamp !== NaN);
+      assert.isTrue(typeof myImmedJobDateTimestamp == 'number');
+      assert.isTrue(myImmedJobDateTimestamp !== NaN);
+      
+      assert.isTrue(myJobDate instanceof Date);
+      assert.isTrue(myJobDate.valueOf() !== NaN);
+      
+      assert.isTrue(myImmedJobDate instanceof Date);
+      assert.isTrue(myImmedJobDate.valueOf() !== NaN);
+      
+      assert.isTrue(myJobDate.valueOf() > now);
+      assert.isTrue(myJobDate.valueOf() > now);
+      
+      // Since 600 seconds have passed in the timeout before the topic exits,
+      // this makes the code below run almost immediately after the next execution
+      // will happen, this is the reason why we check that less than 10 ms have passed
+      // since that time, to overcome for tests in slower machines
+      
+      assert.isTrue((myJobDate.valueOf() - now) <= 10); // 10 ms max execution delay
+      assert.isTrue((myImmedJobDate.valueOf() - now) <= 10); // 10 ms max execution delay
+      
     }
 
   }
@@ -168,6 +202,7 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(state.myImmedJobCounter, 3); // Should be the same as previous test case
       assert.equal(state.runTimes, 2); // Should be the same as previous test case
       assert.isTrue(state.shouldBeTrue); // Should be the same as previous test case
+      
     },
     
     "Properly emits the 'queue_job' event": function() {
