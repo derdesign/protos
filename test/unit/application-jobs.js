@@ -347,7 +347,7 @@ vows.describe('lib/application.js').addBatch({
     
     'Properly emit events': function() {
       assert.deepEqual(events.invalidate_cache_key, ['my_cache_key', 'my_cache_key']);
-      assert.deepEqual(events.cache_key_invalidate_success, ['invalidate_my_cache_key']);
+      assert.deepEqual(events.cache_key_invalidate_success, ['my_cache_key']);
       assert.deepEqual(events.clear_cache_key_interval, ['my_cache_key']);
     }
     
