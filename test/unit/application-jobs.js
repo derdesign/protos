@@ -64,8 +64,13 @@ vows.describe('lib/application.js').addBatch({
         state.runTimes++;
       }, 100);
       
+      var timestamps = {
+        my_job: app.getJobNextCallTime('my_job'),
+        my_immed_job: app.getJobNextCallTime('my_immed_job')
+      }
+      
       setTimeout(function() {
-        promise.emit('success');
+        promise.emit('success', timestamps);
       }, 600);
       
       return promise;
@@ -86,7 +91,7 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(state.myImmedJobCounter, 1); // Callback runs one time
     },
     
-    'Properly sets job timestamps': function() {
+    'Properly sets job timestamps': function(timestamps) {
       
       var now = Date.now();
       
@@ -117,6 +122,15 @@ vows.describe('lib/application.js').addBatch({
       
       assert.isTrue((myJobDate.valueOf() - now) <= 10); // 10 ms max execution delay
       assert.isTrue((myImmedJobDate.valueOf() - now) <= 10); // 10 ms max execution delay
+      
+      // Make sure timestamps are set initially
+      assert.isTrue(typeof timestamps.my_job == 'number');
+      assert.isTrue(timestamps.my_job !== NaN);
+      assert.isTrue(timestamps.my_job < now);
+      
+      assert.isTrue(typeof timestamps.my_immed_job == 'number');
+      assert.isTrue(timestamps.my_immed_job !== NaN);
+      assert.isTrue(timestamps.my_immed_job < now);
       
     }
 
