@@ -119,10 +119,10 @@ app.config.json.pretty = false;
 
 // -- Async tasks --
 
-app.addAsyncTask();
+app.addReadyTask();
 
 setTimeout(function() {
-  app.flushAsyncTask();
+  app.flushReadyTask();
 }, 100);
 
 app.onReady(function() {
