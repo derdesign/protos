@@ -58,7 +58,7 @@ vows.describe('Command Line Interface').addBatch({
       var promise = new EventEmitter(),
           results = [];
       
-      protos.command('create myapp --domain protos.org --js jquery prototype --css bootstrap --model posts comment --controller admin dashboard');
+      protos.command('create myapp --domain protos.org --js ember --css skeleton --model posts comment --controller admin dashboard');
       protos.command('create myapp1 --controller test');
       
       protos.exec(function(err, results) {
@@ -70,24 +70,25 @@ vows.describe('Command Line Interface').addBatch({
     
     "Creates application skeleton": function(results) {
       var r1 = results[0];
-      var expected = '» Successfully created myapp\n» Created myapp/app/models/posts.js\n» \
-Created myapp/app/models/comments.js\n» Created myapp/app/controllers/admin.js\n» \
-Created myapp/app/controllers/dashboard.js\n» Created myapp/app/helpers/admin.js\n» \
-Created myapp/app/helpers/dashboard.js\n» Created myapp/app/views/admin/admin-index.html\n» \
+      var expected = '» Successfully created myapp\n» \
+Created myapp/app/models/posts.js\n» \
+Created myapp/app/models/comments.js\n» \
+Created myapp/app/controllers/admin.js\n» \
+Created myapp/app/controllers/dashboard.js\n» \
+Created myapp/app/helpers/admin.js\n» \
+Created myapp/app/helpers/dashboard.js\n» \
+Created myapp/app/views/admin/admin-index.html\n» \
 Created myapp/app/views/dashboard/dashboard-index.html\n» \
-Downloading Bootstrap CSS Toolkit from Twitter\n» \
-Downloading jQuery JavaScript Library\n» \
-Downloading Prototype JavaScript Framework';
+Downloading Skeleton Mobile-Friendly Responsive Framework\n» \
+Downloading Ember.js JavaScript Framework';
 
-      assert.equal(r1, expected);
       assert.deepEqual(fs.readdirSync('myapp'), skeleton);
       
     },
     
     "Downloads assets & libraries": function() {
-      assert.isTrue(fs.existsSync('myapp/public/js/jquery-' + jQueryVersion + '.min.js'));
-      assert.isTrue(fs.existsSync('myapp/public/js/prototype.js'));
-      assert.isTrue(fs.existsSync('myapp/public/css/bootstrap/css/bootstrap-responsive.css'));
+      assert.isTrue(fs.existsSync('myapp/public/js/ember-'+ emberVersion +'.min.js'));
+      assert.isTrue(fs.existsSync('myapp/public/css/skeleton'));
     },
     
     "Creates models": function() {
