@@ -89,11 +89,6 @@ Downloading Ember.js JavaScript Framework';
       
     },
     
-    "Downloads assets & libraries": function() {
-      assert.isTrue(fs.existsSync('myapp/public/js/ember-' + emberVersion + '.min.js'));
-      assert.isTrue(fs.existsSync('myapp/public/css/skeleton'));
-    },
-    
     "Creates models": function() {
       assert.isTrue(fs.existsSync('myapp/app/models/posts.js'));
       assert.isTrue(fs.existsSync('myapp/app/models/comments.js'));
