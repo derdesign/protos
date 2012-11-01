@@ -62,7 +62,10 @@ vows.describe('Command Line Interface').addBatch({
       protos.command('create myapp1 --controller test');
       
       protos.exec(function(err, results) {
-        promise.emit('success', err || results);
+        setTimeout(function() {
+          // Account for Disk/IO in Travis VM
+          promise.emit('success', err || results);
+        }, 1000);
       });
       
       return promise;
