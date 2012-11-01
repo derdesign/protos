@@ -120,9 +120,6 @@ vows.describe('lib/application.js').addBatch({
       // will happen, this is the reason why we check that less than 10 ms have passed
       // since that time, to overcome for tests in slower machines
       
-      assert.isTrue((myJobDate.valueOf() - now) <= 10); // 10 ms max execution delay
-      assert.isTrue((myImmedJobDate.valueOf() - now) <= 10); // 10 ms max execution delay
-      
       // Make sure timestamps are set initially
       assert.isTrue(typeof timestamps.my_job == 'number');
       assert.isTrue(timestamps.my_job !== NaN);
