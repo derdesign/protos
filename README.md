@@ -1,3 +1,4 @@
+
 # Protos [![Build Status](https://secure.travis-ci.org/derdesign/protos.png)](http://travis-ci.org/derdesign/protos)
 
 Protos is a Web Application Framework, focused on high performance, integration, ease of 
@@ -67,12 +68,6 @@ may not reflect the current state of the framework: some features may have been 
 - [Liquor](https://github.com/chjj/liquor)
 - [Swig](https://github.com/paularmstrong/swig)
 - [Whiskers](https://github.com/gsf/whiskers.js/tree)
-
-## Resources
-
-- [API Documentation](http://derdesign.github.com/protos/docs/index.html)
-- [Google Groups Discussion](https://groups.google.com/group/protos-web-framework)
-- [Github Repository](http://github.com/derdesign/protos)
 
 ## License
 
