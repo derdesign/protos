@@ -142,6 +142,79 @@ vows.describe('lib/application.js').addBatch({
 
 }).addBatch({
   
+  'Directory Structure Tests': {
+    
+    'Properly Loads API methods from api/': function() {
+      
+      var sampleMethod = app.require('api/sample-method.js');
+      var otherMethods = app.require('api/other-methods.js');
+      
+      // This method (anotherMethod) is not added via the api/ directory, instead
+      // it is loaded from the lib/ directory. This demonstrates that the lib/
+      // directory is sourced before the api/ directory.
+      // 
+      // This is for testing purposes only, it is recommended to add API methods using
+      // the api/ directory as per the original design.
+      
+      var anotherMethod = app.require('lib/api.js');
+      
+      assert.deepEqual(Object.keys(anotherMethod), ['anotherMethod']);
+      assert.deepEqual(Object.keys(sampleMethod), ['sampleMethod']);
+      assert.deepEqual(Object.keys(otherMethods), ['methodOne', 'methodTwo']);
+      assert.deepEqual(Object.keys(app.api), ['anotherMethod', 'methodOne', 'methodTwo', 'sampleMethod']);
+      
+      assert.strictEqual(app.api.anotherMethod, anotherMethod.anotherMethod);
+      assert.strictEqual(app.api.methodOne, otherMethods.methodOne);
+      assert.strictEqual(app.api.methodTwo, otherMethods.methodTwo);
+      assert.strictEqual(app.api.sampleMethod, sampleMethod.sampleMethod);
+      
+      assert.equal(app.api.anotherMethod(), 99);
+      assert.equal(app.api.sampleMethod(), 100);
+      assert.equal(app.api.methodOne(), 101);
+      assert.equal(app.api.methodTwo(), 102);
+    },
+    
+    'Properly Loads Extensions from exts/': function() {
+      // Test constants
+      assert.equal(app.TEST_CONSTANT_A, 103);
+      assert.equal(app.TEST_CONSTANT_B, 104);
+      
+      // Test app extensions
+      assert.isFunction(app.testMethodOne);
+      assert.isFunction(app.testMethodTwo);
+      
+      // Test extension output values
+      assert.equal(app.testMethodOne(), "Output for app.testMethodOne");
+      assert.equal(app.testMethodTwo(), "Output for app.testMethodTwo");
+    },
+    
+    'Properly loads & extends objects from lib/': function() {
+      
+      // Test filters
+      var libFilters = app.require('lib/filters.js');
+      assert.deepEqual(Object.keys(libFilters), ['testFilterOne', 'testFilterTwo'])
+      assert.deepEqual(Object.keys(app.filters), ['testFilterOne', 'testFilterTwo']);
+      assert.isFunction(app.filters.testFilterOne);
+      assert.isFunction(app.filters.testFilterTwo);
+      assert.strictEqual(app.filters.testFilterOne, libFilters.testFilterOne);
+      assert.strictEqual(app.filters.testFilterTwo, libFilters.testFilterTwo);
+      assert.equal(app.filters.testFilterOne(), "Output from app.filters.testFilterOne");
+      assert.equal(app.filters.testFilterTwo(), "Output from app.filters.testFilterTwo");
+      
+      // Test globals
+      var libGlobals = app.require('lib/globals.js');
+      assert.deepEqual(Object.keys(libGlobals), ['globalVarOne', 'globalVarTwo']);
+      assert.strictEqual(app.globals.globalVarOne, libGlobals.globalVarOne);
+      assert.strictEqual(app.globals.globalVarTwo, libGlobals.globalVarTwo);
+      assert.equal(app.globals.globalVarOne, 105);
+      assert.equal(app.globals.globalVarTwo, 106);
+      
+    }
+    
+  }
+  
+}).addBatch({
+  
   'Application::onInitialize': {
     
     "Successfully runs callbacks before the 'init' event": function() {

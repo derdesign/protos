@@ -9,11 +9,11 @@ var app = require('../fixtures/bootstrap'),
 var FileManager;
 
 var files = {
-  alpha: {path: app.fullPath('incoming/alpha.txt'), size: 16, type: 'text/plain'},
-  beta: {path: app.fullPath('incoming/beta.jpg'), size: 16, type: 'image/jpg'},
-  gamma: {path: app.fullPath('incoming/gamma.gif'), size: 16, type: 'image/gif'},
-  epsilon: {path: app.fullPath('incoming/epsilon.txt'), size: 0, type: 'text/plain'},
-  delta: {path: app.fullPath('incoming/delta.png'), size: 5, type: 'image/png'},
+  alpha: {path: app.fullPath('uploads/alpha.txt'), size: 16, type: 'text/plain'},
+  beta: {path: app.fullPath('uploads/beta.jpg'), size: 16, type: 'image/jpg'},
+  gamma: {path: app.fullPath('uploads/gamma.gif'), size: 16, type: 'image/gif'},
+  epsilon: {path: app.fullPath('uploads/epsilon.txt'), size: 0, type: 'text/plain'},
+  delta: {path: app.fullPath('uploads/delta.png'), size: 5, type: 'image/png'},
 }
 
 // Simulates file uploads
@@ -277,7 +277,7 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
     topic: function() {
       
       var promise = new EventEmitter();
-      var testFilePath = app.fullPath('incoming/test-file.txt');
+      var testFilePath = app.fullPath('uploads/test-file.txt');
       
       fs.writeFileSync(testFilePath, '', 'utf-8');
       
