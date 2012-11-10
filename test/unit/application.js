@@ -158,10 +158,10 @@ vows.describe('lib/application.js').addBatch({
       
       var anotherMethod = app.require('lib/api.js');
       
-      assert.deepEqual(Object.keys(anotherMethod), ['anotherMethod']);
-      assert.deepEqual(Object.keys(sampleMethod), ['sampleMethod']);
-      assert.deepEqual(Object.keys(otherMethods), ['methodOne', 'methodTwo']);
-      assert.deepEqual(Object.keys(app.api), ['anotherMethod', 'methodOne', 'methodTwo', 'sampleMethod']);
+      assert.deepEqual(Object.keys(anotherMethod).sort(), ['anotherMethod']);
+      assert.deepEqual(Object.keys(sampleMethod).sort(), ['sampleMethod']);
+      assert.deepEqual(Object.keys(otherMethods).sort(), ['methodOne', 'methodTwo']);
+      assert.deepEqual(Object.keys(app.api).sort(), ['anotherMethod', 'methodOne', 'methodTwo', 'sampleMethod'].sort());
       
       assert.strictEqual(app.api.anotherMethod, anotherMethod.anotherMethod);
       assert.strictEqual(app.api.methodOne, otherMethods.methodOne);
@@ -192,8 +192,8 @@ vows.describe('lib/application.js').addBatch({
       
       // Test filters
       var libFilters = app.require('lib/filters.js');
-      assert.deepEqual(Object.keys(libFilters), ['testFilterOne', 'testFilterTwo'])
-      assert.deepEqual(Object.keys(app.filters), ['testFilterOne', 'testFilterTwo']);
+      assert.deepEqual(Object.keys(libFilters).sort(), ['testFilterOne', 'testFilterTwo'])
+      assert.deepEqual(Object.keys(app.filters).sort(), ['testFilterOne', 'testFilterTwo']);
       assert.isFunction(app.filters.testFilterOne);
       assert.isFunction(app.filters.testFilterTwo);
       assert.strictEqual(app.filters.testFilterOne, libFilters.testFilterOne);
@@ -203,7 +203,7 @@ vows.describe('lib/application.js').addBatch({
       
       // Test globals
       var libGlobals = app.require('lib/globals.js');
-      assert.deepEqual(Object.keys(libGlobals), ['globalVarOne', 'globalVarTwo']);
+      assert.deepEqual(Object.keys(libGlobals).sort(), ['globalVarOne', 'globalVarTwo'].sort());
       assert.strictEqual(app.globals.globalVarOne, libGlobals.globalVarOne);
       assert.strictEqual(app.globals.globalVarTwo, libGlobals.globalVarTwo);
       assert.equal(app.globals.globalVarOne, 105);
