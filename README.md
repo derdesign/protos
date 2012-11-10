@@ -9,10 +9,11 @@ may not reflect the current state of the framework: some features may have been 
 ## Features at a Glance
 
 - Powerful Routing & Validation
-- Controller Authentication & Filters
+- Controller Authentication, Filters and Handlers
+- Built-in API Support for Business Logic
 - REST Compliant Routing
 - Environment based Configuration
-- Fast Configuration with bootstrap file
+- Fast and Modular Configuration
 - Multi Core Cluster support
 - Easy Deployment
 - Database Drivers & Storages: MongoDB, MySQL, PostgreSQL, Redis
@@ -20,8 +21,7 @@ may not reflect the current state of the framework: some features may have been 
 - ORM Models, Supporting Relationships
 - Query Caching for Drivers & Models
 - Multiple Template Engines Supported
-- View Helpers
-- View Partials
+- View Helpers, Partials
 - JSON Responses
 - Proxy Server for Multiple Applications
 - Node Inspector for debugging
