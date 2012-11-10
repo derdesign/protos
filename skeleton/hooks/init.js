@@ -1,6 +1,6 @@
 
-function init(app) {
+/* hooks/init.js */
+
+module.exports = function init(app) {
 
 }
-
-module.exports = init;

@@ -408,12 +408,14 @@ vows.describe('lib/regex.js').addBatch({
       var data = validation[key];
       
       if (data) {
-        
+
         var re = data.regex;
         
         // Ensure we're testing against the same regex
         if (debug) console.log(key);
-        assert.equal(re.toString(), data.regex.toString());
+        
+        // This test will break if the regex is changed
+        assert.equal(re.toString(), app.regex[key].toString());
         
         if (debug) console.log('TRUE');
         for (var val,i=0,len=data.valid.length; i < len; i++) {

@@ -4,6 +4,7 @@ var _ = require('underscore'),
     _s = require('underscore.string'),
     fs = require('fs'),
     cp = require('child_process'),
+    ejs = require('ejs'),
     util = require('util'),
     regex = require('../lib/regex.js'),
     pathModule = require('path'),
@@ -465,11 +466,94 @@ module.exports = function() {\n\
     }
   },
   
+  hook: {
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      
+      var template = ejs.compile("\
+\n\
+/* <%- relPath %> */\n\
+\n\
+var app = protos.app;\n\
+\n\
+module.exports = function <%- fileWithoutExtension %>() {\n\
+\n\
+}");
+      
+      createJsFilesWithTemplate('hooks/', data, template);
+    }
+  },
+  
+  api: {
+    args: 99,
+    switches: ['group'],
+    help: {
+      group: "Makes API file export no methods"
+    },
+    validate: validateApp,
+    run: function(data) {
+    
+      var template = ejs.compile("\
+\n\
+/* <%- relPath %> */\n\
+\n\
+var app = protos.app;\n\
+\n\
+module.exports = {\n\
+<% if (typeof group_switch == 'boolean' && group_switch == false) { %>\n\
+  <%- lowerCamelCase %>: function() {\n\
+\n\
+  }\n\
+\n<% } else { %>\n<% } %>\
+}");
+
+      createJsFilesWithTemplate('api/', data, template);
+      
+    }
+  },
+  
+  lib: {
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      
+      var template = ejs.compile("\
+\n\
+/* <%- relPath %> */\n\
+\n\
+module.exports = {\n\
+\n\
+}");
+
+      createJsFilesWithTemplate('lib/', data, template);
+      
+    }
+  },
+  
+  ext: {
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      
+      var template = ejs.compile("\
+\n\
+/* <%- relPath %> */\n\
+\n\
+var app = protos.app;\n\
+\n\
+// Code goes here");
+
+      createJsFilesWithTemplate('exts/', data, template);
+      
+    }
+  },
+  
   view: {
     single: ['ext'],
     args: 99,
     help: {
-      ext: 'Extension to use for generated normal/static/partial views'
+      ext: 'Extension to use for generated views'
     },
     validate: validateApp,
     run: function(data, partial, path) {
@@ -903,7 +987,6 @@ function createView(app, controller, view, partial) {
   
 }
 
-
 function createHelper(app, name) {
 
   // Note: names will be pluralized
@@ -1064,12 +1147,45 @@ bouncy(function(req, bounce) { var host, port;\
   }
 }
 
+function createJsFilesWithTemplate(target, data, template) {
+  var app = pathModule.basename(process.cwd());
+  var filenames = data.args.map(function(val) { return val.replace(/\.js$/, '') + '.js' });
+  var createFiles = {};
+  var existing = [];
+  filenames.forEach(function(file) {
+    var path = process.cwd() + '/' + target + '/' + file;
+    if (fs.existsSync(path)) {
+      console.log(util.format('» Skipping %s%s: file exists', target, file));
+    } else {
+      var fileWithoutExtension = file.replace(/\.js$/, '');
+      var camelCase = inflect.camelize(fileWithoutExtension.toLowerCase());
+      var lowerCamelCase = inflect.camelize(fileWithoutExtension.toLowerCase(), true);
+      var locals = {
+        file: file,
+        fileWithoutExtension: fileWithoutExtension,
+        path: path,
+        relPath: target + file,
+        camelCase: camelCase,
+        lowerCamelCase: lowerCamelCase
+      }
+      for (var v in data) {
+        if (typeof data[v] == 'boolean') {
+          locals[v + '_switch'] = data[v];
+        }
+      }
+      fs.writeFileSync(path, template(locals), 'utf8');
+      console.log(util.format('» Created %s/%s%s', app, target, file));
+    }
+  });
+}
+
 function recursivelyCreateFiles(target, data, ext, callback) {
   
   var app = pathModule.basename(process.cwd());
   
   var files = [];
   var dirs = [];
+  var tpl = data.template;
   var cwd = process.cwd();
   var config = require(cwd + '/config/base.js');
   
@@ -1096,10 +1212,10 @@ function recursivelyCreateFiles(target, data, ext, callback) {
   files.forEach(function(f) {
     f = f.slice(1,-1);
     if (fs.existsSync(f)) {
-      console.log(util.format('» Skipping %s%s: file exists'), app, f.replace(cwd, ''));
+      console.log(util.format('» Skipping %s%s: file exists', app, f.replace(cwd, '')));
     } else {
       out.push(f);
-      console.log(util.format('» Created %s%s'), app, f.replace(cwd, ''));
+      console.log(util.format('» Created %s%s', app, f.replace(cwd, '')));
     }
   });
   
@@ -1123,9 +1239,14 @@ function getModelContext(string) {
 var cli = new CommandLine(commands);
 
 cli.help.before = "\n\
-Usage: protos [action] [arguments ]\n\n\
-Actions: [ create, install, server, deploy, fetch, inspector, lint] \n\n\Components: [controller, handler, helper, model, \
-view, partial, layout, static, restricted ]\n";
+Usage: protos [ACTION] [OPTION]... [ARGUMENTS]...\n\n\
+Actions:\n\n\
+  Project: [ create | install | fetch | inspector | lint ]\n\n\
+  Server: [ server | deploy ]\n\n\
+  Component: [ controller | handler | helper | model ]\n\n\
+  View Generation: [ view | partial | layout | static | restricted ]\n\n\
+  Code Generation: [ api | hook | lib | ext ]\n\n\
+Options:\n";
 
 cli.help.after = "\n\
 protos@" + Protos.version + " " + Protos.path + "\n";

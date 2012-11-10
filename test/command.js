@@ -241,6 +241,159 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
   
 }).addBatch({
   
+  'protos api': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      protos.command('api sample-method cool-method.js some-other-method');
+      protos.command('api --group method-group-1 method-group-2');
+      
+      protos.exec(function(err, results) {
+        if (!err) {
+          var bufs = {};
+          ['api/cool-method.js', 'api/some-other-method.js', 'api/method-group-1.js', 'api/method-group-2.js'].forEach(function(file) {
+            bufs[file] = fs.readFileSync(file, 'utf8');
+          });
+          results.push(bufs);
+        }
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    'Properly files in api/': function(results) {
+      var bufs = results.pop();
+      
+      // Expect proper output in stdout
+      assert.equal(results[0], '» Skipping api/sample-method.js: file exists\n» Created myapp1/api/cool-method.js\n» Created myapp1/api/some-other-method.js');
+      assert.equal(results[1], '» Created myapp1/api/method-group-1.js\n» Created myapp1/api/method-group-2.js');
+      
+      // Api files export methods by default
+      assert.equal(bufs['api/cool-method.js'], '\n/* api/cool-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  coolMethod: function() {\n\n  }\n\n}');
+      assert.equal(bufs['api/some-other-method.js'], '\n/* api/some-other-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  someOtherMethod: function() {\n\n  }\n\n}');
+      
+      // Using --group doesn't export methods
+      assert.equal(bufs['api/method-group-1.js'], '\n/* api/method-group-1.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n}');
+      assert.equal(bufs['api/method-group-2.js'], '\n/* api/method-group-2.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n}');
+    }
+
+  }
+  
+}).addBatch({
+  
+  'protos hook': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      protos.command('hook init db_event.js update_account remove_user');
+
+      protos.exec(function(err, results) {
+        if (!err) {
+          var bufs = {};
+          ['hooks/db_event.js', 'hooks/update_account.js', 'hooks/remove_user.js'].forEach(function(file) {
+            bufs[file] = fs.readFileSync(file, 'utf8');
+          });
+          results.push(bufs);
+        }
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    'Properly creates files in hooks/': function(results) {
+       var bufs = results.pop();
+       
+       // Expect proper output in stdout
+       assert.equal(results[0], '» Skipping hooks/init.js: file exists\n» Created myapp1/hooks/db_event.js\n» Created myapp1/hooks/update_account.js\n» Created myapp1/hooks/remove_user.js');
+       
+       // Verify proper code generation
+       assert.equal(bufs['hooks/db_event.js'], '\n/* hooks/db_event.js */\n\nvar app = protos.app;\n\nmodule.exports = function db_event() {\n\n}');
+       assert.equal(bufs['hooks/update_account.js'], '\n/* hooks/update_account.js */\n\nvar app = protos.app;\n\nmodule.exports = function update_account() {\n\n}');
+       assert.equal(bufs['hooks/remove_user.js'], '\n/* hooks/remove_user.js */\n\nvar app = protos.app;\n\nmodule.exports = function remove_user() {\n\n}');
+     }
+    
+  }
+  
+}).addBatch({
+  
+  'protos lib': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      protos.command('lib filters.js utilities validation misc');
+      
+      protos.exec(function(err, results) {
+        if (!err) {
+          var bufs = {};
+          ['lib/utilities.js', 'lib/validation.js', 'lib/misc.js'].forEach(function(file) {
+            bufs[file] = fs.readFileSync(file, 'utf8');
+          });
+        }
+        results.push(bufs);
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    'Properly creates files in lib/': function(results) {
+      var bufs = results.pop();
+      
+      // Expect proper output in stdout
+      assert.equal(results[0], '» Skipping lib/filters.js: file exists\n» Created myapp1/lib/utilities.js\n» Created myapp1/lib/validation.js\n» Created myapp1/lib/misc.js');
+      
+      // Verify proper code generation
+      assert.equal(bufs['lib/utilities.js'], '\n/* lib/utilities.js */\n\nmodule.exports = {\n\n}');
+      assert.equal(bufs['lib/validation.js'], '\n/* lib/validation.js */\n\nmodule.exports = {\n\n}');
+      assert.equal(bufs['lib/misc.js'], '\n/* lib/misc.js */\n\nmodule.exports = {\n\n}');
+    }
+    
+  }
+  
+}).addBatch({
+  
+  'protos exts': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      protos.command('ext application request response stream');
+      
+      protos.exec(function(err, results) {
+        if (!err) {
+          var bufs = {};
+          ['exts/request.js', 'exts/response.js', 'exts/stream.js'].forEach(function(file) {
+            bufs[file] = fs.readFileSync(file, 'utf8');
+          });
+        }
+        results.push(bufs);
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    'Properly creates files in exts/': function(results) {
+      var bufs = results.pop();
+      
+      // Expect proper output in stdout
+      assert.equal(results[0], '» Skipping exts/application.js: file exists\n» Created myapp1/exts/request.js\n» Created myapp1/exts/response.js\n» Created myapp1/exts/stream.js');
+      
+      // Verify proper code generation
+      assert.equal(bufs['exts/request.js'], '\n/* exts/request.js */\n\nvar app = protos.app;\n\n// Code goes here');
+      assert.equal(bufs['exts/response.js'], '\n/* exts/response.js */\n\nvar app = protos.app;\n\n// Code goes here');
+      assert.equal(bufs['exts/stream.js'], '\n/* exts/stream.js */\n\nvar app = protos.app;\n\n// Code goes here');
+    }
+    
+  }
+  
+}).addBatch({
+  
   'protos view': {
 
     topic: function() {

@@ -1,6 +1,6 @@
 
-function ready(app) {
+/* hooks/ready.js */
+
+module.exports = function ready(app) {
 
 }
-
-module.exports = ready;
