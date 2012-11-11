@@ -1,5 +1,5 @@
 
-/* app.api.sampleMethod */
+/* api/sample-method.js */
 
 var app = protos.app;
 

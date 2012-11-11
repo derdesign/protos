@@ -19,7 +19,6 @@ commandline = ./test/command.js
 default:
 		@echo
 		@echo "* Project Tasks\n"
-		@echo "make docs             Generate the API Documentation"
 		@echo "make deps             Install Dependencies"
 		@echo "make deps-all         Install All Dependencies"
 		@echo "make deps-clean       Removes the node_modules directory"
@@ -36,9 +35,6 @@ default:
 		@echo "make test-mid         Run Middleware tests"
 		@echo "make test-cmd         Run command line tests"
 		@echo
-
-docs:
-		@./tools/doc/gen-docs.sh
 
 deps:
 		@npm install -d
