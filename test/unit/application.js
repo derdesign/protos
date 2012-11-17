@@ -270,30 +270,6 @@ vows.describe('lib/application.js').addBatch({
 
   },
 
-  'Application::driver': {
-
-    'Returns a driver object': function() {
-      var mysqlCtor = protos.drivers.mysql;
-      protos.drivers.mysql = function() { this.success = true; }
-      var driver = app._driver('mysql', {});
-      assert.isTrue(driver.success);
-      protos.drivers.mysql = mysqlCtor; // restore mysql constructor
-    }
-
-  },
-
-  'Application::storage': {
-
-    'Returns a storage object': function() {
-      var redisCtor = protos.storages.redis;
-      protos.storages.redis = function() { this.success = true; }
-      var storage = app._storage('redis', {});
-      assert.isTrue(storage.success);
-      protos.storages.redis = redisCtor; // restore redis constructor
-    }
-
-  },
-  
   'Application::mkdir': {
     
     topic: function() {
@@ -429,7 +405,7 @@ vows.describe('lib/application.js').addBatch({
   'Application::getResource': {
 
     topic: function() {
-      var promise = new EventEmitter();
+      
       app.context = {
         alpha: {name: 'alpha'},
         beta: {
@@ -439,25 +415,22 @@ vows.describe('lib/application.js').addBatch({
 
       app.resources.my_resource = '{RESOURCE}';
 
-      app._getResource('storages/redis', function(storage) {
-        promise.emit('success', storage);
-      });
+      return app.getResource('storages/redis');
 
-      return promise;
     },
 
     'Gets {context}/{resource}': function() {
-      var drv = app._getResource('context/alpha');
+      var drv = app.getResource('context/alpha');
       assert.equal(drv.name, 'alpha');
     },
 
     'Gets {context}/{group}:{resource}': function() {
-      var drv = app._getResource('context/beta:gamma');
+      var drv = app.getResource('context/beta:gamma');
       assert.equal(drv.name, 'gamma');
     },
 
     'Gets {resource}': function() {
-      assert.equal(app._getResource('my_resource'), '{RESOURCE}');
+      assert.equal(app.getResource('my_resource'), '{RESOURCE}');
     },
 
     'Works asynchronously if callback provided': function(storage) {

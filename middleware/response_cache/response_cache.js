@@ -34,7 +34,7 @@ function ResponseCache(config, middleware) { var sto;
   if (!config.storage) {
     throw new Error('A storage is required.');
   } else if (typeof config.storage == 'string') {
-    sto = app._getResource('storages/' + config.storage);
+    sto = app.getResource('storages/' + config.storage);
   } else {
     sto = config.storage;
   }

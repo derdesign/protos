@@ -84,7 +84,7 @@ function MongoDB(app, config) {
          
         // Set storage
         if (typeof config.storage == 'string') {
-          self.storage = app._getResource('storages/' + config.storage);
+          self.storage = app.getResource('storages/' + config.storage);
         } else if (config.storage instanceof protos.lib.storage) {
           self.storage = config.storage;
         }

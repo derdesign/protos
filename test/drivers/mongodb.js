@@ -41,11 +41,11 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
     
     topic: function() {
       var promise = new EventEmitter();
+
+      mongodb = app.getResource('drivers/mongodb');
+      multi = mongodb.multi();
       
-      app._getResource('drivers/mongodb', function(driver) {
-        mongodb = driver;
-        multi = mongodb.multi();
-        
+      var dropTestDatabase = function() {
         mongodb.deleteWhere({
           collection: config.collection,
           condition: {}
@@ -56,9 +56,16 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
             });
           });
         });
-      });
+      }
+
+      if (mongodb.client) {
+        dropTestDatabase();
+      } else {
+        mongodb.events.once('init', dropTestDatabase);
+      }
       
       return promise;
+      
     },
     
     'Sets db': function() {

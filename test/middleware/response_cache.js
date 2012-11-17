@@ -21,7 +21,7 @@ vows.describe('Response Cache (middleware)').addBatch({
       app.use('response_cache', {storage: 'redis'});
       app.config.rawViews = true;
       
-      var cacheStore = app._getResource('response_cache');
+      var cacheStore = app.getResource('response_cache');
       
       // Requests that will be cached
       multi.curl('/response-cache/1');

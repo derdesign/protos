@@ -57,7 +57,7 @@ function Session(config, middleware) {
   if (typeof config.salt != 'string') throw new Error("Session: you must specify a salt");
 
   if (typeof config.storage == 'object') this.storage = config.storage;
-  else if (typeof config.storage == 'string') this.storage = app._getResource('storages/' + config.storage);
+  else if (typeof config.storage == 'string') this.storage = app.getResource('storages/' + config.storage);
   else throw new Error("The 'session' middleware requires a storage to be passed in config.");
 
   this.className = this.constructor.name;

@@ -44,17 +44,11 @@ var batch = vows.describe('drivers/mysql.js').addBatch({
   'Integrity Checks': {
     
     topic: function() {
-      var promise = new EventEmitter();
-      app._getResource('drivers/mysql', function(driver) {
-        mysql = driver;
-        multi = mysql.multi();
-        
-        multi.on('pre_exec', app.backupFilters);
-        multi.on('post_exec', app.restoreFilters);
-        
-        promise.emit('success');
-      });
-      return promise;
+      mysql = app.getResource('drivers/mysql');
+      multi = mysql.multi();
+      multi.on('pre_exec', app.backupFilters);
+      multi.on('post_exec', app.restoreFilters);
+      return null;
     },
     
     'Sets db': function() {

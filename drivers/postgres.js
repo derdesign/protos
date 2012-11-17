@@ -52,7 +52,7 @@ function PostgreSQL(app, config) {
 
   // Assign storage
   if (typeof config.storage == 'string') {
-    this.storage = app._getResource('storages/' + config.storage);
+    this.storage = app.getResource('storages/' + config.storage);
   } else if (config.storage instanceof protos.lib.storage) {
     this.storage = config.storage;
   }

@@ -41,23 +41,14 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
   'Integrity Checks': {
     
     topic: function() {
-      
-      var promise = new EventEmitter();
-      app._getResource('drivers/postgres', function(driver) {
-        
-        postgres = driver;
-        multi = postgres.multi();
-        
-        multi.on('pre_exec', app.backupFilters);
-        multi.on('post_exec', app.restoreFilters);
-        
-        promise.emit('success');
-
-      });
-      return promise;
+      postgres = app.getResource('drivers/postgres');
+      multi = postgres.multi();
+      multi.on('pre_exec', app.backupFilters);
+      multi.on('post_exec', app.restoreFilters);
+      return null;
     },
     
-    'Sets db': function(results) {
+    'Sets db': function() {
       assert.isNotNull(postgres.db);
       assert.equal(postgres.db, config.database);
     },

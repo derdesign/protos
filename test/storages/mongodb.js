@@ -13,12 +13,16 @@ var batch = vows.describe('storages/mongodb.js').addBatch({
   'Integrity Checks': {
     
     topic: function() {
-      var promise = new EventEmitter();
-      app._getResource('storages/mongodb', function(storage) {
-        storageBatch.storage = storage;
-        promise.emit('success', storage);
-      });
-      return promise;
+      var storage = storageBatch.storage = app.getResource('storages/mongodb');
+      if (storage.client) {
+        return storage;
+      } else {
+        var promise = new EventEmitter();
+        storage.events.once('init', function() {
+          promise.emit('success', storage);
+        });
+        return promise;
+      }
     },
 
     'Created storage instance': function(storage) {

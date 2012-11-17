@@ -14,13 +14,7 @@ var batch = vows.describe('storages/redis.js').addBatch({
   'Integrity Checks': {
     
     topic: function() {
-      var promise = new EventEmitter();
-      app._getResource('storages/redis', function(storage) {
-        redisStore = storage;
-        storageBatch.storage = storage;
-        promise.emit('success', storage);
-      });
-      return promise;
+      return redisStore = storageBatch.storage = app.getResource('storages/redis');
     },
 
     'Created storage instance': function(storage) {
