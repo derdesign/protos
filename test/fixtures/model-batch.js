@@ -89,9 +89,9 @@ function ModelBatch() {
           // object + model cache store
           multi.queryCached({
             cacheID: 'user_cache',
-            cacheFilter: function(data) {
-              data[1][0].filterValue = "OK1";
-              return data;
+            cacheFilter: function(err, found) {
+              found[0].filterValue = "OK1";
+              return [err, found];
             }
           }, 'get', {
             username: 'user'+process.pid
@@ -101,9 +101,9 @@ function ModelBatch() {
           multi.queryCached({
             cacheID: 'another_cache',
             cacheTimeout: 3600,
-            cacheFilter: function(data) {
-              data[1][0].filterValue = "OK2";
-              return data;
+            cacheFilter: function(err, found) {
+              found[0].filterValue = "OK2";
+              return [err, found];
             }
           }, 'get', 1);
           
