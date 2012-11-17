@@ -295,7 +295,7 @@ vows.describe('Models').addBatch({
       // ################### QUERY CACHING TESTS [MODEL OBJECTS] #####################
       
       user.queryCached({
-        cacheInvalidate: 'users_cache'
+        cacheInvalidate: 'users_cache',
       }, 'save', function(err) {
         if (err) promise.emit('success', err);
         else {

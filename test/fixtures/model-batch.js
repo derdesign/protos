@@ -81,14 +81,18 @@ function ModelBatch() {
     
     get: {
 
-      'Model API: get': {
+      'Model API: get + cacheFilters': {
 
         topic: function() {
           var promise = new EventEmitter();
 
           // object + model cache store
           multi.queryCached({
-            cacheID: 'user_cache'
+            cacheID: 'user_cache',
+            cacheFilter: function(data) {
+              data[1][0].filterValue = "OK1";
+              return data;
+            }
           }, 'get', {
             username: 'user'+process.pid
           });
@@ -96,7 +100,11 @@ function ModelBatch() {
           // integer + model cache store w/ timeout
           multi.queryCached({
             cacheID: 'another_cache',
-            cacheTimeout: 3600
+            cacheTimeout: 3600,
+            cacheFilter: function(data) {
+              data[1][0].filterValue = "OK2";
+              return data;
+            }
           }, 'get', 1);
           
           // array
@@ -111,8 +119,8 @@ function ModelBatch() {
 
         'Returns valid results': function(results) {
           var expected = [
-            [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
-            [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
+            [{ username: 'user'+process.pid, password: 'pass1', id: 1, filterValue: "OK1"}], // Proves that filters work
+            [{ username: 'user'+process.pid, password: 'pass1', id: 1, filterValue: "OK2"}], // Proves that filters work
             [ [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
               [{ username: 'user2', password: 'pass2', id: 2 }] ] ];
 
