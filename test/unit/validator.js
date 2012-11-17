@@ -168,6 +168,14 @@ vows.describe('lib/validator.js').addBatch({
         tag: null
       });
       
+      ////////////////
+      
+      validator = app.validator()
+        .add({name: 'alpha'}, function() {});
+        
+      // Returns invalid message when validator function doesn't return
+      assert.equal(validator.validate({name: '1234'}), 'Invalid: 1234');
+      
     }
     
   },
