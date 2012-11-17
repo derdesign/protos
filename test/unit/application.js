@@ -609,34 +609,6 @@ vows.describe('lib/application.js').addBatch({
 
 }).addBatch({
   
-  'Application::_detectAjax': {
-    
-    topic: function() {
-      var promise = new EventEmitter();
-      
-      multi.curl('-i /detect-ajax');
-      multi.curl('-i -H "X-Requested-With: XMLHttpRequest" /detect-ajax');
-      
-      multi.exec(function(err, results) {
-        promise.emit('success', err || results);
-      });
-      
-      return promise;
-    },
-    
-    "Detects AJAX requests properly": function(results) {
-      var r1 = results[0],
-          r2 = results[1];
-      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r1.indexOf('X-Ajax-Request: true') === -1); // Should not contain the header, it's not an ajax request
-      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r2.indexOf('X-Ajax-Request: true') >= 0);   // Should contain the header, it's an ajax request
-    }
-    
-  }
-  
-}).addBatch({
-  
   'HEAD Requests': {
     
     topic: function() {
