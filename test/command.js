@@ -13,7 +13,7 @@ var fs = require('fs'),
 var cwd = process.cwd(),
     tmp = pathModule.resolve('./test/fixtures/tmp');
 
-var skeleton = fs.readdirSync(cwd + '/skeleton/');
+var skeleton = fs.readdirSync(cwd + '/skeleton/').sort();
 var prefix = '../../../';
 
 var jsLibs = require('../client/javascript.json');
@@ -85,7 +85,7 @@ Created myapp/app/views/dashboard/dashboard-index.html\n» \
 Downloading Skeleton Mobile-Friendly Responsive Framework\n» \
 Downloading Ember.js JavaScript Framework';
 
-      assert.deepEqual(fs.readdirSync('myapp'), skeleton);
+      assert.deepEqual(fs.readdirSync('myapp').sort(), skeleton.sort());
       
     },
     
