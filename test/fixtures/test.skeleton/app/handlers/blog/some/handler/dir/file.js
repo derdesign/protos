@@ -7,6 +7,8 @@ module.exports = function() {
   
   return function(req, res) {
     
+    return 44;
+    
   }
   
 }

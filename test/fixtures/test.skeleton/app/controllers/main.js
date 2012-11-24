@@ -8,7 +8,8 @@ function MainController(app) {
   
   app.handlerTests.main = {
     'test.js': this.handler('test.js'),
-    'test-dir/another.js': this.handler('test-dir/another.js')
+    'test-dir/another.js': this.handler('test-dir/another.js'),
+    'blog:some/handler/dir/file.js': this.handler('blog:some/handler/dir/file.js')
   }
   
   get('/', function(req, res) {

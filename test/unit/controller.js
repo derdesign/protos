@@ -57,9 +57,11 @@ vows.describe('lib/controller.js').addBatch({
     'Returns valid callbacks for each controller': function() {
       
       // Verify that handlerTests has valid functions
-      assert.isFunction(app.handlerTests.blog['some/handler/dir/file.js']);
+      var mainH, blogH;
+      assert.isFunction(blogH = app.handlerTests.blog['some/handler/dir/file.js']);
       assert.isFunction(app.handlerTests.main['test.js']);
       assert.isFunction(app.handlerTests.main['test-dir/another.js']);
+      assert.isFunction(mainH = app.handlerTests.main['blog:some/handler/dir/file.js']);
       assert.isFunction(app.handlerTests.test['handler.js']);
       
       // Test handler with multiple arguments
@@ -74,6 +76,11 @@ vows.describe('lib/controller.js').addBatch({
       // Running callback, will have access to the arguments passed by the handler method
       assert.deepEqual(callback1(), [1, 2, 3]);
       assert.deepEqual(callback2(), [undefined, undefined, undefined]);
+      
+      // Foreign handlers should have same results as normal controller handlers
+      assert.equal(mainH(), 44);
+      assert.equal(blogH(), 44);
+      
     }
     
   },
