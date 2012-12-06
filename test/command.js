@@ -320,43 +320,6 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
   
 }).addBatch({
   
-  'protos lib': {
-    
-    topic: function() {
-      var promise = new EventEmitter();
-      
-      protos.command('lib filters.js utilities validation misc');
-      
-      protos.exec(function(err, results) {
-        if (!err) {
-          var bufs = {};
-          ['lib/utilities.js', 'lib/validation.js', 'lib/misc.js'].forEach(function(file) {
-            bufs[file] = fs.readFileSync(file, 'utf8');
-          });
-        }
-        results.push(bufs);
-        promise.emit('success', err || results);
-      });
-      
-      return promise;
-    },
-    
-    'Properly creates files in lib/': function(results) {
-      var bufs = results.pop();
-      
-      // Expect proper output in stdout
-      assert.equal(results[0], '» Skipping lib/filters.js: file exists\n» Created myapp1/lib/utilities.js\n» Created myapp1/lib/validation.js\n» Created myapp1/lib/misc.js');
-      
-      // Verify proper code generation
-      assert.equal(bufs['lib/utilities.js'], '\n/* lib/utilities.js */\n\nmodule.exports = {\n\n}');
-      assert.equal(bufs['lib/validation.js'], '\n/* lib/validation.js */\n\nmodule.exports = {\n\n}');
-      assert.equal(bufs['lib/misc.js'], '\n/* lib/misc.js */\n\nmodule.exports = {\n\n}');
-    }
-    
-  }
-  
-}).addBatch({
-  
   'protos exts': {
     
     topic: function() {

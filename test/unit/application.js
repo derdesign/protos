@@ -144,19 +144,19 @@ vows.describe('lib/application.js').addBatch({
   
   'Directory Structure Tests': {
     
-    'Properly Loads API methods from api/': function() {
+    'Properly Loads API methods from app/properties/': function() {
       
       var sampleMethod = app.require('api/sample-method.js');
       var otherMethods = app.require('api/other-methods.js');
       
       // This method (anotherMethod) is not added via the api/ directory, instead
-      // it is loaded from the lib/ directory. This demonstrates that the lib/
+      // it is loaded from the app/properties/ directory. This demonstrates that the app/properties/
       // directory is sourced before the api/ directory.
       // 
       // This is for testing purposes only, it is recommended to add API methods using
       // the api/ directory as per the original design.
       
-      var anotherMethod = app.require('lib/api.js');
+      var anotherMethod = app.require('app/properties/api.js');
       
       assert.deepEqual(Object.keys(anotherMethod).sort(), ['anotherMethod']);
       assert.deepEqual(Object.keys(sampleMethod).sort(), ['sampleMethod']);
@@ -188,10 +188,10 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(app.testMethodTwo(), "Output for app.testMethodTwo");
     },
     
-    'Properly loads & extends objects from lib/': function() {
+    'Properly loads & extends objects from app/properties/': function() {
       
       // Test filters
-      var libFilters = app.require('lib/filters.js');
+      var libFilters = app.require('app/properties/filters.js');
       assert.deepEqual(Object.keys(libFilters).sort(), ['testFilterOne', 'testFilterTwo'])
       assert.deepEqual(Object.keys(app.filters).sort(), ['testFilterOne', 'testFilterTwo']);
       assert.isFunction(app.filters.testFilterOne);
@@ -202,7 +202,7 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(app.filters.testFilterTwo(), "Output from app.filters.testFilterTwo");
       
       // Test globals
-      var libGlobals = app.require('lib/globals.js');
+      var libGlobals = app.require('app/properties/globals.js');
       assert.deepEqual(Object.keys(libGlobals).sort(), ['globalVarOne', 'globalVarTwo'].sort());
       assert.strictEqual(app.globals.globalVarOne, libGlobals.globalVarOne);
       assert.strictEqual(app.globals.globalVarTwo, libGlobals.globalVarTwo);

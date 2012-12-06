@@ -513,24 +513,6 @@ module.exports = {\n\
     }
   },
   
-  lib: {
-    args: 99,
-    validate: validateApp,
-    run: function(data) {
-      
-      var template = ejs.compile("\
-\n\
-/* <%- relPath %> */\n\
-\n\
-module.exports = {\n\
-\n\
-}");
-
-      createJsFilesWithTemplate('lib/', data, template);
-      
-    }
-  },
-  
   ext: {
     args: 99,
     validate: validateApp,
