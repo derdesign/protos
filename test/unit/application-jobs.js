@@ -339,8 +339,53 @@ vows.describe('lib/application.js').addBatch({
                           // Set second check
                           out.secondCheck = results;
                           
-                          // Exit test case
-                          promise.emit('success', out);
+                          // Test cache purge
+                          
+                          multi.set('cache1', 1);
+                          multi.set('cache2', 2);
+                          multi.set('cache3', 3);
+                          multi.set('cache4', 4);
+                          
+                          multi.exec(function(err, results) {
+                            
+                            if (err) {
+                              
+                              // There were errors retrieving values
+                              throw err;
+                              
+                            } else {
+                              
+                              app.purgeCacheKey('my_cache_key', function() {
+                                
+                                multi.get('cache1');
+                                multi.get('cache2');
+                                multi.get('cache3');
+                                multi.get('cache4');
+                                
+                                multi.exec(function(err, results) {
+                                  
+                                  if (err) {
+                                    
+                                    // Error retrieving results
+                                    throw err;
+                                    
+                                  } else {
+                                    
+                                    // Set third check
+                                    out.thirdCheck = results;
+                                    
+                                    // Exit test case
+                                    promise.emit('success', out);
+                                    
+                                  }
+                                  
+                                });
+                                
+                              });
+                              
+                            }
+                            
+                          });
                           
                         }
                         
@@ -370,9 +415,19 @@ vows.describe('lib/application.js').addBatch({
       assert.deepEqual(out.secondCheck, ['1', '2', '3', '4']); // This means interval was properly cleared (values are still there)
     },
     
+    'Successfully purges cache keys': function(out) {
+      assert.deepEqual(out.thirdCheck, [ null, null, null, null ]);
+    },
+    
     'Properly emit events': function() {
+      // The cache key appears two times, the first is from the call to app.invalidateCacheKey, and the
+      // second one, is from the app.purgeCacheKey call, which makes the cache to be invalidated two times, and the
+      // even to be fired two times as well.
+      assert.deepEqual(events.cache_key_invalidate_success, ['my_cache_key', 'my_cache_key']);
+      
+      // The cache key invalidation only occurs two times. When purging the cache key, the invalidation event is not fired.
       assert.deepEqual(events.invalidate_cache_key, ['my_cache_key', 'my_cache_key']);
-      assert.deepEqual(events.cache_key_invalidate_success, ['my_cache_key']);
+      
       assert.deepEqual(events.clear_cache_key_interval, ['my_cache_key']);
     }
     
