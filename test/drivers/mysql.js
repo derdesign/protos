@@ -6,13 +6,13 @@ var app = require('../fixtures/bootstrap'),
     colorize = protos.util.colorize,
     ModelBatch = require('../fixtures/model-batch'),
     Multi = require('multi'),
-    createClient = require('mysql').createClient,
+    createConnection = require('mysql').createConnection,
     EventEmitter = require('events').EventEmitter;
 
 var mysql, multi, model, storageMulti, modelBatch;
 
 var config = app.config.drivers.mysql,
-    client = createClient(config),
+    client = createConnection(config),
     mclient = new Multi(client);
 
 var table = config.table;

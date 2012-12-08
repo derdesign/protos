@@ -130,7 +130,7 @@ function initMongo(config, callback) {
   var self = this;
   
   // Set db
-  self.db = new Db(config.database, new Server(config.host, config.port, {}));
+  self.db = new Db(config.database, new Server(config.host, config.port, {}), {safe: true});
   
   // Get client
   self.db.open(function(err, client) {

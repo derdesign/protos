@@ -1,12 +1,12 @@
 {
   "mongodb": {
-    "mongodb"             : "= 1.0.2"
+    "mongodb"             : "= 1.2.2"
   },
   "mysql": {
-    "mysql"               : "= 0.9.6"
+    "mysql"               : "= 2.0.0-alpha5"
   },
   "postgres": {
-    "pg"                  : "= 0.8.4"
+    "pg"                  : "= 0.9.0"
   },
   "redis": {
     "redis"               : "= 0.7.2",

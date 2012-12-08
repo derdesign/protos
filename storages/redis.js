@@ -6,7 +6,8 @@
 
 var _ = require('underscore'),
     redis = protos.requireDependency('redis', 'Redis Storage'),
-    util = require('util');
+    util = require('util'),
+    slice = Array.prototype.slice;
 
 /**
   Redis Storage class
@@ -22,9 +23,10 @@ function RedisStorage(app, config) {
   
    var self = this;
    
-   config = config || {};
-   config.host = config.host || 'localhost';
-   config.port = config.port || 6379;
+   config = protos.extend({
+     host: 'localhost',
+     port: 6379,
+   }, config || {});
    
    /**
     Application instance
@@ -102,9 +104,6 @@ function RedisStorage(app, config) {
 }
 
 util.inherits(RedisStorage, protos.lib.storage);
-
-RedisStorage.prototype.options = {};
-
 
 /* Storage API get */
 
@@ -321,5 +320,81 @@ RedisStorage.prototype.decrBy = function(key, value, callback) {
     callback.call(self, err);
   });
 }
+
+/* Storage API multi (override) */
+
+RedisStorage.prototype.nativeMulti = function() {
+  return new RedisMulti(this);
+}
+
+////////////// REDIS MULTI
+
+function RedisMulti(instance) {
+  
+  // The Native Storage Multi for RedisStorage works by replacing the 
+  // internal calls to `this.client` with calls to a multi object. This
+  // queues the calls instead of executing them immediately.
+  
+  // Additionally, the exec() method of the multi object has no effect,
+  // in case the storage method uses multi internally, it will just reflect
+  // as an additional statement being queued in the transaction.
+  
+  var multi = instance.client.multi();
+  
+  this.multi = multi;
+  this.instance = instance;
+  
+  // Fake instance, used in place of the original storage instance
+  this.fakeInstance = {client: multi}
+  
+  // Add original exec method
+  multi.__exec = multi.exec;
+  
+  // Replace original multi exec method with empty function
+  multi.exec = this.fakeExec;
+  
+}
+
+// Exec function, gets replaced with fakeExec when queuing statements
+
+RedisMulti.prototype.exec = function(callback) {
+  var self = this;
+  var multi = this.multi;
+  multi.queue = multi.queue.filter(function(arr, i) {
+    var len = arr.length;
+    var valid = (len > 1 || i === 0); // Valid for arrays with more than 1 items (except for the first one)
+    if (valid && arr[len-1] instanceof Function) arr.pop(); // Multi doesn't need callback functions
+    return valid;
+  });
+  multi.__exec(function(err, results) {
+     multi.queue = [[ 'MULTI' ]]; // Reset multi after you're done
+    callback.call(self, err, results);
+  });
+}
+
+// Original exec function, used to perform original execution
+
+RedisMulti.prototype.__exec = RedisMulti.prototype.exec;
+
+// Fake function, does nothing when calling exec
+
+RedisMulti.prototype.fakeExec = function() {
+
+}
+
+// Define RedisMulti interface, based on RedisStorage
+
+Object.keys(RedisStorage.prototype).forEach(function(key) {
+  if (key != 'multi') {
+    var method = RedisStorage.prototype[key];
+    if (method instanceof Function) {
+      RedisMulti.prototype[key] = function() {
+        this.exec = this.fakeExec;
+        this.instance[key].apply(this.fakeInstance, arguments);
+        this.exec = this.__exec;
+      }
+    }
+  }
+});
 
 module.exports = RedisStorage;

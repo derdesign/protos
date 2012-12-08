@@ -91,7 +91,7 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
     topic: function() {
       var promise = new EventEmitter();
 
-      var db = new Db(config.database, new Server(config.host, config.port), {});
+      var db = new Db(config.database, new Server(config.host, config.port), {safe: true});
       
       db.open(function(err, client) {
         if (err) throw err;
@@ -130,7 +130,7 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
     },
     
     'Cleaned up collection': function(results) {
-      assert.deepEqual(results, ['OK', []]);
+      assert.deepEqual(results, [0, []]);
     }
    }
   

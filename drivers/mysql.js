@@ -45,7 +45,7 @@ function MySQL(app, config) {
   this.config = config;
   
   // Set client
-  this.client = mysql.createClient(config);
+  this.client = mysql.createConnection(config);
 
   // Assign storage
   if (typeof config.storage == 'string') {

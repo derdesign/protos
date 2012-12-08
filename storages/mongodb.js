@@ -34,7 +34,8 @@ function MongoStorage(app, config) {
      database: 'store',
      collection: 'keyvalue',
      username: '',
-     password: ''
+     password: '',
+     safe: true
    }, config);
    
    if (typeof config.port != 'number') config.port = parseInt(config.port, 10);
@@ -82,7 +83,7 @@ function MongoStorage(app, config) {
    }
    
    // Set db
-   self.db = new Db(config.database, new Server(config.host, config.port, {}));
+   self.db = new Db(config.database, new Server(config.host, config.port, {}), {safe: config.safe});
 
    // Add async task
    app.addReadyTask();
