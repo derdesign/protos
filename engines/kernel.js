@@ -52,11 +52,8 @@ Kernel.prototype.render = function(data) {
 }
 
 Kernel.prototype.compile = function(source, vars, relPath) {
-  /*jshint evil:true */
   try {
-    return new Function("var helpers = this;\nreturn " 
-    + generator(parser(tokenizer(source), source, this.app.fullPath(relPath))))
-    .call(helpers);
+    return kernel.compile(source, relPath)
   } catch(e) {
     return e;
   }

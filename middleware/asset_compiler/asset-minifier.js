@@ -25,10 +25,6 @@ var compiler = new Multi({
   }
 });
 
-// Uglifyjs internals
-var jsp = uglifyjs.parser;
-var pro = uglifyjs.uglify;
-
 // Recursive minification
 function minification() {
   var sources, target = minifyTargets.shift();
@@ -48,11 +44,7 @@ function minification() {
           fs.writeFileSync(target, source, 'utf8');
           app.debug("Asset Compiler: Minified CSS: " + app.relPath(target));
         } else if (ext == 'js') {
-          var ast = jsp.parse(compiled.join('\n'), config.uglifyOpts.strictSemicolons);   // Initial AST
-          if (config.uglifyOpts.mangle) ast = pro.ast_mangle(ast);                        // Mangled names
-          if (config.uglifyOpts.liftVariables) ast = pro.ast_lift_variables(ast)          // Declare vars at top of scope
-          if (config.uglifyOpts.squeeze) ast = pro.ast_squeeze(ast);                      // Compression optimizations
-          var outSrc = pro.gen_code(ast);                                                 // Compressed code
+          var outSrc = minifyJS(compiled.join('\n'));
           fs.writeFileSync(target, outSrc, 'utf8');
           app.debug("Asset Compiler: Minified JavaScript: " + app.relPath(target));
         } else {
@@ -64,12 +56,19 @@ function minification() {
   }
 }
 
-/*
-mangle: true,
-squeeze: true,
-liftVariables: false,
-strictSemicolons: false
-*/
+function minifyJS(code) {
+  var ast, compressor, stream;
+  ast = uglifyjs.parse(code, {});
+  compressor = uglifyjs.Compressor();
+  ast.figure_out_scope();
+  ast = ast.transform(compressor);
+  ast.figure_out_scope();
+  ast.compute_char_frequency();
+  ast.mangle_names();
+  stream = uglifyjs.OutputStream();
+  ast.print(stream);
+  return stream.toString();
+}
 
 function getExt(file) {
   return file.slice(file.lastIndexOf('.')+1).trim().toLowerCase();

@@ -14,20 +14,20 @@
     "npm": "1.1.x"
   },
   "dependencies"        : {
-    "underscore"        : ">= 1.3.3",
-    "underscore.string" : ">= 2.2.0rc",
-    "node-uuid"         : ">= 1.3.3",
-    "sanitizer"         : ">= 0.0.15",
-    "bouncy"            : ">= 1.3.1",
-    "multi"             : ">= 0.1.2",
-    "file"              : ">= 0.2.1",
-    "mime"              : ">= 1.2.7",
-    "qs"                : ">= 0.5.0",
-    "ejs"               : ">= 0.8.0"
+    "underscore"        : "= 1.4.3",
+    "underscore.string" : "= 2.3.1",
+    "node-uuid"         : "= 1.4.0",
+    "sanitizer"         : "= 0.0.15",
+    "bouncy"            : "= 1.3.1",
+    "multi"             : "= 0.1.2",
+    "file"              : "= 0.2.1",
+    "mime"              : "= 1.2.7",
+    "qs"                : "= 0.5.2",
+    "ejs"               : "= 0.8.3"
   },
   "devDependencies"     : {
-    "jshint"            : ">= 0.7.3",
-    "vows"              : ">= 0.6.3",
+    "jshint"            : ">= 0.9.1",
+    "vows"              : ">= 0.7.0",
     "node-inspector"    : ">= 0.2.0beta3"
   }
 }

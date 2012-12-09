@@ -135,12 +135,12 @@ color:#222}#toc-sidebar ul li.section{margin-top:.5em}#toc-sidebar ul li.section
 li.sub{margin-left:0}#yelow #short{color:#fea}#yelow #long{color:#fea}#yelow #rgba{color:rgba(255,238,170,.1)}#yelow \
 #argb{color:#1affeeaa}';
 
-      var expected2 = '(function(){var e,t,n,r,i,s,o,u,a=Array.prototype.slice;i=42,s=!0,s&&(i=-42),u=function(e){return e*e\
-},t=[1,2,3,4,5],n={root:Math.sqrt,square:u,cube:function(e){return e*u(e)}},o=function(){var e,t;return t=arguments[0],e=2<\
-=arguments.length?a.call(arguments,1):[],print(t,e)},typeof elvis!="undefined"&&elvis!==null&&alert("I knew it!"),e=function\
-(){var e,i,s;s=[];for(e=0,i=t.length;e<i;e++)r=t[e],s.push(n.cube(r));return s}()}).call(this),function(){var e,t,n,r;r=["do\
-","re","mi","fa","so"],n={Jagger:"Rock",Elvis:"Roll"},e=[1,0,1,0,0,1,1,1,0],t={brother:{name:"Max",age:11},sister:{name:"Ida\
-",age:9}}}.call(this)';
+      var expected2 = '(function(){var e,r,n,t,a,u,i,l,o=Array.prototype.slice;a=42,u=!0,u&&(a=-42),l=function(e){return e*e}\
+,r=[1,2,3,4,5],n={root:Math.sqrt,square:l,cube:function(e){return e*l(e)}},i=function(){var e,r;return r=arguments[0],\
+e=arguments.length>=2?o.call(arguments,1):[],print(r,e)},"undefined"!=typeof elvis&&null!==elvis&&alert("I knew it!"),\
+e=function(){var e,a,u;for(u=[],e=0,a=r.length;a>e;e++)t=r[e],u.push(n.cube(t));return u}()}).call(this),function(){var e,r,\
+n,t;t=["do","re","mi","fa","so"],n={Jagger:"Rock",Elvis:"Roll"},e=[1,0,1,0,0,1,1,1,0],r={brother:{name:"Max",age:11},\
+sister:{name:"Ida",age:9}}}.call(this);';
       
       assert.equal(r1, expected1);
       assert.equal(r2, expected2);
