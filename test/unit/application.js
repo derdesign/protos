@@ -31,9 +31,13 @@ vows.describe('lib/application.js').addBatch({
       delete app.environment; // Make sure it can't be deleted
       assert.isTrue(/^(debug|development|travis)$/.test(app.environment));
     },
-
+    
     'Sets domain': function() {
       assert.equal(app.hostname, 'localhost');
+    },
+    
+    'Sets cluster': function() {
+      assert.strictEqual(app.cluster, require('cluster'));
     },
 
     'Sets application path': function() {
