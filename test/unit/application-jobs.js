@@ -179,15 +179,12 @@ vows.describe('lib/application.js').addBatch({
     "Properly removes job data": function() {
       var jobIntervalIDs = app.__jobIntervalIDs;
       var jobExecutionState = app.__jobExecutionState;
-      var jobNextCallTime = app.__jobNextCallTime;
       
       assert.isFalse('my_job' in jobIntervalIDs);
       assert.isFalse('my_job' in jobExecutionState);
-      assert.isFalse('my_job' in jobNextCallTime);
       
       assert.isFalse('my_immed_job' in jobIntervalIDs);
       assert.isFalse('my_immed_job' in jobExecutionState);
-      assert.isFalse('my_immed_job' in jobNextCallTime);
     }
     
   }
