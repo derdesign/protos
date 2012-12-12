@@ -193,6 +193,11 @@ vows.describe('lib/validator.js').addBatch({
         age: function(val) {
           return app.md5(val.toString());
         }
+      })
+      .postFilter({
+        age: function(md5) {
+          return md5.toUpperCase();
+        }
       });
       
     var fields = {
@@ -205,7 +210,7 @@ vows.describe('lib/validator.js').addBatch({
     
     var expected = { 
       name: 'RXJuaWU=',                             // Affected by base64 filter
-      age: '6ea9ab1baa0efb9e19094440c317e21b',      // Affected by md5 filter
+      age: '6EA9AB1BAA0EFB9E19094440C317E21B',      // Affected by md5 filter and the post filter
       some: '--UNCHANGED--'                         // Remains unchanged (no filter)
     }
     
