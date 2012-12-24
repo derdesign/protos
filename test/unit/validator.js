@@ -176,6 +176,66 @@ vows.describe('lib/validator.js').addBatch({
       // Returns invalid message when validator function doesn't return
       assert.equal(validator.validate({name: '1234'}), 'Invalid: 1234');
       
+      ////////////////
+      
+      validator = app.validator()
+        .add({firstname: 'alpha'})
+        .add({lastname: 'alpha'})
+        .add({age: 'integer'})
+        .add({count: 'number'})
+        .add({some: 'anything'});
+        
+      validator.filter({
+        firstname: validator.fn.toUpperCase,
+        lastname: validator.fn.toLowerCase,
+        age: validator.fn.toInteger,
+        count: validator.fn.toFloat
+      });
+      
+      validator.postFilter({
+        age: function(val) {
+          return val + 1;
+        },
+        count: function(val) {
+          return val + 2;
+        }
+      });
+      
+      var valid1 = validator.getValid({
+        firstname: "1",
+        lastname: '2',
+        age: 'a',
+        count: 'b'
+      });
+      
+      // Should return an empty object if no fields validated
+      assert.deepEqual(valid1, {});
+      
+      var valid2 = validator.getValid({
+        firstname: "John",
+        lastname: "Doe",
+        age: 'a',
+        count: 'b'
+      });
+      
+      // Should only return the valid fields + filters applied
+      assert.deepEqual(valid2, {firstname: "JOHN", lastname: "doe"});
+      
+      var valid3 = validator.getValid({
+        firstname: "John",
+        lastname: "Doe",
+        age: '29',
+        count: '55.2'
+      });
+      
+      // Should return all valid fields + filters & postfilters applied
+      assert.deepEqual(valid3, {
+        firstname: "JOHN",
+        lastname: "doe",
+        age: 30, // Gets added 1 on the post filter
+        count: 57.2 // Gets added 2 on the post filter
+      });
+      
     }
     
   },
