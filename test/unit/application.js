@@ -213,6 +213,9 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(app.globals.globalVarOne, 105);
       assert.equal(app.globals.globalVarTwo, 106);
       
+      // Test inflection
+      assert.deepEqual(app.someProp, {value: 99});
+      
     }
     
   }
