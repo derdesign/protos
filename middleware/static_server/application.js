@@ -3,6 +3,7 @@
 
 var app = protos.app,
     fs = require('fs'),
+    util = require('util'),
     mime = require('mime'),
     pathModule = require('path'),
     Application = protos.lib.application;
@@ -105,6 +106,7 @@ Application.prototype._serveStaticFile = function(path, req, res) {
         if (isCached) {
           res.statusCode = 304;
           delete headers['Content-Length'];
+          app.emit('static_headers', headers);
           res.sendHeaders(headers);
           res.end();
           return;
@@ -134,6 +136,7 @@ Application.prototype._serveStaticFile = function(path, req, res) {
             res.statusCode = 416; // HTTP/1.1 416 Requested Range Not Satisfiable
             delete headers['Content-Length'];
             headers.Connection = 'close';
+            app.emit('static_headers', headers);
             res.sendHeaders(headers);
             res.end('');
             return;
@@ -152,6 +155,7 @@ Application.prototype._serveStaticFile = function(path, req, res) {
         });
 
         stream.on('open', function() {
+          app.emit('static_headers', headers);
           res.sendHeaders(headers);
           stream.pipe(res);
         });
