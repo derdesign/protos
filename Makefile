@@ -44,8 +44,7 @@ deps-all:
 		@./tools/merge-deps > package.json.all
 		@mv package.json package.json.orig
 		@mv package.json.all package.json
-		@npm install --save -d
-		@npm shrinkwrap
+		@npm install -d
 		@mv package.json.orig package.json
 		@./tools/remove-sys-notice
 
