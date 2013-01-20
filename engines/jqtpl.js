@@ -4,7 +4,7 @@
   @namespace engine
  */
 
-var jq = protos.requireDependency('jqtpl', 'jQuery Template Engine'),
+var jqtpl = protos.requireDependency('jqtpl', 'jQuery Template Engine'),
     util = require('util');
 
 /**
@@ -20,7 +20,7 @@ var jq = protos.requireDependency('jqtpl', 'jQuery Template Engine'),
 
 function JqueryTemplate(app) {
   this.app = app;
-  this.module = jq;
+  this.module = jqtpl;
   this.multiPart = true;
   this.extensions = ['jqtpl', 'jqtpl.html', 'jq.html'];
 }
@@ -29,12 +29,12 @@ util.inherits(JqueryTemplate, protos.lib.engine);
 
 JqueryTemplate.prototype.render = function(data, vars, relPath) {
   data = this.app.applyFilters('jqtpl_template', data);
-  var tpl, tplID, func = this.getCachedFunction(arguments);
+  var func = this.getCachedFunction(arguments);
   if (func === null) {
-    tplID = util.format('%s:%s', this.app.hostname, relPath);
-    jq.template(tplID, data);
+    var tplID = util.format('%s:%s', this.app.hostname, relPath);
+    var tpl = jqtpl.compile(data, tplID);
     func = function(locals) {
-      return jq.tmpl(tplID, locals);
+      return tpl(locals);
     }
     this.cacheFunction(func, arguments);
   }
