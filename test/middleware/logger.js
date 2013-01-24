@@ -42,10 +42,9 @@ vows.describe('Logger (middleware)').addBatch({
       fs.writeFileSync(app.fullPath('/log/json.log'), '', 'utf-8');
       
       // Remove date from json log data, test filter
-      app.addFilter('test_log_json', function(log) {
+      app.on('test_log_json', function(log) {
         log.pid = process.pid;
         delete log.date;
-        return log;
       });
       
       app.use('logger', {

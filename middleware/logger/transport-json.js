@@ -24,18 +24,22 @@ function JSONTransport(evt, config, level, noAttach) {
   // Create write stream for json filename
   if (config.filename) var stream = app.logger.getFileStream(config.filename);
 
+  var logEvent = evt + '_json';
+  
   // Set write method
   this.write = function(log, data) {
-    if (typeof log == 'object') {
-      log = app.applyFilters(evt + '_json', log);
-    } else {
-      log = app.applyFilters(evt + '_json', {
+    
+    if (typeof log !== 'object') {
+      log = {
         level: level,
         host: app.hostname,
         date: new Date().toGMTString(),
         msg: data[0]
-      });
+      }
     }
+    
+    app.emit(logEvent, log)
+    
     var json = JSON.stringify(log);
     if (stream) stream.write(json+'\n', 'utf8');
     if (config.stdout) console.log(json);
