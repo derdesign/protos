@@ -41,11 +41,15 @@ function JSONTransport(evt, config, level, noAttach) {
     app.emit(logEvent, log)
     
     var json = JSON.stringify(log);
+    
     if (stream) stream.write(json+'\n', 'utf8');
+    
     if (config.stdout) console.log(json);
+    
     for (var transport in self.otherTransports) {
       self.otherTransports[transport].write(json, data, log);
     }
+
   }
 
   if (!noAttach) app.on(evt, this.write);
