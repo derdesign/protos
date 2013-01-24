@@ -227,11 +227,11 @@ function mutedLogCallback() {
   // Do nothing
 }
 
-function setAdditionalTransports(evt, level) {
+function setAdditionalTransports(evt, level, noAttach) {
   var Ctor, t, transports = {};
   for (t in this.config.transports) {
     Ctor = logTransports[t];
-    transports[t] = new Ctor(evt, this.config.transports[t], level);
+    transports[t] = new Ctor(evt, this.config.transports[t], level, noAttach);
   }
   this.otherTransports = transports;
 }

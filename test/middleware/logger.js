@@ -141,8 +141,11 @@ vows.describe('Logger (middleware)').addBatch({
                   app.logger.transports.test.json.otherTransports.mongodb.collection.find({}, function(err, cursor) {
                     cursor.toArray(function(err, docs) {
                       var doc = docs.pop();
-                      
-                      results.forwarding = (doc.log === logMessage);
+
+                      // Forwarding is tested by comparing the logged message in MongoDB (coming from a json log)
+                      // and then comparing it with the regular logMessage.
+                      results.forwarding = (logMessage.slice(-doc.log.msg.length) === doc.log.msg) 
+                        && logMessage.indexOf(doc.log.msg) === 39;
                       
                       promise.emit('success', results);
                       
