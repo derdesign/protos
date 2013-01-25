@@ -644,7 +644,7 @@ function createApplication(data, libs) {
   var app = data.args[0],
       path = process.cwd() + '/' + app,
       masterPath = pathModule.resolve(__dirname, '../')
-      cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/log/*.log %s/public/*.css %s/public/*.js", masterPath, app, 
+      cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/logs/*.log %s/public/*.css %s/public/*.js", masterPath, app, 
         app, app, app);
   
   // console.exit(cmd);
