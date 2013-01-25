@@ -13,13 +13,11 @@ var app = protos.app;
 
 function ProductionUrl() {
   
-  var url = app.baseUrl;
+  // Remove port number from baseUrl
+  app.baseUrl = app.baseUrl.slice(0, app.baseUrl.lastIndexOf(':'));
   
-  // Remove port number from url
-  url = url.slice(0, url.lastIndexOf(':'));
-  
-  // Store the modified url
-  app.baseUrl = url;
+  // Remove port number from baseUrl
+  app.baseUrlSecure = app.baseUrlSecure.slice(0, app.baseUrlSecure.lastIndexOf(':'));
   
 }
 
