@@ -5,7 +5,7 @@
 /work
 /npm-debug.log
 /node_modules*
-/skeleton/logs/*.log
+/skeleton/log/*.log
 /skeleton/public/test
 /test/fixtures/tmp
 /test/fixtures/*skeleton/public/*-style.css
@@ -13,6 +13,6 @@
 /test/fixtures/*skeleton/public/assets/*.css
 /test/fixtures/*skeleton/public/css/*.css
 /test/fixtures/*skeleton/public/css/subdir/*.css
-/test/fixtures/*skeleton/logs/*.log
-/test/fixtures/*skeleton/incoming/*
+/test/fixtures/*skeleton/log/*.log
+/test/fixtures/*skeleton/upload/*
 

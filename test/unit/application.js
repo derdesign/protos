@@ -178,7 +178,7 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(app.api.methodTwo(), 102);
     },
     
-    'Properly Loads Extensions from exts/': function() {
+    'Properly Loads Extensions from ext/': function() {
       // Test constants
       assert.equal(app.TEST_CONSTANT_A, 103);
       assert.equal(app.TEST_CONSTANT_B, 104);

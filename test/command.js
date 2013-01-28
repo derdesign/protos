@@ -293,7 +293,7 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
       protos.exec(function(err, results) {
         if (!err) {
           var bufs = {};
-          ['hooks/db_event.js', 'hooks/update_account.js', 'hooks/remove_user.js'].forEach(function(file) {
+          ['hook/db_event.js', 'hook/update_account.js', 'hook/remove_user.js'].forEach(function(file) {
             bufs[file] = fs.readFileSync(file, 'utf8');
           });
           results.push(bufs);
@@ -304,23 +304,23 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
       return promise;
     },
     
-    'Properly creates files in hooks/': function(results) {
+    'Properly creates files in hook/': function(results) {
        var bufs = results.pop();
        
        // Expect proper output in stdout
-       assert.equal(results[0], '» Skipping hooks/init.js: file exists\n» Created myapp1/hooks/db_event.js\n» Created myapp1/hooks/update_account.js\n» Created myapp1/hooks/remove_user.js');
+       assert.equal(results[0], '» Skipping hook/init.js: file exists\n» Created myapp1/hook/db_event.js\n» Created myapp1/hook/update_account.js\n» Created myapp1/hook/remove_user.js');
        
        // Verify proper code generation
-       assert.equal(bufs['hooks/db_event.js'], '\n/* hooks/db_event.js */\n\nvar app = protos.app;\n\nmodule.exports = function db_event() {\n\n}');
-       assert.equal(bufs['hooks/update_account.js'], '\n/* hooks/update_account.js */\n\nvar app = protos.app;\n\nmodule.exports = function update_account() {\n\n}');
-       assert.equal(bufs['hooks/remove_user.js'], '\n/* hooks/remove_user.js */\n\nvar app = protos.app;\n\nmodule.exports = function remove_user() {\n\n}');
+       assert.equal(bufs['hook/db_event.js'], '\n/* hook/db_event.js */\n\nvar app = protos.app;\n\nmodule.exports = function db_event() {\n\n}');
+       assert.equal(bufs['hook/update_account.js'], '\n/* hook/update_account.js */\n\nvar app = protos.app;\n\nmodule.exports = function update_account() {\n\n}');
+       assert.equal(bufs['hook/remove_user.js'], '\n/* hook/remove_user.js */\n\nvar app = protos.app;\n\nmodule.exports = function remove_user() {\n\n}');
      }
     
   }
   
 }).addBatch({
   
-  'protos exts': {
+  'protos ext': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -330,7 +330,7 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
       protos.exec(function(err, results) {
         if (!err) {
           var bufs = {};
-          ['exts/request.js', 'exts/response.js', 'exts/stream.js'].forEach(function(file) {
+          ['ext/request.js', 'ext/response.js', 'ext/stream.js'].forEach(function(file) {
             bufs[file] = fs.readFileSync(file, 'utf8');
           });
         }
@@ -341,16 +341,16 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
       return promise;
     },
     
-    'Properly creates files in exts/': function(results) {
+    'Properly creates files in ext/': function(results) {
       var bufs = results.pop();
       
       // Expect proper output in stdout
-      assert.equal(results[0], '» Skipping exts/application.js: file exists\n» Created myapp1/exts/request.js\n» Created myapp1/exts/response.js\n» Created myapp1/exts/stream.js');
+      assert.equal(results[0], '» Skipping ext/application.js: file exists\n» Created myapp1/ext/request.js\n» Created myapp1/ext/response.js\n» Created myapp1/ext/stream.js');
       
       // Verify proper code generation
-      assert.equal(bufs['exts/request.js'], '\n/* exts/request.js */\n\nvar app = protos.app;\n\n// Code goes here');
-      assert.equal(bufs['exts/response.js'], '\n/* exts/response.js */\n\nvar app = protos.app;\n\n// Code goes here');
-      assert.equal(bufs['exts/stream.js'], '\n/* exts/stream.js */\n\nvar app = protos.app;\n\n// Code goes here');
+      assert.equal(bufs['ext/request.js'], '\n/* ext/request.js */\n\nvar app = protos.app;\n\n// Code goes here');
+      assert.equal(bufs['ext/response.js'], '\n/* ext/response.js */\n\nvar app = protos.app;\n\n// Code goes here');
+      assert.equal(bufs['ext/stream.js'], '\n/* ext/stream.js */\n\nvar app = protos.app;\n\n// Code goes here');
     }
     
   }

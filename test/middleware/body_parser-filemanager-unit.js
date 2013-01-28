@@ -9,11 +9,11 @@ var app = require('../fixtures/bootstrap'),
 var FileManager;
 
 var files = {
-  alpha: {path: app.fullPath('uploads/alpha.txt'), size: 16, type: 'text/plain'},
-  beta: {path: app.fullPath('uploads/beta.jpg'), size: 16, type: 'image/jpg'},
-  gamma: {path: app.fullPath('uploads/gamma.gif'), size: 16, type: 'image/gif'},
-  epsilon: {path: app.fullPath('uploads/epsilon.txt'), size: 0, type: 'text/plain'},
-  delta: {path: app.fullPath('uploads/delta.png'), size: 5, type: 'image/png'},
+  alpha: {path: app.fullPath('upload/alpha.txt'), size: 16, type: 'text/plain'},
+  beta: {path: app.fullPath('upload/beta.jpg'), size: 16, type: 'image/jpg'},
+  gamma: {path: app.fullPath('upload/gamma.gif'), size: 16, type: 'image/gif'},
+  epsilon: {path: app.fullPath('upload/epsilon.txt'), size: 0, type: 'text/plain'},
+  delta: {path: app.fullPath('upload/delta.png'), size: 5, type: 'image/png'},
 }
 
 // Simulates file uploads
@@ -162,7 +162,6 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
     },
     
     'Required File expected n/a => removes all files': function(results) {
-      
       var fm = results[0];
       assert.equal(fm.length, 0);
       assert.deepEqual(fm.removed, ['alpha', 'beta', 'gamma', 'epsilon', 'delta']);  // All files removed
@@ -277,7 +276,7 @@ vows.describe('Body Parser (middleware) » FileManager').addBatch({
     topic: function() {
       
       var promise = new EventEmitter();
-      var testFilePath = app.fullPath('uploads/test-file.txt');
+      var testFilePath = app.fullPath('upload/test-file.txt');
       
       fs.writeFileSync(testFilePath, '', 'utf-8');
       

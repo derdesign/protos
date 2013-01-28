@@ -1,0 +1,4 @@
+
+# script/
+
+Application-specific scripts

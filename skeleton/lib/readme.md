@@ -1,4 +1,4 @@
 
-# Application Libraries
+# lib/
 
 Standalone libraries, required on demand.

@@ -38,8 +38,8 @@ vows.describe('Logger (middleware)').addBatch({
       var db = app.config.drivers,
           sto = app.config.storages;
       
-      fs.writeFileSync(app.fullPath('/logs/test.log'), '', 'utf-8');
-      fs.writeFileSync(app.fullPath('/logs/json.log'), '', 'utf-8');
+      fs.writeFileSync(app.fullPath('/log/test.log'), '', 'utf-8');
+      fs.writeFileSync(app.fullPath('/log/json.log'), '', 'utf-8');
       
       // Remove date from json log data, test filter
       app.on('test_log_json', function(log) {
@@ -118,10 +118,10 @@ vows.describe('Logger (middleware)').addBatch({
                 results.redis = (res.length === 0 && doc == logMessage);
               }
               
-              results.file = fs.readFileSync(app.fullPath('/logs/test.log', 'utf-8')).toString().trim() === logMessage;
+              results.file = fs.readFileSync(app.fullPath('/log/test.log', 'utf-8')).toString().trim() === logMessage;
               
               var expectedJson = '{"level":"test","host":"localhost","msg":"This event should be logged!","pid":' + process.pid + '}';
-              var obtainedJson = fs.readFileSync(app.fullPath('/logs/json.log', 'utf-8')).toString().trim();
+              var obtainedJson = fs.readFileSync(app.fullPath('/log/json.log', 'utf-8')).toString().trim();
               
               results.json = expectedJson == obtainedJson;
               
@@ -200,7 +200,7 @@ vows.describe('Logger (middleware)').addBatch({
     topic: function() {
       var promise = new EventEmitter();
       
-      var logFile = app.fullPath('/logs/access.log');
+      var logFile = app.fullPath('/log/access.log');
       
       fs.writeFileSync(logFile, '', 'utf-8');
       

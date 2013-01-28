@@ -1,5 +1,5 @@
 
-## Application Static Views
+## views/__static
 
 You can create routes in your application without actually creating them in Controllers. You can also place a file in the 
 *app/views/__static* directory.

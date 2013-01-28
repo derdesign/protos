@@ -1,5 +1,5 @@
 
-/* hooks/init.js */
+/* hook/init.js */
 
 module.exports = function init(app) {
 
