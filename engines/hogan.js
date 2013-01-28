@@ -22,7 +22,7 @@ function Hogan(app) {
   this.multiPart = true;
   this.extensions = ['hogan', 'hogan.html', 'hg.html', 'mustache'];
 
-  app.on('init', function() {
+  app.once('after_init', function() {
     // App partials
     for (var p in app.views.partials) {
       var func = app.views.partials[p];
