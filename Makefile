@@ -18,14 +18,13 @@ commandline = ./test/command.js
 
 default:
 		@echo
-		@echo "* Project Tasks\n"
+		@echo "Project Tasks:\n"
 		@echo "make deps             Install Dependencies"
 		@echo "make deps-all         Install All Dependencies"
 		@echo "make deps-clean       Removes the node_modules directory"
 		@echo "make lint             Run Code Analysis tool (scans entire project)"
-		@echo "make testconfig       Test Configuration Tool"
 		@echo
-		@echo "* Test Suites\n"
+		@echo "Test Suites:\n"
 		@echo "make tests            Run All tests"
 		@echo "make test-unit        Run Unit tests"
 		@echo "make test-sto         Run Storage tests (testconfig required)"
@@ -54,9 +53,6 @@ deps-clean:
 lint:
 		@ls -F | egrep / | egrep -v "(node_modules|test|docs|build|doctmp|resources)" | NODE_ENV=lintall xargs -n 1 ./tools/lint
 		@echo
-
-testconfig:
-		@./tools/testconfig
 
 test:
 		@echo "\nAvailable Test Commands: tests  test-unit  test-sto test-drv test-eng test-int test-mid\n"

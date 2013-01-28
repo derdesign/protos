@@ -27,7 +27,7 @@ function TestModel() {
 
   this.driver = 'mongodb';
 
-  this.properties = app.globals.commonModelProps;
+  this.properties = app.locals.commonModelProps;
 
 }
 

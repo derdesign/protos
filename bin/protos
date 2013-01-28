@@ -31,15 +31,14 @@ var commands = {
   
   create: {
     multiple: ['js', 'css', 'model', 'controller'],
-    single: ['domain'],
+    switches: ['minimal'],
     args: 1,
     help: {
-      domain: "Domain to attach the application to",
+      minimal: "Use the minimal directory structure",
       css: "Bundle client side CSS frameworks",
       js: "Bundle client side JavaScript libraries/frameworks",
       model: "Include models on application",
       controller: "Include controllers on application",
-      mustache: "Use the .mustache extension for generated views"
     },
     run: function(args) {
       
@@ -117,68 +116,6 @@ var commands = {
     }
   },
   
-  deploy: {
-    args: 1,
-    run: function(data) {
-
-      /*
-       cluster.json spec:
-
-       {
-         "fork": "true",
-         "env": "production",
-         "port": "8080",
-         "logpath": "server.log",
-         "routes": {
-           "app1": "8081",
-           "app2": "8082"
-         }
-       }
-
-      */      
-      
-      var file = process.cwd() + '/' + data.args.pop();
-      
-      if (!fs.existsSync(file)) console.exit(file);
-
-      var defaults = {
-        fork: true,
-        env: "production",
-        port: 8080,
-        logpath: "server.log",
-      }
-      
-      var json = require(file),
-          keys = Object.keys(json);
-      
-      if (! 'routes' in json) {
-        console.exit("Invalid JSON file: missing 'routes' field");
-      } else {
-        json = _.extend(defaults, json);
-      }
-      
-      if (typeof json.fork == 'string') {
-        json.fork = json.fork.trim().toLowerCase();
-        json.fork = (json.fork === 'true' || json.fork === '1');
-      }
-      
-      if (typeof json.port == 'string') {
-        json.port = parseInt(json.port, 10);
-      }
-      
-      json.args = [];
-      
-      for (var host in json.routes) {
-        json.args.push(host + ':' + parseInt(json.routes[host], 10));
-      }
-      
-      delete json.routes;
-      
-      commands.server.run.call(this, json);
-      
-    }
-  },
-  
   fetch: {
     multiple: ['js', 'css'],
     args: 0,
@@ -214,13 +151,13 @@ var commands = {
   },
   
   server: {
-    switches: ['fork'], // TODO: Add 'watch',
+    switches: ['fork'],
     single: ['logpath', 'port', 'env'],
     args: 99,
     noargs: true,
     help: {
       fork: "Creates a new node process when starting servers",
-      port: "Port to use when proxying multiple servers",
+      port: "Port to use for the HTTP Server",
       env: "Environment to use when running server",
       logpath: "File to save output when forking a new process",
       // watch: "Automatically watches for changes in apps & reloads server"
@@ -383,11 +320,7 @@ var commands = {
   },
   
   controller: {
-    switches: ['nohelper'],
     args: 99,
-    help: {
-      nohelper: "Don't create helpers when generating controllers"
-    },
     validate: validateApp,
     run: function(data) {
        var app = pathModule.basename(process.cwd());
@@ -397,17 +330,12 @@ var commands = {
        data.args.forEach(function(controller) {
          createController.call(this, app, controller);
        }, this);
-       
-       // Create Helpers
-       if (!data.nohelper) data.args.forEach(function(controller) {
-         createHelper.call(this, app, controller);
-       }, this);
-       
+
        // Create views
        viewsBatch.forEach(function(args) {
          createView.apply(data, args);
        });
-       
+
     }
   },
   
@@ -427,6 +355,8 @@ module.exports = function() {\n\
   }\n\
 \n\
 }\n";
+
+      fs.unlink('app/handlers/readme.md');
       
       var cwd = process.cwd() + '/app/handlers/';
       
@@ -453,6 +383,7 @@ module.exports = function() {\n\
     args: 99,
     validate: validateApp,
     run: function(data) {
+      fs.unlink('app/views/__static/readme.md');
       recursivelyCreateFiles('views/__static', data);
     }
   },
@@ -471,6 +402,8 @@ module.exports = function() {\n\
     validate: validateApp,
     run: function(data) {
       
+      fs.unlink('hook/readme.md');
+      
       var template = ejs.compile("\
 \n\
 /* <%- relPath %> */\n\
@@ -487,10 +420,6 @@ module.exports = function <%- fileWithoutExtension %>() {\n\
   
   api: {
     args: 99,
-    switches: ['group'],
-    help: {
-      group: "Makes API file export no methods"
-    },
     validate: validateApp,
     run: function(data) {
     
@@ -501,12 +430,12 @@ module.exports = function <%- fileWithoutExtension %>() {\n\
 var app = protos.app;\n\
 \n\
 module.exports = {\n\
-<% if (typeof group_switch == 'boolean' && group_switch == false) { %>\n\
+\n\
   <%- lowerCamelCase %>: function() {\n\
 \n\
   }\n\
-\n<% } else { %>\n<% } %>\
-}");
+\n\
+}\n");
 
       createJsFilesWithTemplate('api/', data, template);
       
@@ -517,6 +446,8 @@ module.exports = {\n\
     args: 99,
     validate: validateApp,
     run: function(data) {
+
+      fs.unlink('ext/readme.md');
       
       var template = ejs.compile("\
 \n\
@@ -524,9 +455,29 @@ module.exports = {\n\
 \n\
 var app = protos.app;\n\
 \n\
-// Code goes here");
+// Code goes here\n");
 
       createJsFilesWithTemplate('ext/', data, template);
+      
+    }
+  },
+  
+  include: {
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      
+      fs.unlink('include/readme.md');
+      
+      var template = ejs.compile("\
+\n\
+/* <%- relPath %> */\n\
+\n\
+module.exports = {\n\
+\n\
+}\n");
+
+      createJsFilesWithTemplate('include/', data, template);
       
     }
   },
@@ -606,6 +557,8 @@ var app = protos.app;\n\
        
        var app = pathModule.basename(process.cwd());
 
+       fs.unlink('app/models/readme.md');
+
        process.chdir('../');
        
        // Create models
@@ -641,11 +594,16 @@ var helpersBatch = [];
 
 function createApplication(data, libs) {
   
-  var app = data.args[0],
-      path = process.cwd() + '/' + app,
-      masterPath = pathModule.resolve(__dirname, '../')
-      cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/log/*.log %s/public/*.css %s/public/*.js", masterPath, app, 
-        app, app, app);
+  var app = data.args[0];
+  var path = process.cwd() + '/' + app;
+  var masterPath = pathModule.resolve(__dirname, '../');
+  
+  var cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/log/*.log %s/public/*.css %s/public/*.js", 
+    masterPath, app, app, app, app);
+        
+  if (data.minimal) {
+    cmd += util.format("; rm -Rf %s/{api,ext,hook,include,lib,priv,script,test}", app);
+  }
   
   // console.exit(cmd);
   
@@ -673,10 +631,6 @@ function createApplication(data, libs) {
       }
       
       boot = boot.replace("var Protos = require('../');", util.format("var Protos = require('%s');", repl));
-      
-      if (data.domain) {
-        boot = boot.replace("host: 'localhost',", util.format("host: '%s',", data.domain));
-      }
       
       fs.writeFileSync(bootFile, boot);
       
@@ -831,15 +785,23 @@ function %s(app) {\n\
 \n\
   this.context = \"%s\";\n\
 \n\
+  this.validation = {\n\
+\n\
+  }\n\
+\n\
   this.properties = {\n\
 \n\
   }\n\
 \n\
 }\n\
 \n\
+%s.methods = {\n\
+\n\
+}\n\
+\n\
 module.exports = %s;\n\
 ";
-  tpl = util.format(tpl, model, (opts.driver || 'default'), (opts.context || getModelContext(model)), model);
+  tpl = util.format(tpl, model, (opts.driver || 'default'), (opts.context || getModelContext(model)), model, model);
   
   var file = util.format('%s/app/models/%s.js', app, name);
   
@@ -874,8 +836,7 @@ function %s(app) {\n\
 \n\
 }\n\
 \n\
-module.exports = %s;\n\
-";
+module.exports = %s;\n";
 
   tpl = util.format(tpl, controller, controller);
 
@@ -938,16 +899,13 @@ function createView(app, controller, view, partial) {
     } else {
       file = util.format('%s/%s-%s.', dir, controller, view);
     }
-    file += (this.mustache) ? 'mustache' : (this.ext || config.cli[partial ? 'partialExt' : 'viewExt'] || 'html');
+    file += this.ext || config.cli[partial ? 'partialExt' : 'viewExt'] || 'html';
   }
   
   // Replace static file prefix
   file = file.replace('__static-', '');
 
-  if (controller == 'main' && this.mustache == true) {
-    tpl = "\n<p>Welcome to {{protos.className}}</p>\n";
-    fs.unlinkSync(app + '/app/views/main/main-index.html');
-  } else if (typeof this.ext === 'undefined') {
+  if (typeof this.ext === 'undefined') {
     tpl = util.format("\n<p>%s Controller</p>\n", inflect.camelize(controller));
   } else {
     tpl = '';
@@ -1130,6 +1088,10 @@ bouncy(function(req, bounce) { var host, port;\
 }
 
 function createJsFilesWithTemplate(target, data, template) {
+  
+  // Create target if not exists
+  if (!fs.existsSync(target)) fs.mkdirSync(target);
+  
   var app = pathModule.basename(process.cwd());
   var filenames = data.args.map(function(val) { return val.replace(/\.js$/, '') + '.js' });
   var createFiles = {};
@@ -1164,7 +1126,7 @@ function createJsFilesWithTemplate(target, data, template) {
 function recursivelyCreateFiles(target, data, ext, callback) {
   
   var app = pathModule.basename(process.cwd());
-  
+
   var files = [];
   var dirs = [];
   var tpl = data.template;
@@ -1221,13 +1183,32 @@ function getModelContext(string) {
 var cli = new CommandLine(commands);
 
 cli.help.before = "\n\
-Usage: protos [ACTION] [OPTION]... [ARGUMENTS]...\n\n\
+Usage: protos [ACTION] [ARGUMENTS] [OPTIONS]\n\n\
 Actions:\n\n\
-  Project: [ create | install | fetch | inspector | lint ]\n\n\
-  Server: [ server | deploy ]\n\n\
-  Component: [ controller | handler | helper | model ]\n\n\
-  View Generation: [ view | partial | layout | static | restricted ]\n\n\
-  Code Generation: [ api | hook | lib | ext ]\n\n\
+  create      [name] [options]\n\
+  install     [dependency]\n\
+\n\
+  server      [options]\n\
+\n\
+  controller  [name] ...\n\
+  handler     [controller]/[name1,name2] ...\n\
+  helper      [name] ...\n\
+  model       [name] ...\n\
+\n\
+  view        [controller]/[name1,name2] ... [options]\n\
+  partial     [controller]/[name1,name2] ... [options]\n\
+  layout      [name] ... [options]\n\
+  static      [name] ... [options]\n\
+  restricted  [name] ... [options]\n\
+\n\
+  api         [name] ...\n\
+  hook        [name] ...\n\
+  ext         [name] ...\n\
+  include     [name] ...\n\
+\n\
+  fetch\n\
+  inspector\n\
+  lint\n\n\
 Options:\n";
 
 cli.help.after = "\n\

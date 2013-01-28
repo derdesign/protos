@@ -1,4 +1,4 @@
 
 # upload/
 
-Directory in which uploaded files are stored.
+Uploaded files target directory.

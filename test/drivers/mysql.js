@@ -31,7 +31,7 @@ function TestModel() {
 
   this.driver = 'mysql';
 
-  this.properties = app.globals.commonModelProps;
+  this.properties = app.locals.commonModelProps;
 
 }
 

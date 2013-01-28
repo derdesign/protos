@@ -13,8 +13,8 @@ multi.on('post_exec', app.restoreFilters);
 
 var generalFilter, specificFilter;
 
-app.globals.testval = 99;
-app.globals.anotherVal = 101;
+app.locals.testval = 99;
+app.locals.anotherVal = 101;
 
 var testval, anotherVal;
 
@@ -515,9 +515,9 @@ vows.describe('Response Misc').addBatch({
   
   'Application Globals': {
     
-    "Access app.globals as view locals": function() {
-      assert.strictEqual(testval, app.globals.testval);
-      assert.strictEqual(anotherVal, app.globals.anotherVal);
+    "Access app.locals as view locals": function() {
+      assert.strictEqual(testval, app.locals.testval);
+      assert.strictEqual(anotherVal, app.locals.anotherVal);
     }
     
   }

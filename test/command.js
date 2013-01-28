@@ -58,7 +58,7 @@ vows.describe('Command Line Interface').addBatch({
       var promise = new EventEmitter(),
           results = [];
       
-      protos.command('create myapp --domain protos.org --js ember --css skeleton --model posts comment --controller admin dashboard');
+      protos.command('create myapp --js ember --css skeleton --model posts comment --controller admin dashboard');
       protos.command('create myapp1 --controller test');
       
       protos.exec(function(err, results) {
@@ -122,7 +122,6 @@ Downloading Ember.js JavaScript Framework';
       process.chdir('myapp1');
       prefix += '../';
       protos.command('controller blog admin');
-      protos.command('controller cool --nohelper');
       
       protos.exec(function(err, results) {
         promise.emit('success', err || results);
@@ -133,15 +132,12 @@ Downloading Ember.js JavaScript Framework';
     
     "Properly generates controllers": function(results) {
       var r1 = results[0];
-      var expected =  '» Created myapp1/app/controllers/blog.js\n» Created myapp1/app/controllers/admin.js\n» \
-Created myapp1/app/helpers/blog.js\n» Created myapp1/app/helpers/admin.js\n» \
-Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin/admin-index.html';
+      var expected =  '» Created myapp1/app/controllers/blog.js\n» Created myapp1/app/controllers/admin.js\n\
+» Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin/admin-index.html';
 
       assert.equal(r1, expected);
       assert.isTrue(fs.existsSync('app/controllers/blog.js'));
       assert.isTrue(fs.existsSync('app/controllers/admin.js'));
-      assert.isTrue(fs.existsSync('app/helpers/blog.js'));
-      assert.isTrue(fs.existsSync('app/helpers/admin.js'));
       assert.isTrue(fs.existsSync('app/views/blog/blog-index.html'));
       assert.isTrue(fs.existsSync('app/views/admin/admin-index.html'));
       
@@ -151,17 +147,6 @@ Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin
 res.render(\'index\');\n  });\n\n}\n\nmodule.exports = BlogController;';
       
       assert.equal(expectedBuf, controllerBuf);
-      
-    },
-    
-    "Skips helpers when using --nohelper": function(results) {
-      var r1 = results[1];
-      var expected = '» Created myapp1/app/controllers/cool.js\n» Created myapp1/app/views/cool/cool-index.html';
-      
-      assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('app/controllers/cool.js'));
-      assert.isFalse(fs.existsSync('app/helpers/cool.js'));
-      assert.isTrue(fs.existsSync('app/views/cool/cool-index.html'));
       
     }
     
@@ -193,15 +178,15 @@ res.render(\'index\');\n  });\n\n}\n\nmodule.exports = BlogController;';
         assert.isTrue(fs.existsSync('app/models/comments.js'));
         assert.isTrue(fs.existsSync('app/models/books.js'));
         
-        var modelBuf = 'function BooksModel(app) {\n\n  this.driver = "mongodb:books";\n\n  this.context = "bookstore";\
-\n\n  this.properties = {\n\n  }\n\n}\n\nmodule.exports = BooksModel;';
+        var modelBuf = 'function BooksModel(app) {\n\n  this.driver = "mongodb:books";\n\n  this.context = "bookstore";\n\n  \
+this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nBooksModel.methods = {\n\n}\n\nmodule.exports = BooksModel;';
         
         var expectedBuf = fs.readFileSync('app/models/books.js','utf8').trim();
 
         assert.equal(expectedBuf, modelBuf);
 
         modelBuf = 'function PostsModel(app) {\n\n  this.driver = "default";\n\n  this.context = "posts";\n\n  \
-this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
+this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.methods = {\n\n}\n\nmodule.exports = PostsModel;';
         
         expectedBuf = fs.readFileSync('app/models/posts.js', 'utf8').trim();
         
@@ -247,12 +232,11 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
       var promise = new EventEmitter();
       
       protos.command('api sample-method cool-method.js some-other-method');
-      protos.command('api --group method-group-1 method-group-2');
       
       protos.exec(function(err, results) {
         if (!err) {
           var bufs = {};
-          ['api/cool-method.js', 'api/some-other-method.js', 'api/method-group-1.js', 'api/method-group-2.js'].forEach(function(file) {
+          ['api/cool-method.js', 'api/some-other-method.js'].forEach(function(file) {
             bufs[file] = fs.readFileSync(file, 'utf8');
           });
           results.push(bufs);
@@ -267,16 +251,11 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
       var bufs = results.pop();
       
       // Expect proper output in stdout
-      assert.equal(results[0], '» Skipping api/sample-method.js: file exists\n» Created myapp1/api/cool-method.js\n» Created myapp1/api/some-other-method.js');
-      assert.equal(results[1], '» Created myapp1/api/method-group-1.js\n» Created myapp1/api/method-group-2.js');
+      assert.equal(results[0], '» Created myapp1/api/sample-method.js\n» Created myapp1/api/cool-method.js\n» Created myapp1/api/some-other-method.js');
       
       // Api files export methods by default
-      assert.equal(bufs['api/cool-method.js'], '\n/* api/cool-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  coolMethod: function() {\n\n  }\n\n}');
-      assert.equal(bufs['api/some-other-method.js'], '\n/* api/some-other-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  someOtherMethod: function() {\n\n  }\n\n}');
-      
-      // Using --group doesn't export methods
-      assert.equal(bufs['api/method-group-1.js'], '\n/* api/method-group-1.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n}');
-      assert.equal(bufs['api/method-group-2.js'], '\n/* api/method-group-2.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n}');
+      assert.equal(bufs['api/cool-method.js'], '\n/* api/cool-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  coolMethod: function() {\n\n  }\n\n}\n');
+      assert.equal(bufs['api/some-other-method.js'], '\n/* api/some-other-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  someOtherMethod: function() {\n\n  }\n\n}\n');
     }
 
   }
@@ -308,7 +287,7 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
        var bufs = results.pop();
        
        // Expect proper output in stdout
-       assert.equal(results[0], '» Skipping hook/init.js: file exists\n» Created myapp1/hook/db_event.js\n» Created myapp1/hook/update_account.js\n» Created myapp1/hook/remove_user.js');
+       assert.equal(results[0], '» Created myapp1/hook/init.js\n» Created myapp1/hook/db_event.js\n» Created myapp1/hook/update_account.js\n» Created myapp1/hook/remove_user.js');
        
        // Verify proper code generation
        assert.equal(bufs['hook/db_event.js'], '\n/* hook/db_event.js */\n\nvar app = protos.app;\n\nmodule.exports = function db_event() {\n\n}');
@@ -345,12 +324,48 @@ this.properties = {\n\n  }\n\n}\n\nmodule.exports = PostsModel;';
       var bufs = results.pop();
       
       // Expect proper output in stdout
-      assert.equal(results[0], '» Skipping ext/application.js: file exists\n» Created myapp1/ext/request.js\n» Created myapp1/ext/response.js\n» Created myapp1/ext/stream.js');
+      assert.equal(results[0], '» Created myapp1/ext/application.js\n» Created myapp1/ext/request.js\n» Created myapp1/ext/response.js\n» Created myapp1/ext/stream.js');
       
       // Verify proper code generation
-      assert.equal(bufs['ext/request.js'], '\n/* ext/request.js */\n\nvar app = protos.app;\n\n// Code goes here');
-      assert.equal(bufs['ext/response.js'], '\n/* ext/response.js */\n\nvar app = protos.app;\n\n// Code goes here');
-      assert.equal(bufs['ext/stream.js'], '\n/* ext/stream.js */\n\nvar app = protos.app;\n\n// Code goes here');
+      assert.equal(bufs['ext/request.js'], '\n/* ext/request.js */\n\nvar app = protos.app;\n\n// Code goes here\n');
+      assert.equal(bufs['ext/response.js'], '\n/* ext/response.js */\n\nvar app = protos.app;\n\n// Code goes here\n');
+      assert.equal(bufs['ext/stream.js'], '\n/* ext/stream.js */\n\nvar app = protos.app;\n\n// Code goes here\n');
+    }
+    
+  }
+  
+}).addBatch({
+  
+  'protos include': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      protos.command('include filters locals');
+      
+      protos.exec(function(err, results) {
+        if (!err) {
+          var bufs = {};
+          ['include/filters.js', 'include/locals.js'].forEach(function(file) {
+            bufs[file] = fs.readFileSync(file, 'utf8');
+          });
+        }
+        results.push(bufs);
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    'Properly creates files in include/': function(results) {
+      var bufs = results.pop();
+      
+      // Expect proper output in stdout
+      assert.equal(results[0], '» Created myapp1/include/filters.js\n» Created myapp1/include/locals.js');
+      
+      // Verify proper code generation
+      assert.equal(bufs['include/filters.js'], '\n/* include/filters.js */\n\nmodule.exports = {\n\n}\n');
+      assert.equal(bufs['include/locals.js'], '\n/* include/locals.js */\n\nmodule.exports = {\n\n}\n');
     }
     
   }

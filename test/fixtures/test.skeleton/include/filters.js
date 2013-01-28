@@ -1,5 +1,5 @@
 
-/* Application Filters (methods can be used as controller filters) */
+/* Reusable Controller Filters */
 
 module.exports = {
   

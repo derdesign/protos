@@ -1,5 +1,5 @@
 
-/* Application Global State (exported as view locals) */
+/* Default View Locals */
 
 module.exports = {
   

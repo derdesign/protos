@@ -206,12 +206,12 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(app.filters.testFilterTwo(), "Output from app.filters.testFilterTwo");
       
       // Test globals
-      var libGlobals = app.require('include/globals.js');
-      assert.deepEqual(Object.keys(libGlobals).sort(), ['globalVarOne', 'globalVarTwo'].sort());
-      assert.strictEqual(app.globals.globalVarOne, libGlobals.globalVarOne);
-      assert.strictEqual(app.globals.globalVarTwo, libGlobals.globalVarTwo);
-      assert.equal(app.globals.globalVarOne, 105);
-      assert.equal(app.globals.globalVarTwo, 106);
+      var libLocals = app.require('include/locals.js');
+      assert.deepEqual(Object.keys(libLocals).sort(), ['globalVarOne', 'globalVarTwo'].sort());
+      assert.strictEqual(app.locals.globalVarOne, libLocals.globalVarOne);
+      assert.strictEqual(app.locals.globalVarTwo, libLocals.globalVarTwo);
+      assert.equal(app.locals.globalVarOne, 105);
+      assert.equal(app.locals.globalVarTwo, 106);
       
       // Test inflection
       assert.deepEqual(app.someProp, {value: 99});

@@ -85,7 +85,7 @@ vows.describe('Logger (middleware)').addBatch({
         }
       });
       
-      app.globals.nativeLog = {msg: "This log should be stored as native JSON", date: new Date().toGMTString()};
+      app.locals.nativeLog = {msg: "This log should be stored as native JSON", date: new Date().toGMTString()};
       
       app.testLog('This event should be logged!');
       
@@ -126,14 +126,14 @@ vows.describe('Logger (middleware)').addBatch({
               results.json = expectedJson == obtainedJson;
               
               // Test native logs
-              app.logger.transports.test.mongodb.write(app.globals.nativeLog);
+              app.logger.transports.test.mongodb.write(app.locals.nativeLog);
               
               collection = app.logger.transports.test.mongodb.collection;
               
               collection.find({}, function(err, cursor) {
                 cursor.toArray(function(err, docs) {
                   var doc = docs.pop();
-                  results.native = (doc.log.msg == app.globals.nativeLog.msg && doc.log.date == app.globals.nativeLog.date);
+                  results.native = (doc.log.msg == app.locals.nativeLog.msg && doc.log.date == app.locals.nativeLog.date);
                   
                   // Test log forwarding
                   

@@ -19,9 +19,9 @@ function MainController(app) {
   /* View Locals */
   
   get('/view-locals', function(req, res) {
-    app.globals.testval = 99;
+    app.locals.testval = 99;
     res.render('view-locals.html', true);
-    delete app.globals.testval;
+    delete app.locals.testval;
   });
 
   /* Shortcode filter */

@@ -1,4 +1,4 @@
 
-## test/
+# test/
 
-Application test suites & fixtures.
+Application tests.

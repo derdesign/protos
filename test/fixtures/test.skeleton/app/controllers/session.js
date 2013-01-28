@@ -42,7 +42,7 @@ function SessionController(app) {
   get('/create/:user', {user: 'alpha'}, loadSession, function(req, res, params) {
     var pers = req.queryData.persistent == '1';
     app.session.create(req, res, {user: params.user}, pers, function(session, hashes, expires) {
-      app.globals.userSession = session;
+      app.locals.userSession = session;
       res.sendHeaders({
         'X-Session-Id': hashes.sessId,
         'X-Session-Expires': (new Date(Date.now() + expires*1000)).toUTCString()

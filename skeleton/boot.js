@@ -2,43 +2,40 @@
 var Protos = require('../');
 
 Protos.bootstrap(__dirname, {
-  
-  // Application configuration
+
   debugLog: false,
-  
-  // Server configuration
+
   server: {
     host: '0.0.0.0',
     port: 8080,
+    useSSL: false,
     multiProcess: false,
     stayUp: 'production'
   },
-  
-  // Application environments
+
+  ssl: {
+    port: 8443,
+    key: '',
+    cert: ''
+  },
+
   environments: {
     default: 'development',
-    development: function(app) { 
-      // Development environment code
-    }
+    development: function(app) { },
+    production: function(app) { }
   },
   
-  // Application events
   events: {
     components: function(protos) {
-      // Load framework components
       protos.loadDrivers();
       protos.loadStorages();
       protos.loadEngines('ejs');
     },
-    pre_init: function(app) {
-      // Pre-initialization code
-    },
     init: function(app) {
-      // Load middleware
       app.use('logger');
     }
   }
-  
+
 });
 
 module.exports = protos.app;

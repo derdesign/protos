@@ -28,7 +28,7 @@ function TestModel() {
 
   this.driver = 'postgres';
 
-  this.properties = app.globals.commonModelProps;
+  this.properties = app.locals.commonModelProps;
 
 }
 

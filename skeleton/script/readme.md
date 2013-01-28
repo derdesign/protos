@@ -1,4 +1,4 @@
 
 # script/
 
-Application-specific scripts
+Application-specific scripts.
