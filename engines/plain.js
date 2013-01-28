@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var app = protos.app,
     util = require('util');
 

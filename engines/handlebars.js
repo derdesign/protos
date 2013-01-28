@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var handlebars = protos.requireDependency('handlebars', 'Handlebars Engine'),
     util = require('util');
     

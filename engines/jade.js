@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var jade = protos.requireDependency('jade', 'Jade Engine'),
     util = require('util'),
     extend = protos.extend;

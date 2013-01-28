@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 // require('hamljs') is broken
 // https://github.com/isaacs/npm/issues/1903
 // https://github.com/visionmedia/haml.js/issues/41

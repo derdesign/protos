@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var j = protos.requireDependency('jshtml', 'JSHtml Engine'),
     util = require('util');
 

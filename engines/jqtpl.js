@@ -1,16 +1,11 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var jqtpl = protos.requireDependency('jqtpl', 'jQuery Template Engine'),
     util = require('util');
 
 /**
   JqueryTemplate engine class
   
-  https://github.com/kof/node-jqtpl
+  https://github.com/kof/jqtpl
   
   @class JqueryTemplate
   @extends Engine
@@ -32,10 +27,12 @@ JqueryTemplate.prototype.render = function(data, vars, relPath) {
   var func = this.getCachedFunction(arguments);
   if (func === null) {
     var tplID = util.format('%s:%s', this.app.hostname, relPath);
-    var tpl = jqtpl.compile(data, tplID);
-    func = function(locals) {
-      return tpl(locals);
-    }
+    jqtpl.compile(data, tplID);
+    func = (function(tplID) {
+      return function(locals) {
+        return jqtpl.render(tplID, locals);
+      }
+    })(tplID);
     this.cacheFunction(func, arguments);
   }
   return this.evaluate(func, arguments);

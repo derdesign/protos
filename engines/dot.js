@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var dot = protos.requireDependency('dot', 'DoT Engine'),
     util = require('util');
 

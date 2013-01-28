@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var liquor = protos.requireDependency('liquor', 'Liquor Engine'),
     util = require('util');
 

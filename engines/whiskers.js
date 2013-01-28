@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var whiskers = protos.requireDependency('whiskers', 'Whiskers Engine'),
     util = require('util');
 

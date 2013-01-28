@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var swig = protos.requireDependency('swig', 'Swig Engine'),
     util = require('util');
 

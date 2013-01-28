@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var hamlCoffee = protos.requireDependency('haml-coffee', 'HAML-Coffee Engine'),
     util = require('util');
 

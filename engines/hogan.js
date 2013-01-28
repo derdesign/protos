@@ -1,10 +1,5 @@
 /*jshint noempty: false */
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var hogan = protos.requireDependency('hogan.js', 'Hogan.js Engine', 'hogan.js'),
     util = require('util');
     

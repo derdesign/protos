@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var ejs = protos.requireDependency('ejs', 'EJS Engine'),
     util = require('util');
 

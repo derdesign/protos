@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var eco = protos.requireDependency('eco', 'ECO Engine'),
     util = require('util');
 

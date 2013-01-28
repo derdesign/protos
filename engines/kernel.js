@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var kernel = protos.requireDependency('kernel', 'Kernel Engine'),
     util = require('util'),
     generator = kernel.generator,

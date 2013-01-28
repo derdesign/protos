@@ -1,9 +1,4 @@
 
-/**
-  @module engines
-  @namespace engine
- */
-
 var ck = protos.requireDependency('coffeekup', 'CoffeeKup Engine'),
     util = require('util');
     
