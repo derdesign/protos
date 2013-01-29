@@ -137,35 +137,6 @@ function ModelBatch() {
 
     },
     
-    getAll: {
-
-      'Model API: getAll': {
-
-        topic: function() {
-          var promise = new EventEmitter();
-
-          // getall
-          multi.getAll();
-
-          multi.exec(function(err, results) {
-            promise.emit('success', err || results);
-          });
-
-          return promise;
-        },
-
-        'Returns valid results': function(results) {
-          var expected = [ 
-            [ { username: 'user'+process.pid, password: 'pass1', id: 1 },
-              { username: 'user2', password: 'pass2', id: 2 } ] ];
-          
-          assert.deepEqual(results, expected);
-        }
-
-      }
-
-    },
-    
     save: {
 
       'Model API: save': {

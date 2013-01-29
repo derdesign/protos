@@ -168,39 +168,6 @@ MySQL.prototype.queryWhere = function(o, callback) {
 }
 
 /**
-  Queries all rows in a table
-  
-  Example:
-
-    mysql.queryAll({
-      columns: 'user, pass',
-      table: 'users'
-    }, function(err, results, fields) {
-      console.log([err, results, fields]);
-    });
-
-  @method queryAll
-  @param {object} o
-  @param {function} callback
- */
-
-MySQL.prototype.queryAll = function(o, callback) {
-  var args, 
-      self = this,
-      columns = o.columns || '*',
-      table = o.table || '',
-      appendSql = o.appendSql || '';
-  
-  args = [util.format("SELECT %s FROM %s %s", columns, table, appendSql).trim()];
-  
-  args.push(function(err, results, columns) {
-    callback.call(self, err, results, columns);
-  });
-  
-  this.client.query.apply(this.client, args);
-}
-
-/**
   Queries fields by ID
 
   Example:
@@ -437,95 +404,6 @@ MySQL.prototype.updateWhere = function(o, callback) {
   this.client.query.apply(this.client, args);
 }
 
-/**
-  Counts rows in a table
-
-  Example:
-
-    mysql.countRows({
-      table: table
-    }, function(err, count) {
-      console.log([err, count]);
-    });
-
-  @method countRows
-  @param {object} o
-  @param {function} callback
- */
-
-MySQL.prototype.countRows = function(o, callback) {
-  var args, 
-      self = this,
-      table = o.table || '';
-      
-  args = [util.format("SELECT COUNT('') AS total FROM %s", table), []];
-  
-  args.push(function(err, results, fields) {
-    args = err ? [err, null] : [err, results[0].total];
-    callback.apply(self, args);
-  });
-  
-  this.client.query.apply(this.client, args);
-}
-
-/**
-  Queries rows by ID, returning an object with the ID`s as keys,
-  which contain the row (if found), or null if the row is not found.
-
-  Example:
-
-    mysql.idExists({
-      id: [1,2],
-      table: 'users'
-    }, function(err, results) {
-      console.log([err, results]);
-    });
-
-  @method idExists
-  @param {object} o
-  @param {function} callback
- */
-
-MySQL.prototype.idExists = function(o, callback) {
-  var args, 
-      self = this,
-      id = o.id,
-      table = o.table || '',
-      columns = o.columns || '*',
-      appendSql = o.appendSql || '';
-  
-  if (typeof id == 'number') id = [id];
-  
-  args = [o]; // Passing unmodified `o`
-  
-  args.push(function(err, results, fields) {
-    if (err) {
-      callback.call(self, err, null);
-    } else {
-      if (id.length == 1) {
-        callback.call(self, null, results[0]);
-      } else {
-        var num,
-            found = [],
-            records = {},
-            exists = {};
-        for (var result, i=0; i < results.length; i++) {
-          result = results[i];
-          found.push(result.id);
-          records[result.id] = results[i];
-        }
-        for (i=0; i < id.length; i++) {
-          num = id[i];
-          exists[num] = (found.indexOf(num) >= 0) ? records[num] : null;
-        }
-        callback.apply(self, [null, exists]);
-      }
-    }
-  });
-  
-  this.queryById.apply(this, args);
-}
-
 // Model methods. See lib/driver.js for Model API docs
 
 MySQL.prototype.__modelMethods = {
@@ -630,25 +508,6 @@ MySQL.prototype.__modelMethods = {
         }
       }
     });
-  },
-  
-  /* Model API getAll */
-  
-  getAll: function(callback) {
-    var self = this;
-
-    this.driver.queryAll({
-      table: this.context
-    }, function(err, results) {
-      if (err) callback.call(self, err, null);
-      else {
-        for (var models=[],i=0; i < results.length; i++) {
-          models.push(self.createModel(results[i]));
-        }
-        callback.call(self, null, models);
-      }
-    });
-
   },
   
   /* Model API save */

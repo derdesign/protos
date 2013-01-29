@@ -177,41 +177,6 @@ PostgreSQL.prototype.queryWhere = function(o, callback) {
 }
 
 /**
-  Queries all rows in a table
-  
-  Example:
-
-    postgres.queryAll({
-      columns: 'user, pass',
-      table: 'users'
-    }, function(err, results, info) {
-      console.log([err, results, info]);
-    });
-
-  @method queryAll
-  @param {object} o
-  @param {function} callback
- */
-
-PostgreSQL.prototype.queryAll = function(o, callback) {
-  var args, 
-      self = this,
-      columns = o.columns || '*',
-      table = o.table || '',
-      appendSql = o.appendSql || '';
-  
-  var sql = util.format('SELECT %s FROM %s %s', columns, table, appendSql).trim();
-  
-  this.client.query({
-    text: sql
-  }, function(err, results) {
-    if (err) callback.call(self, err);
-    else callback.call(self, null, results.rows, results);
-  });
-  
-}
-
-/**
   Queries fields by ID
 
   Example:
@@ -450,92 +415,6 @@ PostgreSQL.prototype.updateWhere = function(o, callback) {
   });
 }
 
-/**
-  Counts rows in a table
-
-  Example:
-
-    postgres.countRows({
-      table: 'mytable',
-    }, function(err, count) {
-      console.log([err, count]);
-    });
-
-  @method countRows
-  @param {object} o
-  @param {function} callback
- */
-
-PostgreSQL.prototype.countRows = function(o, callback) {
-  var args, 
-      self = this,
-      table = o.table || '';
-  
-  var sql = util.format("SELECT COUNT('') AS total FROM %s LIMIT 1", table);
-  
-  this.client.query({
-    text: sql,
-  }, function(err, results) {
-    if (err) callback.call(self, err);
-    else callback.call(self, null, results.rows[0].total);
-  });
-  
-}
-
-/**
-  Queries rows by ID, returning an object with the ID`s as keys,
-  which contain the row (if found), or null if the row is not found.
-
-  Example:
-
-    postgres.idExists({
-      id: [1,2],
-      table: 'users'
-    }, function(err, results) {
-      console.log([err, results]);
-    });
-
-  @method idExists
-  @param {object} o
-  @param {function} callback
- */
-
-PostgreSQL.prototype.idExists = function(o, callback) {
-  var args, 
-      self = this,
-      id = o.id,
-      table = o.table || '',
-      columns = o.columns || '*',
-      appendSql = o.appendSql || '';
-  
-  if (typeof id == 'number') id = [id];
-  
-  args = [o]; // Passing unmodified `o`
-  
-  args.push(function(err, results, fields) {
-    if (err) {
-      callback.call(self, err, null);
-    } else {
-      var num,
-          found = [],
-          records = {},
-          exists = {};
-      for (var result, i=0; i < results.length; i++) {
-        result = results[i];
-        found.push(result.id);
-        records[result.id] = results[i];
-      }
-      for (i=0; i < id.length; i++) {
-        num = id[i];
-        exists[num] = (found.indexOf(num) >= 0) ? records[num] : null;
-      }
-      callback.apply(self, [null, exists]);
-    }
-  });
-  
-  this.queryById.apply(this, args);
-}
-
 function createInsertParams(values) {
   var out = [];
   if (values instanceof Array) {
@@ -661,25 +540,6 @@ PostgreSQL.prototype.__modelMethods = {
         }
       }
     });
-  },
-  
-  /* Model API getAll */
-  
-  getAll: function(callback) {
-    var self = this;
-
-    this.driver.queryAll({
-      table: this.context
-    }, function(err, results) {
-      if (err) callback.call(self, err, null);
-      else {
-        for (var models=[],i=0; i < results.length; i++) {
-          models.push(self.createModel(results[i]));
-        }
-        callback.call(self, null, models);
-      }
-    });
-
   },
   
   /* Model API save */

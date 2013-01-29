@@ -252,44 +252,6 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
 
 }).addBatch({
   
-  'MongoDB::queryAll': {
-    
-    topic: function() {
-      var promise = new EventEmitter();
-      
-      // Query all
-      multi.queryAll({
-        collection: config.collection
-      });
-      
-      // Query all + fields
-      multi.queryAll({
-        collection: config.collection,
-        fields: {pass: 1}
-      });
-      
-      multi.exec(function(err, results) {
-        promise.emit('success', err || results);
-      });
-      
-      return promise;
-    },
-    
-    "Returns valid results": function(results) {
-      var r1 = results[0],
-          r2 = results[1];
-      assert.deepEqual(r1[0], {_id: 1, user: 'user1', pass: 'pass1'});
-      assert.deepEqual(r1[1], {_id: 2, user: 'user2', pass: 'pass2'});
-      assert.equal(util.inspect(r1[2]), util.inspect({_id: oid, name: 'user3', pass: 'pass3'}));
-      assert.deepEqual(r2[0], {_id: 1, pass: 'pass1'});
-      assert.deepEqual(r2[1], {_id: 2, pass: 'pass2'});
-      assert.equal(util.inspect(r2[2]), util.inspect({_id: oid, pass: 'pass3'}));
-    }
-
-  }
-  
-}).addBatch({
-  
   'MongoDB::queryById': {
     
     topic: function() {
@@ -364,85 +326,6 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
   
 }).addBatch({
   
-  'MongoDB::count': {
-    
-    topic: function() {
-      var promise = new EventEmitter();
-      
-      multi.count({
-        collection: config.collection
-      });
-      
-      multi.exec(function(err, results) {
-        promise.emit('success', err || results);
-      });
-      
-      return promise;
-    },
-    
-    "Returns correct count": function(results) {
-      var r = results[0];
-      assert.strictEqual(r, 3);
-    }
-    
-  }
-  
-}).addBatch({
-  
-  'MongoDB::idExists': {
-    
-    topic: function() {
-      var promise = new EventEmitter();
-      
-      // MongoDB::idExists uses queryById, so we can pass an array of items,
-      // the other data types have been tested in the previous test case
-      
-      multi.idExists({
-        collection: config.collection,
-        _id: [1, 2, 99, oid, '3de5abd4da447a40ab4dde18']
-      });
-      
-      // Missing _id (error)
-      multi.idExists({
-        collection: config.collection
-      });
-      
-      multi.exec(function(err, results) {
-        promise.emit('success', [err, results]);
-      });
-      
-      return promise;
-    },
-    
-    "Returns valid results": function(topic) {
-      var results = topic[1],
-          r = results[0],
-          expected = { 
-            '1': { _id: 1, user: 'user1', pass: 'pass1' },
-            '2': { _id: 2, user: 'user2', pass: 'pass2' },
-            '99': null,
-            '4de6abd5da558a49fc5eef29': { _id: oid, name: 'user3', pass: 'pass3' },
-            '3de5abd4da447a40ab4dde18': null };
-      
-      assert.isTrue(r.constructor === Object);
-      assert.equal(Object.keys(r).length, 5);
-      assert.deepEqual(r['1'], expected['1']);
-      assert.deepEqual(r['2'], expected['2']);
-      assert.equal(r['99'], expected['99']);
-      assert.equal(JSON.stringify(r['4de6abd5da558a49fc5eef29']), JSON.stringify(expected['4de6abd5da558a49fc5eef29']));
-      assert.deepEqual(r['3de5abd4da447a40ab4dde18'], expected['3de5abd4da447a40ab4dde18']);
-    },
-    
-    "Properly reports errors": function(topic) {
-      var err = topic[0].pop();
-      assert.instanceOf(err, Error);
-      assert.equal(err.toString(), "Error: MongoDB::idExists: '_id' is missing");
-    }
-    
-  }
-  
-}).addBatch({
-  
   'MongoDB::updateWhere': {
     
     topic: function() {
@@ -471,7 +354,8 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
       });
       
       // Get all items, Should confirm that only id's 1 & 2 were updated 
-      multi.queryAll({
+      multi.queryWhere({
+        condition: {},
         collection: config.collection,
       });
       
@@ -486,7 +370,8 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
       })
       
       // Get all items, Should confirm that id's 1 & 2 were updated
-      multi.queryAll({
+      multi.queryWhere({
+        condition: {},
         collection: config.collection
       })
       
@@ -555,7 +440,8 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
       });
       
       // Verify that item 1 was updated
-      multi.queryAll({
+      multi.queryWhere({
+        condition: {},
         collection: config.collection
       });
       
@@ -577,7 +463,8 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
       });
       
       // Verify that a single item was updated
-      multi.queryAll({
+      multi.queryWhere({
+        condition: {},
         collection: config.collection
       });
       
@@ -668,7 +555,8 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
       });
       
       // Verify that all records were deleted
-      multi.queryAll({
+      multi.queryWhere({
+        condition: {},
         collection: config.collection
       });
       
@@ -746,7 +634,8 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
       });
       
       // Verify that no entries have been removed
-      multi.queryAll({
+      multi.queryWhere({
+        condition: {},
         collection: config.collection
       });
       
@@ -763,7 +652,8 @@ var batch = vows.describe('drivers/mongodb.js').addBatch({
       });
       
       // Verify that entries 1, 2 and 3 have been removed
-      multi.queryAll({
+      multi.queryWhere({
+        condition: {},
         collection: config.collection
       });
       
