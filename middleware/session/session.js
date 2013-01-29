@@ -15,7 +15,6 @@
     {array} typecastVars: Session properties to automatically typecast when loading session data
     {string} sessCookie: Default session cookie name
     {string} hashCookie: Default session hash name
-    {string} defaultUserAgent: Default user agent when not set
     {string} salt: Salt used to generate session hashes
     {string|object} storage: Resource string pointing to the storage backend to use, or Storage instance.
 
@@ -50,15 +49,21 @@ function Session(config, middleware) {
     autoTypecast: true,
     sessCookie: "_sess",
     hashCookie: "_shash",
-    defaultUserAgent: "Mozilla",
     salt: null
   }, config);
     
   if (typeof config.salt != 'string') throw new Error("Session: you must specify a salt");
 
-  if (typeof config.storage == 'object') this.storage = config.storage;
-  else if (typeof config.storage == 'string') this.storage = app.getResource('storages/' + config.storage);
-  else throw new Error("The 'session' middleware requires a storage to be passed in config.");
+  switch (typeof config.storage) {
+    case 'object':
+      this.storage = config.storage;
+      break;
+    case 'string':
+      this.storage = app.getResource('storages/' + config.storage);
+      break;
+    default:
+      throw new Error("The 'session' middleware requires a storage to be passed in config.");
+  }
 
   this.className = this.constructor.name;
 
@@ -101,16 +106,14 @@ Session.prototype.endResponse = function() {
 */
 
 Session.prototype.create = function(req, res, data, persistent, callback) {
-  var expires, guest, hashes, multi, userAgent, userAgentMd5, self = this;
+  var expires, guest, hashes, multi, self = this;
   guest = null;
   if (persistent == 'guest') {
     guest = true;
     persistent = true;
   }
   app.debug( guest ? 'Creating guest session' : 'Creating session' );
-  userAgent = req.headers['user-agent'] || this.config.defaultUserAgent;
-  userAgentMd5 = app.md5(userAgent);
-  hashes = this.createHash(userAgent, guest);
+  hashes = this.createHash(guest);
 
   if (guest) {
     // Guest sessions have their own expiration timeout
@@ -125,7 +128,6 @@ Session.prototype.create = function(req, res, data, persistent, callback) {
     
     data = _.extend(data, {
       fpr: hashes.fingerprint,
-      ua_md5: userAgentMd5,
       pers: (persistent ? 1 : 0)
     });
   }
@@ -186,7 +188,7 @@ Session.prototype.destroy = function(req, res, callback) {
   app.debug('Destroying session');
   if (req.hasCookie(this.config.sessCookie) && req.session) {
     sessId = req.getCookie(this.config.sessCookie);
-    fingerprint = this.getFingerprint(req, sessId);
+    fingerprint = this.getFingerprint(sessId);
     
     if (fingerprint == req.session.fpr) {
       this.storage.delete(sessId, function(err) {
@@ -252,7 +254,7 @@ Session.prototype.loadSession = function(req, res, callback) {
 
   sessId = req.getCookie(this.config.sessCookie);
   sessHash = req.getCookie(this.config.hashCookie);
-  fingerprint = self.getFingerprint(req, sessId);
+  fingerprint = self.getFingerprint(sessId);
 
   if (sessId) { // A cookie with sessId exists
 
@@ -261,7 +263,7 @@ Session.prototype.loadSession = function(req, res, callback) {
     this.storage.getHash(sessId, function(err, data) {
       
       var expires, guest, hashes, multi, newHash, 
-          newSess, ua_md5, userAgent;
+          newSess;
 
       if (err) { 
         // If errors retrieving session data,
@@ -353,62 +355,50 @@ Request Headers: \n%s\n", req.socket.remoteAddress, sessId, sessHash, req.method
               
             } else { // Session should be regenerated
               
-              userAgent = req.headers['user-agent'] || self.config.defaultUserAgent;
-              ua_md5 = app.md5(userAgent);
+              hashes = self.createHash();
+              newSess = hashes.sessId;
+              newHash = hashes.fingerprint;
 
-              if (ua_md5 == data.ua_md5) { // If user agent's md5 matches the one in session
-                hashes = self.createHash(userAgent);
-                newSess = hashes.sessId;
-                newHash = hashes.fingerprint;
+              /*
+              Is data persistent ? => use permanentExpires
+              Otherwise:
+              -- Is it a user session ? => use temporaryExpires
+              -- Otherwise => use guestExpires
+              */
 
-                /*
-                Is data persistent ? => use permanentExpires
-                Otherwise:
-                -- Is it a user session ? => use temporaryExpires
-                -- Otherwise => use guestExpires
-                */
+              expires = self.config[(data.pers ? 'permanentExpires' : (data.user ? 'temporaryExpires' : 'guestExpires'))];
 
-                expires = self.config[(data.pers ? 'permanentExpires' : (data.user ? 'temporaryExpires' : 'guestExpires'))];
+              // Set defaultExpires if expires is zero
+              if (!expires) expires = self.config.defaultExpires;
 
-                // Set defaultExpires if expires is zero
-                if (!expires) expires = self.config.defaultExpires;
+              multi = self.storage.multi();
+              multi.updateHash(sessId, {fpr: newHash});
+              multi.rename(sessId, newSess);
+              multi.expire(newSess, expires);
 
-                multi = self.storage.multi();
-                multi.updateHash(sessId, {fpr: newHash});
-                multi.rename(sessId, newSess);
-                multi.expire(newSess, expires);
+              multi.exec(function(err, replies) {
+                if (err) {
+                  app.serverError(res, err);
+                } else {
+                  res.setCookie(self.config.sessCookie, newSess, {
+                    expires: data.pers ? expires : null,
+                    httpOnly: true
+                  });
+                  res.setCookie(self.config.hashCookie, newHash, {
+                    expires: self.config.regenInterval,
+                    httpOnly: true
+                  });
+                  req.cookies[self.config.sessCookie.toLowerCase()] = newSess;
+                  data.fpr = req.cookies[self.config.hashCookie.toLowerCase()] = newHash;
+                  req.session = data;
+                  req.__origSessionState = _.extend({}, data);
+                  req.__jsonSession = JSON.stringify(data);
+                  app.emit('load_session', sessId, req.session);
+                  app.debug('Regenerating session');
+                  callback.call(self);
+                }
+              });
 
-                multi.exec(function(err, replies) {
-                  if (err) {
-                    app.serverError(res, err);
-                  } else {
-                    res.setCookie(self.config.sessCookie, newSess, {
-                      expires: data.pers ? expires : null,
-                      httpOnly: true
-                    });
-                    res.setCookie(self.config.hashCookie, newHash, {
-                      expires: self.config.regenInterval,
-                      httpOnly: true
-                    });
-                    req.cookies[self.config.sessCookie.toLowerCase()] = newSess;
-                    data.fpr = req.cookies[self.config.hashCookie.toLowerCase()] = newHash;
-                    req.session = data;
-                    req.__origSessionState = _.extend({}, data);
-                    req.__jsonSession = JSON.stringify(data);
-                    app.emit('load_session', sessId, req.session);
-                    app.debug('Regenerating session');
-                    callback.call(self);
-                  }
-                });
-
-              } else { // Else (if user agent doesn't match the one in session)
-
-                // => Remove cookies from client, and redirect to login
-                res.removeCookies(self.config.sessCookie, self.config.hashCookie);
-                app.login(res);
-
-              }
-              
             }
 
           }
@@ -460,20 +450,6 @@ Session.prototype.createGuestSession = function(req, res, data, callback) {
 }
 
 /**
-  Generates a session fingerprint for a given session ID
-
-  @param {object} req
-  @param {string} sessId
-  @returns {string} fingerprint hash
-  @private
-*/
-
-Session.prototype.getFingerprint = function(req, sessId) {
-  var userAgent = (req.headers['user-agent'] || this.config.defaultUserAgent);
-  return app.md5(userAgent + sessId + this.config.salt);
-}
-
-/**
   Generates a session ID
   
   @private
@@ -482,22 +458,36 @@ Session.prototype.getFingerprint = function(req, sessId) {
 Session.prototype.generateSid = app.uuid;
 
 /**
+  Generates a session fingerprint for a given session ID
+
+  @param {object} req
+  @param {string} sessId
+  @returns {string} fingerprint hash
+  @private
+*/
+
+Session.prototype.getFingerprint = function(sessId) {
+  return app.md5(sessId + this.config.salt);
+}
+
+/**
   Creates a session hash
 
-  @param {string} userAgent
   @param {boolean} guest
   @returns {object}
   @private
 */
 
-Session.prototype.createHash = function(userAgent, guest) {
-    var sessId = this.generateSid();
-    if (guest) {
-      return {sessId: sessId};
-    } else {
-      var fingerprint = app.md5(userAgent + sessId + this.config.salt);
-      return {sessId: sessId, fingerprint: fingerprint};
+Session.prototype.createHash = function(guest) {
+  var sessId = this.generateSid();
+  if (guest) {
+    return {sessId: sessId};
+  } else {
+    return {
+      sessId: sessId,
+      fingerprint: this.getFingerprint(sessId)
     }
+  }
 }
 
 /**
