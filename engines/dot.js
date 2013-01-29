@@ -1,6 +1,8 @@
 
-var dot = protos.requireDependency('dot', 'DoT Engine'),
-    util = require('util');
+/* engines/dot.js */
+
+var dot = protos.requireDependency('dot', 'DoT Engine');
+var util = require('util');
 
 /**
   DoT engine class

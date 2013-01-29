@@ -1,6 +1,8 @@
 
-var swig = protos.requireDependency('swig', 'Swig Engine'),
-    util = require('util');
+/* engines/swig.js */
+
+var swig = protos.requireDependency('swig', 'Swig Engine');
+var util = require('util');
 
 /**
   Swig engine class

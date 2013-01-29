@@ -1,6 +1,8 @@
 
-var ejs = protos.requireDependency('ejs', 'EJS Engine'),
-    util = require('util');
+/* engines/ejs.js */
+
+var ejs = protos.requireDependency('ejs', 'EJS Engine');
+var util = require('util');
 
 /**
   EJS engine class

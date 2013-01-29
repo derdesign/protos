@@ -1,8 +1,5 @@
 
-/**
-  @module drivers
-  @namespace driver
- */
+/* drivers/postgres.js */
  
 var pg = protos.requireDependency('pg', "PostgreSQL Driver", "postgres"),
     _ = require('underscore'),
@@ -80,7 +77,6 @@ util.inherits(PostgreSQL, protos.lib.driver);
       console.log([err, results, info]);
     });
 
-  @method query
   @param {object} o
   @param {function} callback
 */
@@ -114,7 +110,6 @@ PostgreSQL.prototype.query = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method exec
   @param {object} o
   @param {function} callback
 */
@@ -149,7 +144,6 @@ PostgreSQL.prototype.exec = function(o, callback) {
       console.log([err, results, info]);
     });
 
-  @method queryWhere
   @param {object} o
   @param {function} callback
  */
@@ -188,7 +182,6 @@ PostgreSQL.prototype.queryWhere = function(o, callback) {
       console.log([err, results, fields]);
     });
   
-  @method queryById
   @param {object} o
   @param {function} callback
  */
@@ -224,7 +217,6 @@ PostgreSQL.prototype.queryById = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method insertInto
   @param {object} o
   @param {function} callback
  */
@@ -266,7 +258,6 @@ PostgreSQL.prototype.insertInto = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method deleteById
   @param {object} o
   @param {function} callback
   */
@@ -301,7 +292,6 @@ PostgreSQL.prototype.deleteById = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method deleteWhere
   @param {object} o
   @param {function} callback
  */
@@ -340,7 +330,6 @@ PostgreSQL.prototype.deleteWhere = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method updateById
   @param {object} o
   @param {function} callback
  */
@@ -378,7 +367,6 @@ PostgreSQL.prototype.updateById = function(o, callback) {
       console.log([err, info]);
     });
   
-  @method updateWhere
   @param {object} o
   @param {function} callback
  */

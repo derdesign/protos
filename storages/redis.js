@@ -1,8 +1,5 @@
 
-/**
-  @module storages
-  @namespace storage
- */
+/* storages/redis.js */
 
 var _ = require('underscore'),
     redis = protos.requireDependency('redis', 'Redis Storage'),

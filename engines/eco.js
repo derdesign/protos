@@ -1,6 +1,8 @@
 
-var eco = protos.requireDependency('eco', 'ECO Engine'),
-    util = require('util');
+/* engines/eco.js */
+
+var eco = protos.requireDependency('eco', 'ECO Engine');
+var util = require('util');
 
 /**
   Eco engine class

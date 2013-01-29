@@ -1,7 +1,8 @@
-/*jshint noempty: false */
 
-var hogan = protos.requireDependency('hogan.js', 'Hogan.js Engine', 'hogan.js'),
-    util = require('util');
+/* engines/hogan.js */
+
+var hogan = protos.requireDependency('hogan.js', 'Hogan.js Engine', 'hogan.js');
+var util = require('util');
     
 /**
   Hogan engine class
@@ -17,6 +18,9 @@ var hogan = protos.requireDependency('hogan.js', 'Hogan.js Engine', 'hogan.js'),
 var partials = {};
 
 function Hogan(app) {
+  
+  /*jshint noempty:false */
+  
   this.app = app;
   this.module = hogan;
   this.multiPart = true;

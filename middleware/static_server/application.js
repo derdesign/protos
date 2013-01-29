@@ -167,4 +167,3 @@ Application.prototype._serveStaticFile = function(path, req, res) {
   }
 
 }
-

@@ -1,6 +1,8 @@
 
-var jazz = protos.requireDependency('jazz', 'Jazz Engine'),
-    util = require('util');
+/* engines/jazz.js */
+
+var jazz = protos.requireDependency('jazz', 'Jazz Engine');
+var util = require('util');
 
 /**
   Jazz engine class

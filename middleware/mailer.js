@@ -55,7 +55,6 @@ function Mailer(config, middleware) {
   a) Render the HTML version when the 'html' view local is true
   b) Render the Text version when the 'text' view local is true
   
-  @method renderMessage
   @param {string} partial View partial name to render
   @param {object} locals Locals object to pass to the partial
   @return {object} Object containing {text, html}

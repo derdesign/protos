@@ -1,6 +1,8 @@
 
-var liquor = protos.requireDependency('liquor', 'Liquor Engine'),
-    util = require('util');
+/* engines/liquor.js */
+
+var liquor = protos.requireDependency('liquor', 'Liquor Engine');
+var util = require('util');
 
 /**
   Liquor engine class

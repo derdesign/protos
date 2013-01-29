@@ -1,8 +1,5 @@
          
-/**
-  @module drivers
-  @namespace driver
- */
+/* drivers/mongodb.js */
 
 var _ = require('underscore'),
     util = require('util'),
@@ -48,7 +45,6 @@ function MongoDB(app, config) {
     app.debug(util.format('Initializing MongoDB for %s:%s', config.host, config.port));
     
     /**
-      Driver configuration
     
       config: {
         host: 'localhost',
@@ -56,10 +52,9 @@ function MongoDB(app, config) {
         database: 'db_name',
         storage: 'redis'
       }
-      
-      @property config
-      @type object
+
      */
+
     this.config = config;
 
     var reportError = function(err) {
@@ -141,7 +136,6 @@ util.inherits(MongoDB, protos.lib.driver);
       console.log([err, docs]);
     });
 
-  @method insertInto
   @param {object} o 
   @param {function} callback
  */
@@ -180,7 +174,6 @@ MongoDB.prototype.insertInto = function(o, callback) {
       console.log(err);
     });
 
-  @method updateWhere
   @param {object} o
   @param {function} callback
  */
@@ -234,7 +227,6 @@ MongoDB.prototype.updateWhere = function(o, callback) {
       console.log(err);
     });
 
-  @method updateById
   @param {object} o
   @param {function} callback
 */
@@ -272,7 +264,6 @@ MongoDB.prototype.updateById = function(o, callback) {
       console.log(err);
     });
 
-  @method deleteWhere
   @param {object} o
   @param {function} callback
  */
@@ -317,7 +308,6 @@ MongoDB.prototype.deleteWhere = function(o, callback) {
       console.log(err);
     });
 
-  @method deleteById
   @param {object} o 
   @param {function} callback
  */
@@ -352,7 +342,6 @@ MongoDB.prototype.deleteById = function(o, callback) {
       console.log([err, docs]);
     });
 
-  @method queryWhere
   @param {object} o
   @param {function} callback
  */
@@ -403,7 +392,6 @@ MongoDB.prototype.queryWhere = function(o, callback) {
       console.log([err, docs]);
     });
 
-  @method queryById
   @param {object} o
   @param {function} callback
  */
@@ -437,7 +425,6 @@ MongoDB.prototype.queryById = function(o, callback) {
   Used internally by the model.
   
   @private
-  @method idFilter
   @param {object} o
  */
  
@@ -647,9 +634,7 @@ function convertMongoID(o) {
   }
 }
 
-/*
-  Quick find method without cursors
- */
+// Quick find method without cursors
 
 Collection.prototype.__find = function() {
   var self = this,

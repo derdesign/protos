@@ -1,6 +1,8 @@
 
-var j = protos.requireDependency('jshtml', 'JSHtml Engine'),
-    util = require('util');
+/* engines/jshtml.js */
+
+var jshtml = protos.requireDependency('jshtml', 'JSHtml Engine');
+var util = require('util');
 
 /**
   JsHtml engine class
@@ -15,7 +17,7 @@ var j = protos.requireDependency('jshtml', 'JSHtml Engine'),
 
 function JsHtml(app) {
   this.app = app;
-  this.module = j;
+  this.module = jshtml;
   
   var opts = (app.config.engines && app.config.engines.jshtml) || {};
 
@@ -31,7 +33,7 @@ JsHtml.prototype.render = function(data) {
   data = this.app.applyFilters('jshtml_template', data);
   var func = this.getCachedFunction(arguments);
   if (func === null) {
-    func = j.compile(data, this.options);
+    func = jshtml.compile(data, this.options);
     this.cacheFunction(func, arguments);
   }
   return this.evaluate(func, arguments);

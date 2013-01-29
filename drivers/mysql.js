@@ -1,8 +1,5 @@
 
-/**
-  @module drivers
-  @namespace driver
- */
+/* drivers/mysql.js */
 
 var _ = require('underscore'),
     mysql = protos.requireDependency('mysql', 'MySQL Driver'),
@@ -77,7 +74,6 @@ util.inherits(MySQL, protos.lib.driver);
       console.log([err, results, fields]);
     });
 
-  @method query
   @param {object} o
   @param {function} callback
 */
@@ -106,7 +102,6 @@ MySQL.prototype.query = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method exec
   @param {object} o
   @param {function} callback
 */
@@ -140,7 +135,6 @@ MySQL.prototype.exec = function(o, callback) {
       console.log([err, results, fields]);
     });
 
-  @method queryWhere
   @param {object} o
   @param {function} callback
  */
@@ -179,7 +173,6 @@ MySQL.prototype.queryWhere = function(o, callback) {
       console.log([err, results, fields]);
     });
   
-  @method queryById
   @param {object} o
   @param {function} callback
  */
@@ -215,7 +208,6 @@ MySQL.prototype.queryById = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method insertInto
   @param {object} o
   @param {function} callback
  */
@@ -260,7 +252,6 @@ MySQL.prototype.insertInto = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method deleteById
   @param {object} o
   @param {function} callback
   */
@@ -295,7 +286,6 @@ MySQL.prototype.deleteById = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method deleteWhere
   @param {object} o
   @param {function} callback
  */
@@ -332,7 +322,6 @@ MySQL.prototype.deleteWhere = function(o, callback) {
       console.log([err, info]);
     });
 
-  @method updateById
   @param {object} o
   @param {function} callback
  */
@@ -370,7 +359,6 @@ MySQL.prototype.updateById = function(o, callback) {
       console.log([err, info]);
     });
   
-  @method updateWhere
   @param {object} o
   @param {function} callback
  */

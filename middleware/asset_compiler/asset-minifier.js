@@ -7,8 +7,8 @@ var app = protos.app,
     config = app.asset_compiler,
     Multi = require('multi');
     
-var cleancss = protos.requireDependency('clean-css', 'Asset Compiler', 'asset_compiler'),
-    uglifyjs = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_compiler');
+var cleancss = protos.requireDependency('clean-css', 'Asset Compiler', 'asset_compiler');
+var uglifyjs = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_compiler');
 
 var minifyTargets = Object.keys(config.minify);
 

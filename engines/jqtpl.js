@@ -1,6 +1,8 @@
 
-var jqtpl = protos.requireDependency('jqtpl', 'jQuery Template Engine'),
-    util = require('util');
+/* engines/jqtpl.js */
+
+var jqtpl = protos.requireDependency('jqtpl', 'jQuery Template Engine');
+var util = require('util');
 
 /**
   JqueryTemplate engine class

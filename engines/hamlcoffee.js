@@ -1,6 +1,8 @@
 
-var hamlCoffee = protos.requireDependency('haml-coffee', 'HAML-Coffee Engine'),
-    util = require('util');
+/* engines/hamlcoffee.js */
+
+var hamlCoffee = protos.requireDependency('haml-coffee', 'HAML-Coffee Engine');
+var util = require('util');
 
 /**
   HamlCoffee engine class

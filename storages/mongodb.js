@@ -1,8 +1,5 @@
 
-/**
-  @module storages
-  @namespace storage
- */
+/* storages/mongodb.js */
 
 var _ = require('underscore'),
     util = require('util'),

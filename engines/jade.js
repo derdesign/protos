@@ -1,7 +1,9 @@
 
-var jade = protos.requireDependency('jade', 'Jade Engine'),
-    util = require('util'),
-    extend = protos.extend;
+/* engines/jade.js */
+
+var jade = protos.requireDependency('jade', 'Jade Engine');
+var util = require('util');
+var extend = protos.extend;
 
 /**
   Jade engine class

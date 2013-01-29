@@ -24,8 +24,8 @@
 var app = protos.app;
 var slice = Array.prototype.slice;
 
-var _ = require('underscore'),
-    util = require('util');
+var _ = require('underscore');
+var util = require('util');
     
 require('./request.js');
 
@@ -73,7 +73,6 @@ Session.prototype.storage = null;
   save sessions when changed.
 
   @private
-  @method endResponse
  */
 
 Session.prototype.endResponse = function() {

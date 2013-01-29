@@ -1,10 +1,12 @@
 
+/* engines/haml.js */
+
 // require('hamljs') is broken
 // https://github.com/isaacs/npm/issues/1903
 // https://github.com/visionmedia/haml.js/issues/41
 
-var haml = protos.requireDependency('./node_modules/hamljs/lib/haml.js', 'HAML Engine', 'hamljs'),
-    util = require('util');
+var haml = protos.requireDependency('./node_modules/hamljs/lib/haml.js', 'HAML Engine', 'hamljs');
+var util = require('util');
     
 /**
   Haml engine class

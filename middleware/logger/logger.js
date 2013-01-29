@@ -1,4 +1,3 @@
-/*jshint immed: false */
 
 /**
   Logger

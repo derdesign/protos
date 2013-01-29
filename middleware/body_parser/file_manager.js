@@ -135,7 +135,6 @@ FileManager.prototype.expect = function(defs) {
 /**
   Removes a file
   
-  @method removeFile
   @param {string} file
   @return {object} instance
  */
@@ -152,7 +151,6 @@ FileManager.prototype.removeFile = function(file, callback) {
 /**
   Sets the default maxFilesize configuration
   
-  @method maxFilesize
   @param {int} size Filesize to expect in bytes
   @return {object} instance
  */
@@ -165,7 +163,6 @@ FileManager.prototype.maxFilesize = function(size) {
 /* 
   Sets the filemanager configuration to allow specific mime types
   
-  @method allow
   @param {str} Mime type to allow (multiple args)
   @return {object} instance;
  */
@@ -182,7 +179,6 @@ FileManager.prototype.allow = function(mime) {
 /* 
   Sets the filemanager configuration to allow empty files
   
-  @method allowEmpty
   @return {object} instance;
  */
 
@@ -194,7 +190,6 @@ FileManager.prototype.allowEmpty = function() {
 /**
   Gets a specific file
   
-  @method get
   @param {string} file
   @return {object} file data
   @public
@@ -207,7 +202,6 @@ FileManager.prototype.get = function(file) {
 /**
   Removes all files uploaded
   
-  @method removeAll
   @param {function} callback Callback to pass to each fs.unlink call (optional)
   @public
  */
@@ -222,7 +216,6 @@ FileManager.prototype.removeAll = function(callback) {
 /**
   Iterates over the files uploaded
   
-  @method forEach
   @param {function} callback
   @public
  */

@@ -13,7 +13,6 @@ var FileManager = require('./file_manager.js');
   Retrieves POST/PUT Data & Optionally checks for CSRF Token
   
   @public
-  @method getRequestData
   @param {string} token
   @param {function} callback
  */
@@ -54,7 +53,6 @@ IncomingMessage.prototype.getRequestData = function(token, callback) {
   Gets POST data & files
 
   @private
-  @method parseBodyData
   @param {function} callback
  */
 
@@ -85,7 +83,6 @@ IncomingMessage.prototype.parseBodyData = function(callback) {
   Checks if the upload limit has exceeded
 
   @private
-  @method exceededUploadLimit
   @returns {boolean}
   
  */

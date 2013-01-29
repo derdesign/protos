@@ -1,6 +1,8 @@
 
-var whiskers = protos.requireDependency('whiskers', 'Whiskers Engine'),
-    util = require('util');
+/* engines/whiskers.js */
+
+var whiskers = protos.requireDependency('whiskers', 'Whiskers Engine');
+var util = require('util');
 
 /**
   Whiskers engine class

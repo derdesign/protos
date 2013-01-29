@@ -1,6 +1,8 @@
 
-var handlebars = protos.requireDependency('handlebars', 'Handlebars Engine'),
-    util = require('util');
+/* engines/handlebars.js */
+
+var handlebars = protos.requireDependency('handlebars', 'Handlebars Engine');
+var util = require('util');
     
 /**
   Handlebars engine class

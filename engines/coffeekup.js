@@ -1,6 +1,8 @@
 
-var ck = protos.requireDependency('coffeekup', 'CoffeeKup Engine'),
-    util = require('util');
+/* engines/coffeekup.js */
+
+var ck = protos.requireDependency('coffeekup', 'CoffeeKup Engine');
+var util = require('util');
     
 /**
   CoffeeKup engine class
