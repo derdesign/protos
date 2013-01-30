@@ -316,28 +316,9 @@ Session.prototype.loadSession = function(req, res, callback) {
 
             } else { // Else if session hash doesn't match
 
-              // This could be somebody trying to impersonate as someone else
-
-              // a) Remove the cookies from client, and redirect to login page
+              // Remove the cookies on client, and redirect to login page
               req.removeCookies(self.config.sessCookie, self.config.hashCookie);
               app.login(res);
-
-              // Log message
-              var logMessage = util.format("\n\
-SECURITY WARNING: %s tried to access session '%s' with hash: '%s'\n\
-Request Method: %s,\n\
-Request Headers: \n%s\n", req.socket.remoteAddress, sessId, sessHash, req.method, util.inspect(req.headers));
-
-              // b) Log security event
-              app.log(logMessage);
-
-              // c) Emit security warning
-              app.emit('security_warning', 'session', { // context, data
-                sessId: sessId,
-                sessHash: sessHash,
-                fingerprint: fingerprint,
-                sessionData: data
-              });
 
             }
 

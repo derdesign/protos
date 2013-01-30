@@ -16,6 +16,12 @@ function MainController(app) {
     res.render('index');
   });
   
+  /* Get IP */
+  
+  get('get-ip', function(req, res) {
+    res.json({ip: req.ip});
+  });
+  
   /* View Locals */
   
   get('/view-locals', function(req, res) {

@@ -86,7 +86,7 @@ var accessLogFormats = {
     var log = {
       host: app.hostname,
       date: new Date().toGMTString(),
-      remote_address: req.socket.remoteAddress,
+      remote_address: req.ip,
       method: req.method,
       url: req.url,
       status_code: res.statusCode,
@@ -96,12 +96,12 @@ var accessLogFormats = {
   },
   default: function(req, res, app) {
     var ms = Date.now() - req.startTime;
-    return util.format('%s (%s) [%s] %s %s %s (%s)', app.hostname, app.date(), req.socket.remoteAddress, req.method, 
+    return util.format('%s (%s) [%s] %s %s %s (%s)', app.hostname, app.date(), req.ip, req.method, 
     req.url, res.statusCode, this.timeDelta(ms));
   },
   detailed: function(req, res, app) {
     var ms = Date.now() - req.startTime;
-    return util.format('%s (%s) [%s] %s %s %s (%s) - %s', app.hostname, app.date(), req.socket.remoteAddress, req.method, 
+    return util.format('%s (%s) [%s] %s %s %s (%s) - %s', app.hostname, app.date(), req.ip, req.method, 
     req.url, res.statusCode, this.timeDelta(ms), req.headers['user-agent']);
   }
 }

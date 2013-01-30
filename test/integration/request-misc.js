@@ -40,6 +40,39 @@ vows.describe('Request Misc').addBatch({
   
 }).addBatch({
   
+  'Remote Address': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      multi.curl('-i /get-ip');
+      multi.curl('-i -H "X-Real-IP: 1.2.3.4" /get-ip');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+      
+    },
+    
+    "Returns valid remote address on presence of the X-Real-IP header": function(results) {
+      var r = results[0];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('{"ip":"127.0.0.1"}') >= 0);
+    },
+    
+    "Returns valid remote address": function(results) {
+      var r = results[1];
+      assert.isTrue(r.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r.indexOf('{"ip":"1.2.3.4"}') >= 0);
+    }
+    
+  }
+  
+}).addBatch({
+  
   'Referer URI': {
     
     topic: function() {
