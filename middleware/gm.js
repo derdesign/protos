@@ -86,4 +86,13 @@ GraphicsMagick.prototype.multi = function(cfg) {
   return new Multi(this, cfg);
 }
 
+/**
+  Alias of gm().thumb()
+  
+ */
+ 
+GraphicsMagick.prototype.thumb = function(inputImg, width, height, outFile, quality, callback) {
+  gm(inputImg).thumb(width, height, outFile, quality, callback);
+}
+
 module.exports = GraphicsMagick;

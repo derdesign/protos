@@ -6,10 +6,9 @@ var fs = require('fs'),
     assert = require('assert'),
     EventEmitter = require('events').EventEmitter;
     
-var Multi = protos.require('multi');
-
 var inFile = app.fullPath("priv/nodejs.png");
-var outFile = app.fullPath("priv/out.png");
+var outFile1 = app.fullPath("priv/out1.png");
+var outFile2 = app.fullPath("priv/out2.png");
 
 vows.describe('GraphicsMagick (middleware)').addBatch({
   
@@ -21,34 +20,48 @@ vows.describe('GraphicsMagick (middleware)').addBatch({
 
       app.use('gm');
       
-      app.gm.process({
+      // Test the multi method
+      
+      var multi = app.gm.multi();
+      
+      // Test the process method
+      
+      multi.process({
         in: inFile,
-        out: outFile,
+        out: outFile1,
         operations: {
-          resize: [80, 0],      // Tests multiple arguments
-          sepia: true,          // Tests no arguments
-          quality: 80           // Tests single argument
+          resize: [80, 0],    // Tests multiple arguments
+          sepia: true,        // Tests no arguments
+          edge: 3             // Tests single argument
         }
-      }, function(err) {
-        promise.emit('success', err || null);
+      });
+      
+      // Test the thumb method
+      
+      multi.thumb(inFile, 100, 100, outFile2, 85);
+      
+      // Run batch
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err);
       });
       
       return promise;
       
     },
     
-    "Properly converts images": function(err) {
+    "The app.gm.process() method works as expected": function(err) {
       assert.isNull(err);
-      assert.isTrue(fs.existsSync(outFile));
-      fs.unlink(outFile);
+      assert.isTrue(fs.existsSync(outFile1));
+      fs.unlink(outFile1);
     },
 
-    "Returns valid Multi object": function(err) {
-      var multi = app.gm.multi();
-      assert.isTrue(multi instanceof Multi);
-      assert.isTrue(multi.process instanceof Function);
+    "The app.gm.thumb() method works as expected": function(err) {
+      assert.isNull(err);
+      assert.isTrue(fs.existsSync(outFile2));
+      fs.unlink(outFile2);
     }
-    
+
   }
   
 }).export(module);

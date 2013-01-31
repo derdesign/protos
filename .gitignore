@@ -13,5 +13,6 @@
 /test/fixtures/*skeleton/public/assets/*.css
 /test/fixtures/*skeleton/public/css/*.css
 /test/fixtures/*skeleton/public/css/subdir/*.css
+/test/fixtures/*skeleton/priv/out*
 /test/fixtures/*skeleton/log/*.log
 /test/fixtures/*skeleton/upload/*
