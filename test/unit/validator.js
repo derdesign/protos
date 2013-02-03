@@ -243,9 +243,9 @@ vows.describe('lib/validator.js').addBatch({
   'Properly applies filters': function() {
     
     var validator = app.validator()
-      .add({name: 'alpha'})
-      .add({age: 'integer'})
-      .add({some: 'anything'})
+      .addOptional({name: 'alpha'})
+      .addOptional({some: 'anything'})
+      .addOptional({age: 'integer'})
       .filter({
         name: function(val) {
           return new Buffer(val).toString('base64')
@@ -275,6 +275,20 @@ vows.describe('lib/validator.js').addBatch({
     }
     
     assert.deepEqual(fields, expected);
+    
+    // Filters applied to values only when present
+    // Values are guaranteed to be strings
+    
+    fields = {};
+    
+    expected = validator.validate(fields);
+    
+    assert.isNull(expected);
+    assert.deepEqual(fields, {
+      name: null,
+      age: null,
+      some: null
+    });
     
   }
   
