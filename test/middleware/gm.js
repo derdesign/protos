@@ -1,6 +1,8 @@
 
 var app = require('../fixtures/bootstrap');
 
+if (app.environment === 'travis') return;
+
 var fs = require('fs'),
     vows = require('vows'),
     assert = require('assert'),
