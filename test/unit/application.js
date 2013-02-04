@@ -135,6 +135,45 @@ vows.describe('lib/application.js').addBatch({
   }
 
 }).addBatch({
+  
+  'Application Configuration': {
+    
+    'Is properly assigned based on config files': function() {
+
+      var config = app.config;
+      
+      assert.deepEqual(Object.keys(config), [
+        'title',
+        'language',
+        'encoding',
+        'rawViews',
+        'pageTitle',
+        'headers',
+        'cli',
+        'cacheControl',
+        'json',
+        'engines',
+        'viewExtensions',
+        'alpha',
+        'beta',
+        'gamma',
+        'drivers',
+        'regex',
+        'storages' ]);
+      
+      assert.strictEqual(config.json.pretty, false);
+      assert.strictEqual(config.headers['X-Powered-By'], 'protos');
+      assert.strictEqual(config.cacheControl.maxAge, 315360000);
+      assert.strictEqual(config.drivers.default, 'mysql');
+      assert.strictEqual(config.alpha, 1);
+      assert.strictEqual(config.beta, 2);
+      assert.strictEqual(config.gamma, 3);
+
+    }
+    
+  }
+
+}).addBatch({
 
   'Application Bootstrap': {
 
