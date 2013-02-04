@@ -142,7 +142,7 @@ vows.describe('lib/application.js').addBatch({
 
       var config = app.config;
       
-      assert.deepEqual(Object.keys(config), [
+      assert.deepEqual(Object.keys(config).sort(), [
         'title',
         'language',
         'encoding',
@@ -159,7 +159,7 @@ vows.describe('lib/application.js').addBatch({
         'gamma',
         'drivers',
         'regex',
-        'storages' ]);
+        'storages' ].sort());
       
       assert.strictEqual(config.json.pretty, false);
       assert.strictEqual(config.headers['X-Powered-By'], 'protos');
