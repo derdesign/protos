@@ -31,10 +31,11 @@ var commands = {
   
   create: {
     multiple: ['js', 'css', 'model', 'controller'],
-    switches: ['minimal'],
+    switches: ['minimal', 'bare'],
     args: 1,
     help: {
       minimal: "Use the minimal directory structure",
+      bare: "Use the bare bones directory structure",
       css: "Bundle client side CSS frameworks",
       js: "Bundle client side JavaScript libraries/frameworks",
       model: "Include models on application",
@@ -601,8 +602,15 @@ function createApplication(data, libs) {
   var cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/log/*.log %s/public/*.css %s/public/*.js", 
     masterPath, app, app, app, app);
         
-  if (data.minimal) {
-    cmd += util.format("; rm -Rf %s/{api,ext,hook,include,lib,priv,script,test}", app);
+  if (data.minimal || data.bare) {
+    cmd += util.format("; rm -Rf %s/{api,ext,hook,include,lib,priv,script,upload,test}", app);
+  }
+  
+  if (data.bare) {
+    
+    cmd += util.format("; rm -Rf %s/{config,env,log,public}", app);
+    cmd += util.format("; rm -Rf %s/app/{handlers,helpers,models,views}", app);
+    
   }
   
   // console.exit(cmd);
@@ -616,6 +624,55 @@ function createApplication(data, libs) {
   cp.exec(cmd, function(err, stdout, stderr) {
     if (err) console.exit(stderr);
     else {
+      
+      if (data.bare) {
+        
+        // Patch MainController
+        var mainControllerPath = util.format("%s/app/controllers/main.js", app);
+        var mainController = fs.readFileSync(mainControllerPath, 'utf8');
+
+        fs.writeFileSync(mainControllerPath, mainController.replace("res.render('index');", "res.sendHeaders();\n    res.end(\"Welcome to Protos\");"), 'utf8');
+
+        // Edit Config
+        var configPath = util.format("%s/config.js", app);
+        var config = fs.readFileSync(configPath, 'utf8');
+        
+        // Set title
+        config = config
+          .replace(/title: "(.+)",/, "title: null,")
+          .replace("rawViews: false,", "rawViews: true,")
+          .replace('return "text/html;', 'return "text/plain;')
+          .replace('pretty: true,', 'pretty: false,');
+        
+        fs.writeFileSync(configPath, config, 'utf8');
+        
+        // Set app overrides
+        fs.mkdirSync(util.format("%s/ext", app));
+        
+        fs.writeFileSync(util.format("%s/ext/application.js", app), '\
+\n\
+/* ext/application.js */\n\
+\n\
+var app = protos.app;\n\
+\n\
+protos.extend(app.constructor.prototype, {\n\
+\n\
+  notFound: function(res) {\n\
+    res.statusCode = 404;\n\
+    res.sendHeaders();\n\
+    res.end("HTTP/404 Page Not Found");\n\
+  },\n\
+\n\
+  serverError: function(res, err) {\n\
+    if (err) app.errorLog(err);\n\
+    res.statusCode = 500;\n\
+    res.sendHeaders();\n\
+    res.end("HTTP/500 Internal Server Error");\n\
+  }\n\
+\n\
+});\n', 'utf8');
+        
+      }
       
       // Replace protos directory
       var bootFile = util.format('./%s/boot.js', app),
@@ -660,22 +717,28 @@ function createApplication(data, libs) {
         createView.apply(data, args);
       });
       
-      // Switch to public/ before downloading assets
-      var currentDir = process.cwd();
-      process.chdir(util.format('./%s/public', app));
-      
-      // Download client-side CSS
-      data.css.forEach(function(lib) {
-        downloader.download(libs.css[lib]);
-      });
-      
-      // Download client-side JavaScript
-      data.js.forEach(function(lib) {
-        downloader.download(libs.javascript[lib]);
-      });
-      
-      // Exec downloader queue
-      downloader.exec(function(err, results) {});
+      try {
+        
+        // Switch to public/ before downloading assets
+        var currentDir = process.cwd();
+        process.chdir(util.format('./%s/public', app));
+
+        // Download client-side CSS
+        data.css.forEach(function(lib) {
+          downloader.download(libs.css[lib]);
+        });
+
+        // Download client-side JavaScript
+        data.js.forEach(function(lib) {
+          downloader.download(libs.javascript[lib]);
+        });
+
+        // Exec downloader queue
+        downloader.exec(function(err, results) {});
+        
+      } catch(e) {
+        
+      }
       
     }
   });
@@ -878,7 +941,9 @@ function getDirPaths(p) {
 function createView(app, controller, view, partial) {
 
   var tpl, file;
-  var config = require(process.cwd() + '/' + app + '/config/base.js');
+  var baseConfig = process.cwd() + '/' + app + '/config/base.js';
+  
+  var config = fs.existsSync(baseConfig) ? require(baseConfig) : {};
   
   if (!config.cli) config.cli = {};
   
@@ -1182,33 +1247,44 @@ function getModelContext(string) {
 
 var cli = new CommandLine(commands);
 
+/*
+
+  Arguments:
+  ==========
+
+  create      [name] [options]
+  install     [dependency]
+
+  server      [options]
+
+  controller  [name] ...
+  handler     [controller]/[name1,name2] ...
+  helper      [name] ...
+  model       [name] ...
+
+  view        [controller]/[name1,name2] ... [options]
+  partial     [controller]/[name1,name2] ... [options]
+  layout      [name] ... [options]
+  static      [name] ... [options]
+  restricted  [name] ... [options]
+
+  api         [name] ...
+  hook        [name] ...
+  ext         [name] ...
+  include     [name] ...
+
+  fetch
+  inspector
+  lint
+
+*/
+
 cli.help.before = "\n\
 Usage: protos [ACTION] [ARGUMENTS] [OPTIONS]\n\n\
-Actions:\n\n\
-  create      [name] [options]\n\
-  install     [dependency]\n\
-\n\
-  server      [options]\n\
-\n\
-  controller  [name] ...\n\
-  handler     [controller]/[name1,name2] ...\n\
-  helper      [name] ...\n\
-  model       [name] ...\n\
-\n\
-  view        [controller]/[name1,name2] ... [options]\n\
-  partial     [controller]/[name1,name2] ... [options]\n\
-  layout      [name] ... [options]\n\
-  static      [name] ... [options]\n\
-  restricted  [name] ... [options]\n\
-\n\
-  api         [name] ...\n\
-  hook        [name] ...\n\
-  ext         [name] ...\n\
-  include     [name] ...\n\
-\n\
-  fetch\n\
-  inspector\n\
-  lint\n\n\
+Actions: \n\
+         create install server controller handler helper model\n\
+         view partial layout static restricted api hook include\n\
+         fetch inspector lint \n\
 Options:\n";
 
 cli.help.after = "\n\

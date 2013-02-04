@@ -12,6 +12,9 @@
 
 var app = protos.app;
 
+// Create upload directory if not present
+app.mkdir(app.paths.upload);
+
 require('./request.js');
 
 function BodyParser(config, middleware) {

@@ -21,6 +21,9 @@ var app = protos.app,
     util = require('util'),
     pathModule = require('path'),
     inflect = protos.require('./lib/support/inflect.js');
+
+// Create log directory if present
+app.mkdir('log');
     
 var slice = Array.prototype.slice;
 

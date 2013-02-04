@@ -3,17 +3,17 @@
 
 module.exports = {
   
-  title: 'My Application',
+  title: "My Application",
   language: 'en-US',
   encoding: 'utf-8',
   rawViews: false,
   
-  pageTitle: '%s &raquo; %s',
+  pageTitle: "%s &raquo; %s",
   
   headers: {
-    'Content-Type': function(req, res) { return "text/html; charset=" + this.config.encoding; },
-    'Status': function(req, res) {  return res.statusCode + " " + this.httpStatusCodes[res.statusCode]; },
-    'X-Powered-By': 'protos'
+    "Content-Type": function(req, res) { return "text/html; charset=" + this.config.encoding; },
+    "Status": function(req, res) {  return res.statusCode + " " + this.httpStatusCodes[res.statusCode]; },
+    "X-Powered-By": 'protos'
   },
   
   cli: {

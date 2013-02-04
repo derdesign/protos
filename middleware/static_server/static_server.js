@@ -15,6 +15,8 @@
  
 var app = protos.app,
     fs = require('fs');
+    
+app.mkdir(app.paths.public);
 
 require('./application.js');
 require('./response.js');
