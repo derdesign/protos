@@ -200,66 +200,6 @@ var commands = {
         }
       } else {
         if (!data.port) console.exit("--port is required when running multiple servers");
-        
-        // Validate
-        data.args = data.args.map(function(app) {
-          app = app.split(':');
-          if (app.length === 1) {
-            console.log("Invalid app: " + app.join(''));
-            console.exit("Apps should be specified as {appPath}:{port}");
-          } else {
-            return app;
-          }
-        });
-        
-        var hosts = {};
-        
-        var queue = data.args.length;
-        
-        // Launch servers!
-        data.args.forEach(function(args) {
-          var app = args[0],
-              port = args[1];
-          
-          var bootFile = app + '/boot.js';
-          
-          if (fs.existsSync(bootFile)) {
-            process.env.FAUX = 1;
-            var cmd = 'node ' + bootFile;
-            cp.exec(cmd, function(err, stdout, stderr) {
-              if (err) console.exit(stderr);
-              else {
-                var bootstrap = JSON.parse(stdout);
-                
-                if (!bootstrap.server || !bootstrap.server.host) {
-                  console.exit(util.format("Can't find server config in boostrap file of %s/", app));
-                }
-                
-                if (bootstrap.server.host in hosts) {
-                  console.exit("Conflict: One or more applications are listening on the same domain");
-                } else {
-                  hosts[bootstrap.server.host] = port;
-                }
-                
-                // Set port override
-                process.env.PORT_OVERRIDE = port;
-                
-                delete process.env.FAUX;
-                
-                startServer.call(this, app, data);
-                
-                queue--;
-                
-                if (queue === 0) startProxyServer(hosts, data);
-                
-              }
-            });
-          } else {
-            console.exit("Can't find application: " + app);
-          }
-          
-        });
-        
       }
       
     }
@@ -1111,44 +1051,6 @@ function startServer(path, data, callback) {
     var log = function(data) { console.log(data.toString('utf8').trimRight()); }
     cmd.stdout.on('data', log);
     cmd.stderr.on('data', log);
-  }
-}
-
-function startProxyServer(hosts, data) {
-  var bouncy = require('bouncy');
-  if (data.fork) {
-    var logPath = data.logpath;
-    var code = util.format("\
-var bouncy = require('%s/node_modules/bouncy'), hosts = JSON.parse('%s'); \
-for (var h in hosts) { hosts[h] = parseInt(hosts[h], 10); } \
-bouncy(function(req, bounce) { var host, port;\
- host = req.headers.host.split(':').shift();\
- if (port = hosts[host]) bounce(port);\
- else req.socket.destroy(); \
-}).listen(%s);", Protos.path, JSON.stringify(hosts), data.port);
-    
-    code = code.replace(/"/g, '\\"');
-    // console.exit(code);
-    var cmd = util.format('NODE_ENV=%s nohup node -e "%s" >> %s 2>&1', process.env.NODE_ENV, code, logPath);
-    // console.exit(cmd);
-    cp.exec(cmd);
-    console.log("Saving all output to " + logPath);
-    process.exit();
-    
-  } else {
-    
-    var bouncy = require('bouncy');
-
-    (function(bouncy, hosts) {
-      bouncy(function(req, bounce) { var host, port;
-        host = req.headers.host.split(':').shift();
-        if (port = hosts[host]) bounce(port);
-        else req.socket.destroy();
-      }).listen(data.port);
-    }).call(null, bouncy, hosts);
-    
-    console.log("Proxy server listening on " + data.port);
-    
   }
 }
 
