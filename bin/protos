@@ -938,8 +938,6 @@ function createHelper(app, name) {
   name = name.toLowerCase().replace(/(-|_)?helper$/,'');
   helper = inflect.camelize(name) + 'Helper';
 
-  if (helper === 'MainHelper') return; // That's a no-no
-
   // console.exit([name, helper]);
 
   var tpl = "\n\
