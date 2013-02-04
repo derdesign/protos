@@ -11,7 +11,7 @@ multi.on('pre_exec', app.backupFilters);
 multi.on('post_exec', app.restoreFilters);
 
 vows.describe('Request Misc').addBatch({
-  
+
   'AJAX Detection': {
     
     topic: function() {
@@ -36,6 +36,36 @@ vows.describe('Request Misc').addBatch({
       assert.isTrue(r2.indexOf('X-Ajax-Request: true') >= 0);   // Should contain the header, it's an ajax request
     }
     
+  }
+
+}).addBatch({
+  
+  'Headers': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      multi.curl('-i -H "X-Another-Header:1234" /get-header/X-Another-Header');
+      multi.curl('-i -H "X-Another-Header:5678" /get-header/X-ANOTHER-HEADER');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+      
+    },
+    
+    "IncomingMessage:header(k) retrieves a header value": function(results) {
+      var r1 = results[0],
+          r2 = results[1];
+      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r1.indexOf('{"header":"X-Another-Header","value":"1234"}') >= 0);
+      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r2.indexOf('{"header":"X-ANOTHER-HEADER","value":"5678"}') >= 0);
+    }
+
   }
   
 }).addBatch({

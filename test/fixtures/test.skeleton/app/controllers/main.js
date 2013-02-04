@@ -16,6 +16,17 @@ function MainController(app) {
     res.render('index');
   });
   
+  /* Get Header */
+  
+  get('/get-header/:header', {
+    header: 'alpha_dashes'
+  }, function(req, res, params) {
+    res.json({
+      header: params.header,
+      value: req.header(params.header)
+    });
+  });
+  
   /* Raw Message */
   
   get('/raw-message', function(req, res) {
