@@ -16,6 +16,12 @@ function MainController(app) {
     res.render('index');
   });
   
+  /* Raw Message */
+  
+  get('/raw-message', function(req, res) {
+    res.httpMessage("This is a raw message", true);
+  });
+  
   /* Get IP */
   
   get('get-ip', function(req, res) {

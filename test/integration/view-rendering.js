@@ -1,6 +1,7 @@
 
 var app = require('../fixtures/bootstrap'),
     vows = require('vows'),
+    fs = require('fs'),
     util = require('util'),
     assert = require('assert'),
     Multi = require('multi'),
@@ -187,7 +188,7 @@ vows.describe('View Rendering').addBatch({
     }
 
   }
-
+  
 }).addBatch({
   
   'Static View Events': {
