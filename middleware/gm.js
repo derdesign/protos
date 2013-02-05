@@ -19,6 +19,15 @@ function GraphicsMagick(config, middleware) {
 }
 
 /**
+  Makes the module use imagemagick instead
+  
+  */
+  
+GraphicsMagick.prototype.useImageMagick = function() {
+  gm = gm.subClass({ imageMagick: true });
+}
+
+/**
   Processes an image and stores into a target image
   
   The 'operations' object receives the method names
