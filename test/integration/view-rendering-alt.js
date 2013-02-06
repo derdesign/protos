@@ -37,6 +37,16 @@ vows.describe('View Rendering').addBatch({
       assert.strictEqual(headers['status'], '200 OK');
     }
     
+  },
+  
+  'Plain View Engine': {
+    
+    'Returns valid view buffer': function() {
+      var buf = "<h1>HELLO WORLD</h1>";
+      var tpl = app.engines.plain.render(buf);
+      assert.strictEqual(buf, tpl(buf));
+    }
+    
   }
 
 }).export(module);

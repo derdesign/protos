@@ -139,7 +139,7 @@ protos.path = Protos.path + '/test/fixtures/test-protos';
 
 // Extend assert to check view engine compatibility
 
-var engines = Object.keys(app.engines),
+var engines = Object.keys(app.engines).filter(function(val) { return val !== 'plain'; }),
     colorize = protos.util.colorize;
 
 /* Prevent conflicts with template engine test filters */
