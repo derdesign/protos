@@ -50,7 +50,7 @@ var protos = Protos.bootstrap(testSkeleton, {
           protos.loadDrivers('mongodb', 'mysql', 'postgres');
           protos.loadStorages('mongodb', 'redis');
           protos.loadEngines('coffeekup', 'dot', 'eco', 'ejs', 'haml', 'hamlcoffee', 'handlebars', 'hogan', 'jade',
-          'jazz', 'jqtpl', 'jshtml', 'kernel', 'liquor', 'swig', 'whiskers');
+          'jazz', 'jqtpl', 'jshtml', 'kernel', 'liquor', 'swig', 'whiskers', 'plain');
         },
         pre_init: function(app) {
           

@@ -16,6 +16,12 @@ function MainController(app) {
     res.render('index');
   });
   
+  /* Plain View Engine */
+  
+  get('/plain-view-engine', function(req, res) {
+    res.render('plain.txt');
+  });
+  
   /* Get Header */
   
   get('/get-header/:header', {

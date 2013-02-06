@@ -1,0 +1,35 @@
+
+/* engines/plain.js */
+
+var util = require('util');
+
+/**
+  Plain engine class
+  
+  @class Plain
+  @extends Engine
+  @constructor
+  @param {object} app Application Instance
+ */
+
+function Plain(app) {
+  this.app = app;
+  this.module = null;
+  this.multiPart = true;
+  this.extensions = ['txt', 'plain.html'];
+}
+
+util.inherits(Plain, protos.lib.engine);
+
+Plain.prototype.render = function(data) {
+  var tpl, func = this.getCachedFunction(arguments);
+  if (func === null) {
+    func = function() {
+      return data;
+    }
+    this.cacheFunction(func, arguments);
+  }
+  return this.evaluate(func, arguments);
+}
+
+module.exports = Plain;
