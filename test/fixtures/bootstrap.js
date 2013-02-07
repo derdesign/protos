@@ -50,7 +50,7 @@ var protos = Protos.bootstrap(testSkeleton, {
           protos.loadDrivers('mongodb', 'mysql', 'postgres');
           protos.loadStorages('mongodb', 'redis');
           protos.loadEngines('coffeekup', 'dot', 'eco', 'ejs', 'haml', 'hamlcoffee', 'handlebars', 'hogan', 'jade',
-          'jazz', 'jqtpl', 'jshtml', 'kernel', 'liquor', 'swig', 'whiskers', 'plain');
+          'jazz', 'jqtpl', 'jshtml', 'kernel', 'liquor', 'swig', 'whiskers', 'plain', 'markdown');
         },
         pre_init: function(app) {
           
@@ -139,7 +139,7 @@ protos.path = Protos.path + '/test/fixtures/test-protos';
 
 // Extend assert to check view engine compatibility
 
-var engines = Object.keys(app.engines).filter(function(val) { return val !== 'plain'; }),
+var engines = Object.keys(app.engines).filter(function(val) { return val !== 'plain' && val !== 'markdown'; }),
     colorize = protos.util.colorize;
 
 /* Prevent conflicts with template engine test filters */

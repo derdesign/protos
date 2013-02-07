@@ -16,7 +16,7 @@ function Plain(app) {
   this.app = app;
   this.module = null;
   this.multiPart = true;
-  this.extensions = ['txt', 'plain.html'];
+  this.extensions = ['txt', 'plain.html', 'plain.js'];
 }
 
 util.inherits(Plain, protos.lib.engine);

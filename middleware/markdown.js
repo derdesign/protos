@@ -36,9 +36,14 @@ function Markdown(config, middleware) {
   // Configuration defaults
   config = protos.extend({
     gfm: true,
+    tables: true,
+    breaks: false,
     pedantic: false,
     sanitize: true,
+    smartLists: false,
+    silent: true,
     highlight: null,
+    langPrefix: 'lang-'
   }, config);
   
   // Setup Caja sanitizer
@@ -47,9 +52,6 @@ function Markdown(config, middleware) {
   // Will use sanitizer module instead
   config.sanitize = false;
 
-  // Set marked config
-  marked.setOptions(config);
-  
   // Define config property
   Object.defineProperty(this, 'config', {
     value: config,
@@ -85,7 +87,7 @@ Markdown.prototype.sanitizeURI = function(url) {
  */
 
 Markdown.prototype.parse = function(str, sanitize) {
-  var html = marked(str), type = typeof sanitize;
+  var html = marked(str, this.config), type = typeof sanitize;
   if ( (type == 'undefined' && this.sanitize) || (type == 'boolean' && sanitize) ) sanitize = true;
   return sanitize ? sanitizer.sanitize(html, this.sanitizeURI) : html;
 }

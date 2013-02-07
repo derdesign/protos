@@ -37,9 +37,15 @@ vows.describe('View Rendering').addBatch({
       assert.strictEqual(headers['status'], '200 OK');
     }
     
-  },
+  }
+
+}).addBatch({
   
   'Plain View Engine': {
+    
+    'Registers valid extensions': function() {
+      assert.deepEqual(app.engines.plain.extensions, ['txt', 'plain.html', 'plain.js']);
+    },
     
     'Returns valid view buffer': function() {
       var buf = "<h1>HELLO WORLD</h1>";
@@ -47,8 +53,23 @@ vows.describe('View Rendering').addBatch({
       assert.strictEqual(buf, tpl(buf));
     }
     
-  }
+  },
+  
+  'Markdown View Engine': {
 
+    'Registers valid extensions': function() {
+      assert.deepEqual(app.engines.markdown.extensions, ['md', 'markdown']);
+    },
+    
+    'Returns valid view buffer': function() {
+      var buf = "# Hello World \nSomething **very** important _indeed_";
+      var tpl = app.engines.markdown.render(buf);
+      var expected = '<h1>Hello World</h1>\n<p>Something <strong>very</strong> important <em>indeed</em></p>\n';
+      assert.strictEqual(tpl(buf), expected);
+    }
+    
+  }
+  
 }).export(module);
 
 
