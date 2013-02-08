@@ -92,7 +92,6 @@ Development tasks (tests, lint, etc):
 - Mailer
 - Message Queue (RabbitMQ)
 - Runtime REPL
-- Response Caching
 - Sessions
 - Shortcodes
 - SocketIO
