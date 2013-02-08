@@ -6,17 +6,10 @@ Protos.bootstrap(__dirname, {
   debugLog: false,
 
   server: {
-    host: '0.0.0.0',
+    host: 'localhost',
     port: 8080,
-    useSSL: false,
     multiProcess: false,
     stayUp: 'production'
-  },
-
-  ssl: {
-    port: 8443,
-    key: '',
-    cert: ''
   },
 
   environments: {

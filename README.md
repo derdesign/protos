@@ -1,7 +1,8 @@
 
 # Protos [![Build Status](https://secure.travis-ci.org/derdesign/protos.png)](http://travis-ci.org/derdesign/protos)
 
-Protos is a Web Application Framework for node.js. Runs on UNIX-like systems such as **Linux**, **FreeBSD** & **Mac OSX**.
+Protos is a Web Application Framework for Node.js focused on building Highly Scalable Web Applications. 
+Runs on UNIX-like systems such as **Linux**, **FreeBSD** & **Mac OSX**.
 
 ## Getting Started
 
@@ -50,6 +51,7 @@ Development tasks (tests, lint, etc):
 
 - Powerful Routing
 - Environment-based configuration
+- Multicore friendly (IPC using event-based communication)
 - Namespaced routes using Controllers
 - Authentication for each Controller
 - Route Filters for route preprocessing
