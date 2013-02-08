@@ -141,7 +141,7 @@ vows.describe('lib/protos.js').addBatch({
       assert.deepEqual(results, expected);
       assert.isFunction(protos.production);
       assert.isFunction(app.production);
-      assert.strictEqual(protos.production, protos.app.production);
+      assert.strictEqual(protos.production, app.production);
     }
     
   }

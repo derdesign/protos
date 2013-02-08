@@ -13,7 +13,6 @@ var OutgoingMessage = require('http').OutgoingMessage;
 function newResponse() {
   // Simulate a response
   var res = new OutgoingMessage();
-  res.app = app;
   res.__controller = app.controller;
   return res;
 }

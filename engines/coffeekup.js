@@ -1,6 +1,7 @@
 
 /* engines/coffeekup.js */
 
+var app = protos.app;
 var ck = protos.requireDependency('coffeekup', 'CoffeeKup Engine');
 var util = require('util');
     
@@ -8,16 +9,9 @@ var util = require('util');
   CoffeeKup engine class
   
   https://github.com/mauricemach/coffeekup
-  
-  @private
-  @class CoffeeKup
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function CoffeeKup(app) {
-  this.app = app;
+function CoffeeKup() {
   
   var opts = (app.config.engines && app.config.engines.coffeekup) || {};
 
@@ -30,12 +24,13 @@ function CoffeeKup(app) {
 
   this.multiPart = true;
   this.extensions = ['coffeekup', 'ck.html'];
+
 }
 
 util.inherits(CoffeeKup, protos.lib.engine);
 
 CoffeeKup.prototype.render = function(data) {
-  data = this.app.applyFilters('coffeekup_template', data);
+  data = app.applyFilters('coffeekup_template', data);
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
     tpl = ck.compile(data, this.options);

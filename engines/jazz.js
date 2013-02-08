@@ -1,6 +1,7 @@
 
 /* engines/jazz.js */
 
+var app = protos.app;
 var jazz = protos.requireDependency('jazz', 'Jazz Engine');
 var util = require('util');
 
@@ -8,25 +9,21 @@ var util = require('util');
   Jazz engine class
   
   https://github.com/shinetech/jazz
-  
-  @class Jazz
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function Jazz(app) {
-  this.app = app;
+function Jazz() {
+
   this.module = jazz;
   this.async = true;
   this.multiPart = true;
   this.extensions = ['jazz', 'jazz.html'];
+
 }
 
 util.inherits(Jazz, protos.lib.engine);
 
 Jazz.prototype.render = function(data) {
-  data = this.app.applyFilters('jazz_template', data);
+  data = app.applyFilters('jazz_template', data);
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
     tpl = jazz.compile(data);

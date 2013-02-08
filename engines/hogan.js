@@ -1,6 +1,7 @@
 
 /* engines/hogan.js */
 
+var app = protos.app;
 var hogan = protos.requireDependency('hogan.js', 'Hogan.js Engine', 'hogan.js');
 var util = require('util');
     
@@ -8,20 +9,14 @@ var util = require('util');
   Hogan engine class
   
   https://github.com/twitter/hogan.js
-  
-  @class Hogan
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
 var partials = {};
 
-function Hogan(app) {
+function Hogan() {
   
   /*jshint noempty:false */
   
-  this.app = app;
   this.module = hogan;
   this.multiPart = true;
   this.extensions = ['hogan', 'hogan.html', 'hg.html', 'mustache'];
@@ -60,7 +55,7 @@ function Hogan(app) {
 util.inherits(Hogan, protos.lib.engine);
 
 Hogan.prototype.render = function(data, vars) {
-  data = this.app.applyFilters('hogan_template', data);
+  data = app.applyFilters('hogan_template', data);
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
     tpl = hogan.compile(data);

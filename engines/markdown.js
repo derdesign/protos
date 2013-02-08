@@ -14,9 +14,7 @@ var marked = protos.requireDependency('marked', "Markdown Engine", 'markdown');
   @param {object} app Application Instance
  */
 
-function Markdown(app) {
-  
-  this.app = app;
+function Markdown() {
   
   var opts = (app.config.engines && app.config.engines.markdown) || {};
   

@@ -1,6 +1,7 @@
          
 /* drivers/mongodb.js */
 
+var app = protos.app;
 var _ = require('underscore'),
     util = require('util'),
     slice = Array.prototype.slice,
@@ -21,7 +22,7 @@ var _ = require('underscore'),
   @param {object} config Driver configuration
  */
 
-function MongoDB(app, config) {
+function MongoDB(config) {
   
     var self = this;
     
@@ -40,7 +41,6 @@ function MongoDB(app, config) {
     if (typeof config.port != 'number') config.port = parseInt(config.port, 10);
     
     this.className = this.constructor.name;
-    this.app = app;
     
     app.debug(util.format('Initializing MongoDB for %s:%s', config.host, config.port));
     

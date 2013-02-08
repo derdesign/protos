@@ -1,6 +1,7 @@
 
 /* engines/swig.js */
 
+var app = protos.app;
 var swig = protos.requireDependency('swig', 'Swig Engine');
 var util = require('util');
 
@@ -11,15 +12,9 @@ var util = require('util');
   use paths relative to the application's `app/views` directory.
 
   https://github.com/paularmstrong/swig
-  
-  @class Swig
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function Swig(app) {
-  this.app = app;
+function Swig() {
   
   var opts = (app.config.engines && app.config.engines.swig) || {};
   
@@ -36,12 +31,13 @@ function Swig(app) {
   this.module = swig;
   this.multiPart = true;
   this.extensions = ['swig', 'swig.html', 'sw.html'];
+
 }
 
 util.inherits(Swig, protos.lib.engine);
 
 Swig.prototype.render = function(data) {
-  data = this.app.applyFilters('swig_template', data);
+  data = app.applyFilters('swig_template', data);
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
     tpl = swig.compile(data);

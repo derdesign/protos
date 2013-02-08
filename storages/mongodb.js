@@ -1,6 +1,7 @@
 
 /* storages/mongodb.js */
 
+var app = protos.app;
 var _ = require('underscore'),
     util = require('util'),
     mongodb = protos.requireDependency('mongodb', 'MongoDB Storage'),
@@ -19,7 +20,7 @@ var _ = require('underscore'),
   @param {object} config Storage configuration
  */
 
-function MongoStorage(app, config) {
+function MongoStorage(config) {
   
    var self = this;
    
@@ -36,16 +37,6 @@ function MongoStorage(app, config) {
    }, config);
    
    if (typeof config.port != 'number') config.port = parseInt(config.port, 10);
-   
-   /**
-    Application instance
-    
-    @private
-    @property app
-    @type Application
-   */
-   
-   this.app = app;
    
    /**
     Storage Configuration
@@ -211,8 +202,7 @@ MongoStorage.prototype.getHash = function(key, callback) {
 /* Storage API set */
 
 MongoStorage.prototype.set = function(key, value, callback) {
-  var app = this.app,
-      self = this;
+  var self = this;
   
   // If key is a string » Sets a single value
   if (typeof key == 'string') {
@@ -271,8 +261,7 @@ MongoStorage.prototype.set = function(key, value, callback) {
 /* Storage API setHash */
 
 MongoStorage.prototype.setHash = function(key, object, callback) {
-  var app = this.app,
-      self = this,
+  var self = this,
       _key = 'h' + key;
       
   self.collection.find({key: _key}, {_id: 1}, function(err, cursor) {
@@ -407,7 +396,7 @@ MongoStorage.prototype.rename = function(oldkey, newkey, callback) {
 /* Storage API expire */
 
 MongoStorage.prototype.expire = function(key, timeout, callback) {
-  this.app.log("MongoStorage: MongoDB does not support key expiration");
+  app.log("MongoStorage: MongoDB does not support key expiration");
   callback.call(this, null);
 }
 

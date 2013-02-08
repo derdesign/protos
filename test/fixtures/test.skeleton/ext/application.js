@@ -1,7 +1,8 @@
 
 /* Application Extensions */
 
-var Application = protos.app.constructor;
+var app = protos.app;
+var Application = app.constructor;
 
 protos.extend(Application.prototype, {
   

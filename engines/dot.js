@@ -1,6 +1,7 @@
 
 /* engines/dot.js */
 
+var app = protos.app;
 var dot = protos.requireDependency('dot', 'DoT Engine');
 var util = require('util');
 
@@ -8,15 +9,10 @@ var util = require('util');
   DoT engine class
   
   https://github.com/olado/doT
-  
-  @class Dot
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function Dot(app) {
-  this.app = app;
+function Dot() {
+
   this.module = dot;
   this.multiPart = true;
   this.extensions = ['dot', 'dot.html'];
@@ -36,7 +32,7 @@ function Dot(app) {
 util.inherits(Dot, protos.lib.engine);
 
 Dot.prototype.render = function(data) {
-  data = this.app.applyFilters('dot_template', data);
+  data = app.applyFilters('dot_template', data);
   var func = this.getCachedFunction(arguments);
   if (func === null) {
     func = dot.compile(data);

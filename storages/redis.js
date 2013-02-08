@@ -1,6 +1,7 @@
 
 /* storages/redis.js */
 
+var app = protos.app;
 var _ = require('underscore'),
     redis = protos.requireDependency('redis', 'Redis Storage'),
     util = require('util'),
@@ -16,7 +17,7 @@ var _ = require('underscore'),
   @param {object} config Storage configuration
  */
 
-function RedisStorage(app, config) {
+function RedisStorage(config) {
   
    var self = this;
    
@@ -24,16 +25,6 @@ function RedisStorage(app, config) {
      host: 'localhost',
      port: 6379,
    }, config || {});
-   
-   /**
-    Application instance
-    
-    @private
-    @property app
-    @type Application
-   */
-   
-   this.app = app;
    
    app.debug(util.format('Initializing Redis Storage for %s:%s', config.host, config.port));
    

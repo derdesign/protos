@@ -1,6 +1,7 @@
 
 /* engines/handlebars.js */
 
+var app = protos.app;
 var handlebars = protos.requireDependency('handlebars', 'Handlebars Engine');
 var util = require('util');
     
@@ -8,27 +9,23 @@ var util = require('util');
   Handlebars engine class
   
   https://github.com/wycats/handlebars.js
-  
-  @class Handlebars
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
 var partials;
 
-function Handlebars(app) {
-  this.app = app;
+function Handlebars() {
+
   this.module = handlebars;
   this.multiPart = true;
   this.extensions = ['handlebars', 'handlebars.html', 'hb.html'];
   partials = {partials: app.views.partials};
+
 }
 
 util.inherits(Handlebars, protos.lib.engine);
 
 Handlebars.prototype.render = function(data) {
-  data = this.app.applyFilters('handlebars_template', data);
+  data = app.applyFilters('handlebars_template', data);
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
     func = handlebars.compile(data);

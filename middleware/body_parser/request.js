@@ -21,8 +21,7 @@ IncomingMessage.prototype.getRequestData = function(token, callback) {
   
   var data = this.requestData,
       fields = data.fields,
-      files = data.files,
-      app = this.app;
+      files = data.files;
       
   if (typeof callback == 'undefined') {
     callback = token;

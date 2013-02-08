@@ -1,6 +1,6 @@
 {
 
-  "predef": ["protos", "app", "get"],
+  "predef": ["protos", "get"],
 
   "bitwise": true,
   "curly": false,

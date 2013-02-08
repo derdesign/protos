@@ -1,6 +1,7 @@
 
 /* drivers/postgres.js */
  
+var app = protos.app;
 var pg = protos.requireDependency('pg', "PostgreSQL Driver", "postgres"),
     _ = require('underscore'),
     Client = pg.Client,
@@ -27,7 +28,7 @@ var pg = protos.requireDependency('pg', "PostgreSQL Driver", "postgres"),
   @param {object} config Driver configuration
  */
 
-function PostgreSQL(app, config) {
+function PostgreSQL(config) {
 
   var self = this;
 
@@ -37,7 +38,6 @@ function PostgreSQL(app, config) {
   }, config);
   
   this.className = this.constructor.name;
-  this.app = app;
   
   this.config = config;
   

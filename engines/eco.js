@@ -1,6 +1,7 @@
 
 /* engines/eco.js */
 
+var app = protos.app;
 var eco = protos.requireDependency('eco', 'ECO Engine');
 var util = require('util');
 
@@ -8,24 +9,20 @@ var util = require('util');
   Eco engine class
   
   https://github.com/sstephenson/eco
-  
-  @class Eco
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function Eco(app) {
-  this.app = app;
+function Eco() {
+
   this.module = eco;
   this.multiPart = true;
   this.extensions = ['eco', 'eco.html'];
+
 }
 
 util.inherits(Eco, protos.lib.engine);
 
 Eco.prototype.render = function(data) {
-  data = this.app.applyFilters('eco_template', data);
+  data = app.applyFilters('eco_template', data);
   var func = this.getCachedFunction(arguments);
   if (func === null) {
     func = eco.compile(data);

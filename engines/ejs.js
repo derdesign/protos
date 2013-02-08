@@ -1,6 +1,7 @@
 
 /* engines/ejs.js */
 
+var app = protos.app;
 var ejs = protos.requireDependency('ejs', 'EJS Engine');
 var util = require('util');
 
@@ -8,15 +9,9 @@ var util = require('util');
   EJS engine class
   
   https://github.com/visionmedia/ejs
-  
-  @class EJS
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function EJS(app) {
-  this.app = app;
+function EJS() {
   
   var opts = (app.config.engines && app.config.engines.ejs) || {};
   
@@ -25,12 +20,13 @@ function EJS(app) {
   this.module = ejs;
   this.multiPart = true;
   this.extensions = ['ejs', 'ejs.html'];
+
 }
 
 util.inherits(EJS, protos.lib.engine);
 
 EJS.prototype.render = function(data) {
-  data = this.app.applyFilters('ejs_template', data);
+  data = app.applyFilters('ejs_template', data);
   var func = this.getCachedFunction(arguments);
   if (func === null) {
     func = ejs.compile(data, this.options);

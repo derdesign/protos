@@ -1,6 +1,7 @@
 
 /* drivers/mysql.js */
 
+var app = protos.app;
 var _ = require('underscore'),
     mysql = protos.requireDependency('mysql', 'MySQL Driver'),
     util = require('util'),
@@ -28,7 +29,7 @@ var _ = require('underscore'),
   @param {object} config Driver configuration
  */
 
-function MySQL(app, config) {
+function MySQL(config) {
   
   var self = this;
   
@@ -37,7 +38,6 @@ function MySQL(app, config) {
   config.port = config.port || 3306;
   
   this.className = this.constructor.name;
-  this.app = app;
   
   this.config = config;
   

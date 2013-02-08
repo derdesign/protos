@@ -178,7 +178,7 @@ Logger.prototype.enableAccessLog = function(config) {
   var accessLogCallback = function() {
     var data, json, log = accessLogFormat.call(self, this.request, this, app);
     if (format == 'json') {
-      log = app.applyFilters('access_log_data', log, this.request, this.app);
+      log = app.applyFilters('access_log_data', log, this.request, app);
       json = JSON.stringify(log);
       data = [log, json]; // msg (object), log (text)
       app.emit('access_log', json, data, log);

@@ -1,6 +1,7 @@
 
 /* engines/jade.js */
 
+var app = protos.app;
 var jade = protos.requireDependency('jade', 'Jade Engine');
 var util = require('util');
 var extend = protos.extend;
@@ -9,15 +10,9 @@ var extend = protos.extend;
   Jade engine class
   
   https://github.com/visionmedia/jade
-  
-  @class Jade
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function Jade(app) {
-  this.app = app;
+function Jade() {
   
   var opts = (app.config.engines && app.config.engines.jade) || {};
   
@@ -27,17 +22,18 @@ function Jade(app) {
   
   this.module = jade;
   this.multiPart = false;
-  this.extensions = ['jade', 'jade.html']
+  this.extensions = ['jade', 'jade.html'];
+
 }
 
 util.inherits(Jade, protos.lib.engine);
 
 Jade.prototype.render = function(data, vars, relPath) {
-  data = this.app.applyFilters('jade_template', data);
+  data = app.applyFilters('jade_template', data);
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
   
-    var filename = (relPath && relPath[0] == '/') ? relPath :  this.app.fullPath(this.app.mvcpath + 'views/' + relPath);
+    var filename = (relPath && relPath[0] == '/') ? relPath : app.fullPath(app.mvcpath + 'views/' + relPath);
     var options = extend({filename: filename}, this.options);
         
     func = jade.compile(data, options);

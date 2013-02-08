@@ -1,6 +1,7 @@
 
 /* engines/jshtml.js */
 
+var app = protos.app;
 var jshtml = protos.requireDependency('jshtml', 'JSHtml Engine');
 var util = require('util');
 
@@ -8,15 +9,10 @@ var util = require('util');
   JsHtml engine class
   
   https://github.com/LuvDaSun/jshtml
-  
-  @class JsHtml
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function JsHtml(app) {
-  this.app = app;
+function JsHtml() {
+
   this.module = jshtml;
   
   var opts = (app.config.engines && app.config.engines.jshtml) || {};
@@ -24,13 +20,14 @@ function JsHtml(app) {
   this.options = protos.extend({with: false}, opts);
   
   this.multiPart = true;
-  this.extensions = ['jshtml'];
+  this.extensions = ['jshtml', 'js.html'];
+
 }
 
 util.inherits(JsHtml, protos.lib.engine);
 
 JsHtml.prototype.render = function(data) {
-  data = this.app.applyFilters('jshtml_template', data);
+  data = app.applyFilters('jshtml_template', data);
   var func = this.getCachedFunction(arguments);
   if (func === null) {
     func = jshtml.compile(data, this.options);

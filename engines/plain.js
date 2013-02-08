@@ -5,18 +5,14 @@ var util = require('util');
 
 /**
   Plain engine class
-  
-  @class Plain
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function Plain(app) {
-  this.app = app;
+function Plain() {
+
   this.module = null;
   this.multiPart = true;
   this.extensions = ['txt', 'plain.html', 'plain.js'];
+
 }
 
 util.inherits(Plain, protos.lib.engine);

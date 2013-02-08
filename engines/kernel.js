@@ -1,6 +1,7 @@
 
 /* engines/kernel */
 
+var app = protos.app;
 var kernel = protos.requireDependency('kernel', 'Kernel Engine'),
     util = require('util'),
     generator = kernel.generator,
@@ -12,25 +13,21 @@ var kernel = protos.requireDependency('kernel', 'Kernel Engine'),
   Kernel engine class
   
   https://github.com/c9/kernel
-  
-  @class Kernel
-  @extends Engine
-  @constructor
-  @param {object} app Application Instance
  */
 
-function Kernel(app) {
-  this.app = app;
+function Kernel() {
+
   this.module = kernel;
   this.async = true;
   this.multiPart = true;
   this.extensions = ['kernel', 'kernel.html', 'k.html', 'khtml'];
+
 }
 
 util.inherits(Kernel, protos.lib.engine);
 
 Kernel.prototype.render = function(data) {
-  data = this.app.applyFilters('kernel_template', data);
+  data = app.applyFilters('kernel_template', data);
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
     tpl = this.compile.apply(this, arguments);
