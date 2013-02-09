@@ -92,7 +92,7 @@ Development tasks (tests, lint, etc):
 - Markdown Parser
 - Mailer
 - Message Queue (RabbitMQ)
-- Runtime REPL
+- REPL
 - Sessions
 - Shortcodes
 - SocketIO
