@@ -13,6 +13,7 @@ engines = ./test/engines/*.js
 integration = ./test/integration/*.js
 middleware = ./test/middleware/*.js
 commandline = ./test/command.js
+hotCodeLoading = ./test/hot-code-loading.js
 
 # Make commands
 
@@ -58,7 +59,7 @@ test:
 		@echo "\nAvailable Test Commands: tests  test-unit  test-sto test-drv test-eng test-int test-mid\n"
 
 tests:
-		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${commandline}
+		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${hotCodeLoading} ${commandline}
 
 test-unit:
 		@${vows} ${vowsOpts} ${unit}

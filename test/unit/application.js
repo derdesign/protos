@@ -206,10 +206,10 @@ vows.describe('lib/application.js').addBatch({
       assert.deepEqual(Object.keys(otherMethods).sort(), ['methodOne', 'methodTwo']);
       assert.deepEqual(Object.keys(app.api).sort(), ['anotherMethod', 'methodOne', 'methodTwo', 'sampleMethod'].sort());
       
-      assert.strictEqual(app.api.anotherMethod, anotherMethod.anotherMethod);
-      assert.strictEqual(app.api.methodOne, otherMethods.methodOne);
-      assert.strictEqual(app.api.methodTwo, otherMethods.methodTwo);
-      assert.strictEqual(app.api.sampleMethod, sampleMethod.sampleMethod);
+      assert.strictEqual(app.api.anotherMethod.toString(), anotherMethod.anotherMethod.toString());
+      assert.strictEqual(app.api.methodOne.toString(), otherMethods.methodOne.toString());
+      assert.strictEqual(app.api.methodTwo.toString(), otherMethods.methodTwo.toString());
+      assert.strictEqual(app.api.sampleMethod.toString(), sampleMethod.sampleMethod.toString());
       
       assert.equal(app.api.anotherMethod(), 99);
       assert.equal(app.api.sampleMethod(), 100);
@@ -239,8 +239,8 @@ vows.describe('lib/application.js').addBatch({
       assert.deepEqual(Object.keys(app.filters).sort(), ['testFilterOne', 'testFilterTwo']);
       assert.isFunction(app.filters.testFilterOne);
       assert.isFunction(app.filters.testFilterTwo);
-      assert.strictEqual(app.filters.testFilterOne, libFilters.testFilterOne);
-      assert.strictEqual(app.filters.testFilterTwo, libFilters.testFilterTwo);
+      assert.strictEqual(app.filters.testFilterOne.toString(), libFilters.testFilterOne.toString());
+      assert.strictEqual(app.filters.testFilterTwo.toString(), libFilters.testFilterTwo.toString());
       assert.equal(app.filters.testFilterOne(), "Output from app.filters.testFilterOne");
       assert.equal(app.filters.testFilterTwo(), "Output from app.filters.testFilterTwo");
       
