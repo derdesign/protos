@@ -4,7 +4,7 @@ var app = require('../fixtures/bootstrap.js'),
     assert = require('assert'),
     fs = require('fs');
     
-vows.describe('REPL Middleware').addBatch({
+vows.describe('REPL (middleware)').addBatch({
   
   '': {
     
