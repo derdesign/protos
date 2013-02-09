@@ -287,7 +287,7 @@ function createLoggingLevels(config) {
 
           // Do not attach to prototype, attach to instance instead (it's faster)
           app[getLogCallback(level)] = function() {
-            this.log.apply(context, arguments); // Using `this`, since the method is running on the app's context
+            app.log.apply(context, arguments);
           }
 
           }).call(this, app, util.format);

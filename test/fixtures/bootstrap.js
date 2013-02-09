@@ -54,6 +54,9 @@ var protos = Protos.bootstrap(testSkeleton, {
         },
         pre_init: function(app) {
           
+          // Partials watching
+          app.watchPartials = true;
+          
           // Handler tests
           app.handlerTests = {};
           

@@ -6,11 +6,15 @@ var app = require('./fixtures/bootstrap'),
     Multi = require('multi'),
     EventEmitter = require('events').EventEmitter;
 
-var spec;
+var before, after;
 
-app.on('reload', function(__spec) {
-  spec = __spec;
+app.on('before_reload', function(spec) {
+  before = spec;
 });
+
+app.on('after_reload', function(spec) {
+  after = spec;
+})
     
 vows.describe('Hot Code Loading').addBatch({
   
@@ -59,15 +63,7 @@ vows.describe('Hot Code Loading').addBatch({
   'Reloading Components...': function() {
     
     app.reload({
-      include: true,
-      exts: true,
-      models: true,
-      helpers: true,
-      views: true,
-      partials: true,
-      handlers: true,
-      controllers: true,
-      api: true
+      all: true
     });
     
   }
@@ -105,16 +101,24 @@ vows.describe('Hot Code Loading').addBatch({
     
   },
   
- "The 'reload' event is emitted with spec": function() {
-   assert.deepEqual(spec, { include: true,
+ "The reload events are emitted with spec": function() {
+   
+   var spec = {
+     controllers: true, 
+     api: true,
      exts: true,
-     models: true,
      helpers: true,
-     views: true,
-     partials: true,
-     handlers: true,
-     controllers: true,
-     api: true });
+     models: true,
+     partials: true, 
+     includes: true, 
+     all: true, 
+     views: true, 
+     handlers: true
+   };
+
+   assert.deepEqual(before, spec);
+   assert.deepEqual(after, spec);
+
  }
   
 }).export(module);
