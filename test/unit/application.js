@@ -47,6 +47,10 @@ vows.describe('lib/application.js').addBatch({
     'Sets default controller': function() {
       assert.instanceOf(app.controller, protos.lib.controller);
     },
+    
+    'Sets IPC Token': function() {
+      assert.equal(app.IPC_TOKEN, '::internal::');
+    },
 
     'Inherits from EventEmitter': function() {
       assert.instanceOf(app, EventEmitter);

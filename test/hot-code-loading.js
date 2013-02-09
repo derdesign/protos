@@ -14,11 +14,25 @@ app.on('before_reload', function(spec) {
 
 app.on('after_reload', function(spec) {
   after = spec;
-})
-    
+});
+
+var testHook = app.fullPath('hook/test_hook.js');
+var testHookBuf = fs.readFileSync(testHook, 'utf8');
+var otherHook = app.fullPath('hook/other_hook.js');
+var otherHookDisabled = app.fullPath('other_hook.js');
+
 vows.describe('Hot Code Loading').addBatch({
   
   'Modifying runtime before reload...': function() {
+    
+    // hooks
+    assert.isUndefined(app.TEST_HOOK);
+    app.emit('test_hook');
+    assert.equal(app.TEST_HOOK, 'ABCD');
+    
+    assert.isUndefined(app.OTHER_HOOK);
+    app.emit('other_hook');
+    assert.equal(app.OTHER_HOOK, 'EFGH');
     
     // include
     app.filters.testFilterOne = null;
@@ -62,6 +76,10 @@ vows.describe('Hot Code Loading').addBatch({
   
   'Reloading Components...': function() {
     
+    fs.writeFileSync(testHook, testHookBuf.replace('ABCD', '1234'));
+    
+    fs.renameSync(otherHook, otherHookDisabled);
+    
     app.reload({
       all: true
     });
@@ -71,8 +89,21 @@ vows.describe('Hot Code Loading').addBatch({
 }).addBatch({
   
   'Verifying runtime after reload...': function() {
-
-    // include
+    
+    // Restore hook files
+    fs.writeFileSync(testHook, testHookBuf, 'utf8');
+    fs.renameSync(otherHookDisabled, otherHook);
+    
+    // hooks - The test_hook should have been modified in place
+    app.emit('test_hook');
+    assert.equal(app.TEST_HOOK, 1234);
+    
+    // hooks - The other_hook has been removed
+    app.emit('other_hook');
+    assert.isUndefined(app.hooks.other_hook);
+    assert.isUndefined(app._events.other_hook);
+    
+    // includes
     assert.isFunction(app.filters.testFilterOne);
     
     // exts
@@ -104,6 +135,7 @@ vows.describe('Hot Code Loading').addBatch({
  "The reload events are emitted with spec": function() {
    
    var spec = {
+     hooks: true,
      controllers: true, 
      api: true,
      exts: true,
