@@ -10,8 +10,7 @@
   "preferGlobal"        : "true",
   "bin"                 : { "protos": "./bin/protos" },
   "engines"             : {
-    "node": "0.8.x",
-    "npm": "1.1.x"
+    "node": "0.8.x"
   },
   "dependencies"        : {
     "underscore"        : "= 1.4.3",
