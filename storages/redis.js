@@ -46,7 +46,7 @@ function RedisStorage(config) {
         host: 'localhost',
         port: 6379,
         db: 1,
-        pass: 'password'
+        password: 'password'
       }
     
     @property config
@@ -66,13 +66,11 @@ function RedisStorage(config) {
    this.className = this.constructor.name;
    
    // Set redis client
-   self.client = redis.createClient(config.port, config.host, self.options);
+   
+   self.client = redis.createClient(config.port, config.host, config.options);
 
    // Authenticate if password provided
-   
-   if (typeof config.pass == 'string') {
-     self.client.auth(config.pass);
-   }
+   if (config.password) self.client.auth(config.password);
 
    // Handle error event
    self.client.on('error', function(err) {
