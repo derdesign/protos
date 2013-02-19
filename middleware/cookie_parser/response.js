@@ -35,8 +35,8 @@ OutgoingMessage.prototype.setCookie = function(name, val, opts) {
   if (opts.domain != null) pairs.push("domain=" + opts.domain);
   pairs.push("path=" + opts.path);
   if (opts.expires != null) pairs.push("expires=" + (opts.expires.toUTCString()));
-  if (opts.httpOnly != null) pairs.push('httpOnly');
-  if (opts.secure != null) pairs.push('secure');
+  if (opts.httpOnly) pairs.push('httpOnly');
+  if (opts.secure) pairs.push('secure');
   if (!removeCookie) request.cookies[name.toLowerCase()] = val;
   
   return this.__setCookie.push(pairs.join('; '));
