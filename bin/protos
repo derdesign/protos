@@ -1096,7 +1096,8 @@ function recursivelyCreateFiles(target, data, ext, callback) {
   var dirs = [];
   var tpl = data.template;
   var cwd = process.cwd();
-  var config = require(cwd + '/config/base.js');
+  var baseConfig = cwd + '/config/base.js';
+  var config = fs.existsSync(baseConfig) ? require(baseConfig) : {};
   
   if (!config.cli) config.cli = {};
   
