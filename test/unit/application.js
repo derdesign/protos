@@ -616,48 +616,6 @@ vows.describe('lib/application.js').addBatch({
   }
 
 }).addBatch({
-
-  'Application::clientRequest': {
-
-    topic: function() {
-      var promise = new EventEmitter();
-      multi.clientRequest('/request-test');
-      multi.clientRequest({path: '/', method: 'PUT'});
-      multi.clientRequest({
-        path: '/request-headers-test',
-        method: 'GET',
-        headers: { 'x-custom-header': 1 }
-      });
-      multi.exec(function(err, results) {
-        app.removeAllListeners('request'); // Remove `request` listeners (set on previous test case)
-        promise.emit('success', err || results);
-      });
-      return promise;
-    },
-
-    'Returns valid responses & data': function(results) {
-      var r1 = results[0],
-          r2 = results[1];
-      assert.equal(r1[0], 'SUCCESS');
-      assert.equal(r1[1].status, '200 OK');
-      assert.equal(r1[2], 200);
-      assert.isTrue(r1[3] instanceof http.IncomingMessage);
-      assert.equal(r2[0], 'BAD REQUEST');
-      assert.equal(r2[1].status, '400 Bad Request');
-      assert.equal(r2[2], 400);
-      assert.isTrue(r2[3] instanceof http.IncomingMessage);
-    },
-
-    'Allows sending custom headers': function(results) {
-      var r = results[2];
-      assert.equal(r[0], 'SUCCESS');
-      assert.equal(r[1].status, '200 OK');
-      assert.equal(r[2], 200);
-    }
-
-  }
-
-}).addBatch({
   
   'HEAD Requests': {
     

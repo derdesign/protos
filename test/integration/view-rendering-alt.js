@@ -18,11 +18,11 @@ vows.describe('View Rendering').addBatch({
       
       fs.renameSync(msgTemplate, msgTemplate + '1');
       
-      app.clientRequest('/raw-message', function(err, buf, headers) {
+      app.request(app.url('/raw-message'), function(err, res, buf) {
         
         fs.renameSync(msgTemplate + 1, msgTemplate);
         
-        promise.emit('success', [err, buf, headers]);
+        promise.emit('success', [err, buf, res.headers]);
         
       });
       

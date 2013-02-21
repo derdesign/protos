@@ -33,7 +33,7 @@ vows.describe('Response Misc').addBatch({
       
       app.config.rawViews = false;
       
-      multi.clientRequest('/');
+      multi.request(app.url('/'));
       multi.curl('-i -G -d "X-Custom-Header=1&X-Another-Header=2&x-lowercase-header=3" /setheaders');
       
       multi.exec(function(err, results) {
@@ -44,8 +44,8 @@ vows.describe('Response Misc').addBatch({
     },
 
     'Headers are properly sent in the response': function(results) {
-      var buf = results[0][0],
-          headers = results[0][1];
+      var buf = results[0][1], // buf
+          headers = results[0][0].headers; // res
       var expected = Object.keys(app.config.headers).map(function(elem) {
         return elem.toLowerCase();
       }).concat(['date', 'cache-control', 'connection', 'transfer-encoding']).sort();
@@ -53,8 +53,8 @@ vows.describe('Response Misc').addBatch({
     },
     
     'Dynamic headers work according to function': function(results) {
-      var buf = results[0][0],
-          headers = results[0][1];
+      var buf = results[0][1], // buf
+          headers = results[0][0].headers; // res
       assert.isFalse(isNaN(Date.parse(headers.date)));
       assert.equal(headers.status, '200 OK');
     },
@@ -70,30 +70,6 @@ vows.describe('Response Misc').addBatch({
       assert.isTrue(headers.indexOf('X-Custom-Header: 1') >= 0);
       assert.isTrue(headers.indexOf('X-Another-Header: 2') >= 0);
       assert.isTrue(headers.indexOf('x-lowercase-header: 3') >= 0);
-    }
-    
-  }
-  
-}).addBatch({
-  
-  'Bad Requests': {
-    
-    topic: function() {
-      var promise = new EventEmitter();
-      
-      app.clientRequest({
-        path: 'http://google.com',
-        method: 'GET'
-      }, function(err, buffer, headers, statusCode, response) {
-        promise.emit('success', [err, buffer, headers, statusCode]);
-      });
-      
-      return promise;
-    },
-    
-    'Ignores malformed HTTP requests': function(results) {
-      delete results[2].date; // Remove date from output
-      assert.deepEqual(results, [ null, '', { connection: 'close', status: '400 Bad Request', 'transfer-encoding': 'chunked'}, 400 ]);
     }
     
   }

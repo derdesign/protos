@@ -215,7 +215,7 @@ app.createEngineBatch = function(className, engine, testUrl, __module__) {
 
       topic: function() {
         var promise = new EventEmitter();
-        app.clientRequest(testUrl  , function(err, buffer, headers) {
+        app.request(app.url(testUrl)  , function(err, res, buffer) {
           // console.exit(buffer);
           promise.emit('success', err || buffer);
         });

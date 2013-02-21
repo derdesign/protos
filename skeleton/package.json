@@ -1,14 +1,13 @@
 {
-  "name"              : "skeleton",
-  "description"       : "Protos Application Skeleton",
-  "version"           : "0.0.0",
-  "main"              : "boot.js",
-  "private"           : "true",
-  "engines"           : {
-    "node": "0.8.x",
-    "npm" : "1.1.x"
+  "name": "skeleton",
+  "description": "Protos Application Skeleton",
+  "version": "0.0.0",
+  "main": "boot.js",
+  "private": "true",
+  "engines": {
+    "node": "0.8.x"
   },
-  "dependencies"      : {
-    "protos"          : ">= 0.3.x"
+  "dependencies": {
+    "protos": "0.4.x"
   }
 }

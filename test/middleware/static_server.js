@@ -41,13 +41,13 @@ vows.describe('Static File Server (middleware)').addBatch({
       multi.curl('-i /dir/.hidden-file');             // hidden file, level 1
 
       // Partial content
-      multi.clientRequest({                           // partial file request, valid
-        path: '/ranges.txt',
+      multi.request({                                 // partial file request, valid
+        url: app.url('/ranges.txt'),
         headers: { Range: 'bytes=5-10' }
-      });
+      })
       
-      multi.clientRequest({                           // partial file request, invalid
-        path: '/ranges.txt',
+      multi.request({                                 // partial file request, invalid
+        url: app.url('/ranges.txt'),
         headers: { Range: 'bytes=10-5' }
       });
       
@@ -131,10 +131,10 @@ vows.describe('Static File Server (middleware)').addBatch({
     'Responds with 206 for Partial Content requests': function(results) {
       var r1 = results[11], // HTTP/1.1 206 Partial Content
           r2 = results[12]; // HTTP/1.1 416 Requested Range Not Satisfiable
-      assert.equal(r1[0], 'fghijk');
-      assert.equal(r1[1].status, '206 Partial Content');
-      assert.equal(r2[0], '');
-      assert.equal(r2[1].status, '416 Requested Range Not Satisfiable');
+      assert.equal(r1[1], 'fghijk');
+      assert.equal(r1[0].headers.status, '206 Partial Content');
+      assert.equal(r2[1], undefined);
+      assert.equal(r2[0].headers.status, '416 Requested Range Not Satisfiable');
     },
     
     'Successfully sends files (forcing download)': function(results) {

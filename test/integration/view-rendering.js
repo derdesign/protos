@@ -83,11 +83,6 @@ vows.describe('View Rendering').addBatch({
         app.on('request', function(req, res) {
           req.stopRoute();
           switch (req.url) {
-            case '/bad-request':
-              res.statusCode = 400;
-              res.sendHeaders();
-              res.httpMessage(400);
-              break;
             case '/not-found':
               res.statusCode = 404;
               res.sendHeaders();
@@ -105,10 +100,9 @@ vows.describe('View Rendering').addBatch({
           }
         });
 
-        multi.clientRequest('/bad-request');
-        multi.clientRequest('/not-found');
-        multi.clientRequest('/server-error');
-        multi.clientRequest('/http-message');
+        multi.request(app.url('/not-found'));
+        multi.request(app.url('/server-error'));
+        multi.request(app.url('/http-message'));
 
         multi.exec(function(err, results) {
           promise.emit('success', err || results);
@@ -116,23 +110,23 @@ vows.describe('View Rendering').addBatch({
 
         return promise;
       },
-
+      
       'Application::notFound works properly': function(results) {
-        var res = results[1], buf = res[0].trim(), hdr = res[1];
+        var res = results[0], buf = res[1].trim(), hdr = res[0].headers;
         assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
         assert.equal(buf, '<p>HTTP/404: Page not Found</p>');
         assert.equal(hdr.status, '404 Not Found');
       },
 
       'Application::serverError works properly': function(results) {
-        var res = results[2], buf = res[0].trim(), hdr = res[1];
+        var res = results[1], buf = res[1].trim(), hdr = res[0].headers;
         assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
         assert.equal(buf, '<p>HTTP/500: Internal Server Error</p>');
         assert.equal(hdr.status, '500 Internal Server Error');
       },
 
       'Application::httpMessage works properly': function(results) {
-        var res = results[3], buf = res[0].trim(), hdr = res[1];
+        var res = results[2], buf = res[1].trim(), hdr = res[0].headers;
         assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
         assert.equal(buf, '<p>{RAW MESSAGE}</p>');
         assert.equal(hdr.status, '200 OK');
@@ -166,7 +160,7 @@ vows.describe('View Rendering').addBatch({
     },
 
     'Application::notFound works properly': function(results) {
-      var res = results[1], buf = res[0].trim(), hdr = res[1];
+      var res = results[0], buf = res[1].trim(), hdr = res[0].headers;
       assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
       assert.isTrue(buf.indexOf('<p>HTTP/404: Page not Found</p>') >= 0);
       assert.equal(hdr.status, '404 Not Found');
@@ -174,13 +168,13 @@ vows.describe('View Rendering').addBatch({
 
     'Application::serverError works properly': function(results) {
       // ServerError only includes the #500 template
-      var res = results[2], buf = res[0].trim(), hdr = res[1];
+      var res = results[1], buf = res[1].trim(), hdr = res[0].headers;
       assert.equal(buf, '<p>HTTP/500: Internal Server Error</p>');
       assert.equal(hdr.status, '500 Internal Server Error');
     },
 
     'Application::httpMessage works properly': function(results) {
-      var res = results[3], buf = res[0].trim(), hdr = res[1];
+      var res = results[2], buf = res[1].trim(), hdr = res[0].headers;
       assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
       assert.isTrue(buf.indexOf('<p>{RAW MESSAGE}</p>') >= 0);
       assert.equal(hdr.status, '200 OK');

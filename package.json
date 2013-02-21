@@ -1,31 +1,34 @@
 {
-  "name"                : "protos",
-  "description"         : "Web Application Framework",
-  "version"             : "0.3.9",
-  "homepage"            : "https://github.com/derdesign/protos",
-  "repository"          : "https://github.com/derdesign/protos",
-  "author"              : "Ernesto Méndez <der@der-design.com>",
-  "license"             : "MIT",
-  "main"                : "lib/protos",
-  "preferGlobal"        : "true",
-  "bin"                 : { "protos": "./bin/protos" },
-  "engines"             : {
+  "name": "protos",
+  "description": "Web Application Framework",
+  "version": "0.4.0",
+  "homepage": "https://github.com/derdesign/protos",
+  "repository": "https://github.com/derdesign/protos",
+  "author": "Ernesto Méndez <der@der-design.com>",
+  "license": "MIT",
+  "main": "lib/protos",
+  "preferGlobal": "true",
+  "bin": {
+    "protos": "./bin/protos"
+  },
+  "engines": {
     "node": "0.8.x"
   },
-  "dependencies"        : {
-    "underscore"        : "= 1.4.3",
-    "underscore.string" : "= 2.3.1",
-    "node-uuid"         : "= 1.4.0",
-    "sanitizer"         : "= 0.0.15",
-    "multi"             : "= 0.1.2",
-    "mime"              : "= 1.2.7",
-    "file"              : "= 0.2.1",
-    "qs"                : "= 0.5.2",
-    "ejs"               : "= 0.8.3"
+  "dependencies": {
+    "underscore": "= 1.4.3",
+    "underscore.string": "= 2.3.1",
+    "node-uuid": "= 1.4.0",
+    "sanitizer": "= 0.0.15",
+    "request": "= 2.14.0",
+    "multi": "= 0.1.2",
+    "mime": "= 1.2.7",
+    "file": "= 0.2.1",
+    "qs": "= 0.5.2",
+    "ejs": "= 0.8.3"
   },
-  "devDependencies"     : {
-    "jshint"            : ">= 0.9.1",
-    "vows"              : ">= 0.7.0",
-    "node-inspector"    : ">= 0.2.0beta3"
+  "devDependencies": {
+    "jshint": ">= 0.9.1",
+    "vows": ">= 0.7.0",
+    "node-inspector": ">= 0.2.x"
   }
 }
