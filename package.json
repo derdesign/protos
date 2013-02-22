@@ -15,17 +15,17 @@
     "node": "0.8.x"
   },
   "dependencies": {
-    "underscore": "= 1.4.3",
-    "underscore.string": "= 2.3.1",
-    "node-uuid": "= 1.4.0",
-    "sanitizer": "= 0.0.15",
-    "request": "= 2.14.0",
-    "moment": "= 2.0.0",
-    "multi": "= 0.1.2",
-    "mime": "= 1.2.7",
-    "file": "= 0.2.1",
-    "qs": "= 0.5.2",
-    "ejs": "= 0.8.3"
+    "underscore": "1.4.3",
+    "underscore.string": "2.3.1",
+    "node-uuid": "1.4.0",
+    "sanitizer": "0.0.15",
+    "request": "2.14.0",
+    "moment": "2.0.0",
+    "multi": "0.1.2",
+    "mime": "1.2.7",
+    "file": "0.2.1",
+    "qs": "0.5.2",
+    "ejs": "0.8.3"
   },
   "devDependencies": {
     "jshint": ">= 0.9.1",
