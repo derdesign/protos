@@ -1,69 +1,69 @@
 {
   "mongodb": {
-    "mongodb"             : "= 1.2.10"
+    "mongodb"             : "1.2.10"
   },
   "mysql": {
-    "mysql"               : "= 2.0.0-alpha5"
+    "mysql"               : "2.0.0-alpha5"
   },
   "postgres": {
-    "pg"                  : "= 0.12.1"
+    "pg"                  : "0.12.1"
   },
   "redis": {
-    "redis"               : "= 0.7.2",
-    "hiredis"             : "= 0.1.14"
+    "redis"               : "0.7.2",
+    "hiredis"             : "0.1.14"
   },
   "middleware": {
   	"asset_compiler": {
-  	    "coffee-script"   : "= 1.4.0",
-  	    "less"            : "= 1.3.3",
-  	    "stylus"          : "= 0.32.0",
-  	    "nib"             : "= 0.9.1",
-  	    "clean-css"       : "= 0.9.1",
-  	    "uglify-js"       : "= 2.2.3"
+  	    "coffee-script"   : "1.4.0",
+  	    "less"            : "1.3.3",
+  	    "stylus"          : "0.32.0",
+  	    "nib"             : "0.9.1",
+  	    "clean-css"       : "0.9.1",
+  	    "uglify-js"       : "2.2.3"
   	},
   	"aws": {
-      	"aws2js"          : "= 0.8.0"
+      	"aws2js"          : "0.8.0"
   	},
   	"mq": {
-  	    "amqp"            : ">= 0.1.4"
+  	    "amqp"            : "0.1.4"
   	},
   	"gm": {
-  	    "gm"              : ">= 1.8.1"
+  	    "gm"              : "1.8.1"
   	},
   	"bcrypt": {
-      	"bcrypt"          : ">= 0.7.3"
+      	"bcrypt"          : "0.7.3"
   	},
   	"body_parser": {
-  		"formidable"        : ">= 1.0.11"
+  		"formidable"        : "1.0.11"
   	},
   	"mailer": {
-  		"nodemailer"        : ">= 0.3.35"
+  		"nodemailer"        : "0.3.35"
   	},
   	"magick": {
-  	  "node-imagemagick"  : ">= 0.1.8"
+  	  "node-imagemagick"  : "0.1.8"
   	},
   	"markdown": {
-  		"marked"            : ">= 0.2.6"
+  		"marked"            : "0.2.6"
   	},
   	"socket_io": {
-  		"socket.io"         : ">= 0.9.9"
+  		"socket.io"         : "0.9.9"
   	}
   },
   "engines": {
-      "coffeekup"         : "= 0.3.1",
-      "dot"               : "= 1.0.1",
-      "eco"               : "= 1.1.0-rc-3",
-      "hamljs"            : "= 0.6.1",
-      "haml-coffee"       : "= 1.9.1",
-      "handlebars"        : "= 1.0.8",
-      "hogan.js"          : "= 2.0.0",
-      "jade"              : "= 0.28.1",
-      "jazz"              : "= 0.0.18",
-      "jqtpl"             : "= 2.0.14rc1",
-      "jshtml"            : "= 0.2.4",
-      "kernel"            : "= 0.1.4",
-      "liquor"            : "= 0.0.4",
-      "swig"              : "= 0.13.5",
-      "whiskers"          : "= 0.3.1"
+      "coffeekup"         : "0.3.1",
+      "dot"               : "1.0.1",
+      "eco"               : "1.1.0-rc-3",
+      "hamljs"            : "0.6.1",
+      "haml-coffee"       : "1.9.1",
+      "handlebars"        : "1.0.8",
+      "hogan.js"          : "2.0.0",
+      "jade"              : "0.28.1",
+      "jazz"              : "0.0.18",
+      "jqtpl"             : "2.0.14rc1",
+      "jshtml"            : "0.2.4",
+      "kernel"            : "0.1.4",
+      "liquor"            : "0.0.4",
+      "swig"              : "0.13.5",
+      "whiskers"          : "0.3.1"
   }
 }
