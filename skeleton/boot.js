@@ -1,5 +1,5 @@
 
-var Protos = require('../');
+var Protos = require('protos');
 
 Protos.bootstrap(__dirname, {
 
@@ -32,3 +32,4 @@ Protos.bootstrap(__dirname, {
 });
 
 module.exports = protos.app;
+
