@@ -14,6 +14,7 @@
 
     {object} minify: Assets to be minified. {target: [sources]}
     {array} watchOn: Array containing environments in which the assets will be automatically compiled on change
+    {integer} watchInterval: Watch polling interval
     {array} compile: Extensions to compile and/or watch.
     {object} compileExts: Object containing the target extensions of compiled assets. Contains {ext: outExt}
     {object} compilers: Object containing the functions that compile the target extensions.
@@ -63,6 +64,7 @@ function AssetCompiler(config, middleware) {
   // Extend configuration
   config = protos.configExtend({
     watchOn: ['development', 'debug'],
+    watchInterval: app.config.watchInterval || 100,
     compile: ['less', 'styl', 'coffee'],
     assetSourceAccess: false,
     compilers: require('./compilers.js'),

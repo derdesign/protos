@@ -13,8 +13,12 @@ var app = protos.app,
  */
 
 Application.prototype._loadCookies = function(req) {
-  if (req.cookies != null) return;
-  return req.cookies = getRequestCookies(req);
+  if (req.cookies != null) {
+    return;
+  } else {
+    req.cookies = getRequestCookies(req);
+    return req.cookies;
+  }
 }
 
 /**

@@ -1,7 +1,7 @@
 {
   "name": "protos",
   "description": "Web Application Framework",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "homepage": "https://github.com/derdesign/protos",
   "repository": "https://github.com/derdesign/protos",
   "author": "Ernesto Méndez <der@der-design.com>",
@@ -19,6 +19,7 @@
     "underscore.string": "2.3.1",
     "node-uuid": "1.4.0",
     "sanitizer": "0.0.15",
+		"chokidar": "0.6.2",
     "request": "2.14.0",
     "moment": "2.0.0",
     "multi": "0.1.2",
@@ -28,8 +29,8 @@
     "ejs": "0.8.3"
   },
   "devDependencies": {
-    "jshint": ">= 0.9.1",
+    "jshint": ">= 1.1.0",
     "vows": ">= 0.7.0",
-    "node-inspector": ">= 0.2.x"
+    "node-inspector": "0.2.0beta4"
   }
 }

@@ -97,7 +97,7 @@ var accessLogFormats = {
     }
     return log;
   },
-  default: function(req, res, app) {
+  "default": function(req, res, app) {
     var ms = Date.now() - req.startTime;
     return util.format('%s (%s) [%s] %s %s %s (%s)', app.hostname, app.date(), req.ip, req.method, 
     req.url, res.statusCode, this.timeDelta(ms));

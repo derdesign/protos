@@ -18,7 +18,7 @@ var rootPath = path.dirname(__filename);
 var config = process.env.JSHINT_CONFIG || path.resolve(rootPath, '../jshint.json');
 
 // Command, using local jshint library
-var cmd = path.resolve(rootPath, '../node_modules/jshint/bin/hint'),
+var cmd = path.resolve(rootPath, '../node_modules/jshint/bin/jshint'),
     args = process.argv.slice(2).concat(['--config', config]);
 
 // Output colors
@@ -33,7 +33,9 @@ function logger(data) {
     if (process.env.NODE_ENV == 'lintall') {
       console.log(util.format('\n♢ \u001b[1;30m%s\u001b[0m', process.argv[2]));
       data = '\n' + data.trim();
-    } else data = '\n' + data;
+    } else {
+      data = '\n' + data;
+    }
     console.log(colorize(data));
   }
 }

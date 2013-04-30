@@ -4,6 +4,7 @@
 var app = protos.app,
     fs = require('fs'),
     util = require('util'),
+    chokidar = require('chokidar'),
     fileModule = require('file'),
     config = app.asset_compiler;
 
@@ -117,12 +118,18 @@ function compileSrc(file, compiler, ext) {
  */
  
 function Watcher(path, compiler, ext) {
+  var watcher = chokidar.watch(path, {interval: config.watchInterval});
   compileSrc(path, compiler, ext);
-  var watcher = fs.watch(path, function(event, filename) {
-    if (event == 'change') compileSrc(path, compiler, ext);
-    else if (event == 'rename') {
-      app.log(util.format("Asset Manager: Stopped watching '%s' (renamed)", app.relPath(path)));
-      watcher.close();
-    }
+  watcher.on('change', function() {
+    compileSrc(path, compiler, ext);
+  });
+  watcher.on('unlink', function() {
+    app.log(util.format("Asset Manager: Stopped watching '%s' (unlinked)", app.relPath(path)));
+    watcher.close();
+  });
+  watcher.on('error', function(err) {
+    app.log(util.format("Asset Manager: Error watching '%s' (error)", app.relPath(path)));
+    app.log(err.stack);
+    watcher.close();
   });
 }
