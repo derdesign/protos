@@ -19,7 +19,7 @@
     "underscore.string": "2.3.1",
     "node-uuid": "1.4.0",
     "sanitizer": "0.0.15",
-		"chokidar": "0.6.2",
+    "chokidar": "0.6.2",
     "request": "2.14.0",
     "moment": "2.0.0",
     "multi": "0.1.2",
