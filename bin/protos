@@ -100,9 +100,10 @@ var commands = {
       var args = ['install', '--save'].concat(packages);
       
       var npm = cp.spawn('npm', args);
+      var stdout = process.stdout;
       
       var logger = function(data) {
-        console.log(data.toString('utf-8').trim());
+        stdout.write(data);
       }
       
       npm.stdout.on('data', logger);

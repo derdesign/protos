@@ -6,16 +6,18 @@ var app = protos.app,
     util = require('util'),
     chokidar = require('chokidar'),
     fileModule = require('file'),
+    pathModule = require('path'),
     config = app.asset_compiler;
 
+// Handle compile_all event
+app.on('compile_all', compileAll);
+    
 // Do nothing if no compilation is required
 if (config.compile.length === 0) return;
 
 var assets = {},
     extRegex = new RegExp('\\.(' + config.compile.join('|') + ')$');
     
-// console.exit(extRegex);
-
 // Prevent access to raw source files
 if (! config.assetSourceAccess) {
   app.on('static_file_request', function(req, res, path) {
@@ -75,24 +77,57 @@ ignores = ignores.filter(function(item) {
   return !extRegex.test(item);
 });
 
-// console.exit(ignores);
-// console.exit(assets);
-
-// config.watchOn = [];
-
-var watch = (config.watchOn.indexOf(protos.environment) >= 0),
-    assetExts = Object.keys(assets);
+var watch = (config.watchOn.indexOf(protos.environment) >= 0);
+var assetExts = Object.keys(assets);
     
-if (watch) app.debug('Asset Manager: Watching files in ' + app.paths.public);
+if (watch) {
+  
+  // Watch for changes and compile
+  
+  app.debug('Asset Manager: Watching files in ' + app.paths.public);
+  
+  var watcher = chokidar.watch(app.paths.public, {interval: config.watchInterval});
+  
+  watcher.on('add', watchCompile);
+  watcher.on('change', watchCompile);
+  
+  watcher.on('unlink', function(file) {
+    var matches, path = pathModule.dirname(file);
+    if (ignores.indexOf(path) === -1 && (matches = file.match(extRegex))) {
+      app.log(util.format("Asset Manager: Stopped watching '%s' (unlinked)", app.relPath(file)));
+    }
+  });
+  
+  watcher.on('error', function(err) {
+    app.log(util.format("Asset Manager: ", err.stack));
+  });
+  
+} else {
 
-// Loop over each file and determine what to do
-for (var compiler, files, ext, i=0; i < assetExts.length; i++) {
-  ext = assetExts[i];
-  compiler = config.compilers[ext];
-  files = assets[ext];
-  for (var src, file, outSrc, outFile, j=0; j < files.length; j++) {
-    if (watch) new Watcher(files[j], compiler, ext);
-    else compileSrc(files[j], compiler, ext);
+  // Loop over each file and compile
+  compileAll();
+
+}
+
+function watchCompile(file) {
+  
+  var matches, path = pathModule.dirname(file);
+  if (ignores.indexOf(path) === -1 && (matches = file.match(extRegex))) {
+    // Only compile if path is not being ignored
+    var ext = matches[1];
+    var compiler = config.compilers[ext];
+    compileSrc(file, compiler, ext);
+  }
+}
+
+function compileAll() {
+  for (var compiler, files, ext, i=0; i < assetExts.length; i++) {
+    ext = assetExts[i];
+    compiler = config.compilers[ext];
+    files = assets[ext];
+    for (var src, file, outSrc, outFile, j=0; j < files.length; j++) {
+      compileSrc(files[j], compiler, ext);
+    }
   }
 }
 
@@ -105,31 +140,8 @@ function compileSrc(file, compiler, ext) {
     relPath = app.relPath(outFile);
     fs.writeFileSync(outFile, code, 'utf8');
     app.debug('Asset Manager: Compiled %s (%s)', relPath, ext);
-    if (app.environment != 'production') app.emit(util.format('compile: %s', relPath), err, code);
-  });
-}
-
-/**
-  Asset watcher
-  
-  @param {string} path: Path to asset
-  @param {function} compiler: Function to use to compile buffer
-  @return {string} compiled asset
- */
- 
-function Watcher(path, compiler, ext) {
-  var watcher = chokidar.watch(path, {interval: config.watchInterval});
-  compileSrc(path, compiler, ext);
-  watcher.on('change', function() {
-    compileSrc(path, compiler, ext);
-  });
-  watcher.on('unlink', function() {
-    app.log(util.format("Asset Manager: Stopped watching '%s' (unlinked)", app.relPath(path)));
-    watcher.close();
-  });
-  watcher.on('error', function(err) {
-    app.log(util.format("Asset Manager: Error watching '%s' (error)", app.relPath(path)));
-    app.log(err.stack);
-    watcher.close();
+    if (app.environment != 'production') {
+      app.emit('compile', relPath, err, code);
+    }
   });
 }

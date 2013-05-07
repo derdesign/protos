@@ -16,28 +16,28 @@ vows.describe('Asset Compiler (middleware)').addBatch({
   '': {
     
     topic: function() {
-      var promise = new EventEmitter();
       
-      // Restore modified file before starting tests
-      var restore = fs.readFileSync(app.fullPath('../stylus.styl.orig'), 'utf8');
-      fs.writeFileSync(app.fullPath('public/assets/stylus.styl'), restore, 'utf8');
+      var promise = new EventEmitter();
       
       // Load dependencies
       if (!app.supports.static_server) app.use('static_server');
       
-      if (!app.supports.asset_compiler) app.use('asset_compiler', {
-        watchOn: [protos.environment],
-        minify: {
-          'assets/min.css': ['target.css', 'assets/target.less'],
-          'assets/min.js': ['target.js', 'assets/target.coffee']
-        },
-        ignore: ['ignore.styl']
-      });
-     
+      if (!app.supports.asset_compiler) {
+        
+        app.use('asset_compiler', {
+          watchOn: [],
+          minify: {
+            'assets/min.css': ['target.css', 'assets/target.less'],
+            'assets/min.js': ['target.js', 'assets/target.coffee']
+          },
+          ignore: ['ignore.styl']
+        });
+        
+      }
+
       // Get pre-compiled files for comparison
       compiledLess = fs.readFileSync(app.fullPath('../compiled-assets/less.txt'), 'utf8');
       compiledStylus = fs.readFileSync(app.fullPath('../compiled-assets/stylus.txt'), 'utf8');
-      compiledStylusModified = fs.readFileSync(app.fullPath('../compiled-assets/stylus2.txt'), 'utf8');
       compiledCoffee = fs.readFileSync(app.fullPath('../compiled-assets/coffee.txt'), 'utf8');
      
       // Forbids access to asset sources
@@ -64,37 +64,8 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       
       multi.exec(function(err, results) {
         
-        var p = app.fullPath('public/assets/stylus.styl');
-      
-        fs.readFile(p, 'utf8', function(err, styl) {
-          if (err) promise.emit('success', err);
-          else {
-            styl = styl.replace('border-radius(5px)', 'border-radius(100px)');
-            
-            if (app.environment != 'travis') {
-
-              // Prepare for the change event
-              app.on('compile: public/assets/stylus.css', function(err, code) {
-                
-                if (err) promise.emit('success', err);
-                else {
-                  delete app.supports.static_server;
-                  results.push(err || code);
-                  promise.emit('success', err || results);
-                }
-              });
-
-              // Write file
-              fs.writeFileSync(p, styl, 'utf8');
-
-            } else {
-              
-              promise.emit('success', err || results);
-              
-            }
-
-          }
-        });
+        promise.emit('success', err || results);
+        
       });
       
       return promise;
@@ -151,20 +122,6 @@ sister:{name:"Ida",age:9}}}.call(this);';
           r2 = results[9];
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
-    },
-    
-    "Watches for source file changes (when enabled)": function(results) {
-      // Note: Due to the heavy disk i/o from the travis testing environment,
-      // this test is not considered. For example, the compile event is never
-      // fired, which is somehow related to the operating system's load.
-      // 
-      // This means, that the fs.Watcher instance does not know if/when the file
-      // has been changed, which makes makes it impossible to verify if the file
-      // has been compiled after changes have been comitted into the asset's source.
-      if (app.environment != 'travis') {
-        var r = results[10];
-        assert.equal(r, compiledStylusModified);
-      }
     },
     
     "Does not compile ignored files": function() {
