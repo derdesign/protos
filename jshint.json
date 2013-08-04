@@ -19,7 +19,6 @@
 
   "asi": true,
   "eqnull": true,
-  "es5": true,
   "strict": false,
   "funcscope": true,
   "lastsemic": false,

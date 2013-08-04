@@ -43,7 +43,7 @@ vows.describe('lib/protos.js').addBatch({
     },
     
     'Detects view engines': function() {
-      assert.isFunction(protos.engines.eco);
+      assert.isFunction(protos.engines.ejs);
     }
     
   },
