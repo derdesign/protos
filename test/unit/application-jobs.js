@@ -77,8 +77,10 @@ vows.describe('lib/application.js').addBatch({
       assert.isUndefined(state.shouldBeTrue); // Callback never runs
       assert.isFalse(app.__jobExecutionState.my_immed_job); // Registers state
       assert.isFalse(app.__jobExecutionState.my_job); // Register state
-      assert.equal(app.__jobIntervalIDs.my_immed_job.constructor.name, 'Timer'); // Sets interval
-      assert.equal(app.__jobIntervalIDs.my_job.constructor.name, 'Timer'); // Sets interval
+      assert.isNotNull(app.__jobIntervalIDs.my_immed_job); // Sets interval
+      assert.isTrue(app.__jobIntervalIDs.my_immed_job._repeat); // Sets interval
+      assert.isNotNull(app.__jobIntervalIDs.my_job); // Sets interval
+      assert.isTrue(app.__jobIntervalIDs.my_job._repeat); // Sets interval
     },
     
     'Runs job callback when runImmed is true': function() {
