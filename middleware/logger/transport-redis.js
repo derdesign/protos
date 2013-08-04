@@ -125,7 +125,7 @@ function initRedis(config, callback) {
 
   var self = this;
 
-  protos.util.checkPort(config.port, function(err) {
+  protos.util.checkLocalPort(config.port, function(err) {
 
     if (err) {
       app.log("RedisTransport [%s:%s] %s", config.host, config.port, err.code);

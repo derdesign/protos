@@ -97,7 +97,7 @@ vows.describe('lib/utility.js').addBatch({
   
 }).addBatch({
   
-  'Utility::checkPort': {
+  'Utility::checkLocalPort': {
     
     topic: function() {
       var promise = new EventEmitter();
@@ -105,10 +105,10 @@ vows.describe('lib/utility.js').addBatch({
       var port = 9999;
       var server = net.createServer().listen(port);
       server.on('listening', function() {
-        protos.util.checkPort(port, function(err) {
+        protos.util.checkLocalPort(port, function(err) {
           errors.push(err); // err1
           server.close(function() {
-            protos.util.checkPort(port, function(err) {
+            protos.util.checkLocalPort(port, function(err) {
               errors.push(err); // err2
               promise.emit('success', errors); // Send topic
             });
