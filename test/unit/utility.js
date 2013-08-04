@@ -100,22 +100,20 @@ vows.describe('lib/utility.js').addBatch({
   'Utility::checkPort': {
     
     topic: function() {
-      var promise = new EventEmitter(),
-          errors = [],
-          port = 9999,
-          server = net.createServer().listen(port); // listen on 9999;
-      // Check port when server is listening
-      protos.util.checkPort(port, function(err) {
-        errors.push(err); // err1
-        // Emitted when server closes
-        server.on('close', function(err) {
-          protos.util.checkPort(port, function(err) {
-            errors.push(err); // err2
-            promise.emit('success', errors); // Send topic
+      var promise = new EventEmitter();
+      var errors = [];
+      var port = 9999;
+      var server = net.createServer().listen(port);
+      server.on('listening', function() {
+        protos.util.checkPort(port, function(err) {
+          errors.push(err); // err1
+          server.close(function() {
+            protos.util.checkPort(port, function(err) {
+              errors.push(err); // err2
+              promise.emit('success', errors); // Send topic
+            });
           });
         });
-        // Close server. Emits the 'close' event
-        server.close();
       });
       return promise;
     },
