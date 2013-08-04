@@ -7,7 +7,7 @@
   },
 
   "backbone": {
-    "description": "Backbone.js: Models, Views, Collections & Events",
+    "description": "Backbone.js: Client-Side Application Framework",
     "version": "1.0.0",
     "website": "http://documentcloud.github.io/backbone/",
     "download": "http://documentcloud.github.io/backbone/backbone-min.js" 

@@ -17,8 +17,7 @@ var skeleton = fs.readdirSync(cwd + '/skeleton/').sort();
 var prefix = '../../../';
 
 var jsLibs = require('../client/javascript.json');
-var jQueryVersion = jsLibs.jquery.version;
-var emberVersion = jsLibs.ember.version;
+var jqueryVersion = jsLibs.jquery.version;
 
 var protos = new Multi({
   command: function(str, callback) {
@@ -58,7 +57,7 @@ vows.describe('Command Line Interface').addBatch({
       var promise = new EventEmitter(),
           results = [];
       
-      protos.command('create myapp --js ember --css skeleton --model posts comment --controller admin dashboard');
+      protos.command('create myapp --js jquery --css bootstrap --model posts comment --controller admin dashboard');
       protos.command('create myapp1 --controller test');
       
       protos.exec(function(err, results) {
@@ -629,7 +628,7 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created mya
     topic: function() {
       var promise = new EventEmitter();
 
-      protos.command('fetch --js ember --css skeleton');
+      protos.command('fetch --js jquery --css bootstrap');
 
       protos.exec(function(err, results) {
         promise.emit('success', err || results);
@@ -640,10 +639,10 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created mya
 
     "Properly downloads & extracts assets into public/": function(results) {
       var r1 = results[0];
-      var expected = '» Downloading Skeleton Mobile-Friendly Responsive Framework\n» Downloading Ember.js JavaScript Framework';
+      var expected = '» Downloading Bootstrap CSS Toolkit\n» Downloading jQuery JavaScript Library';
       assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('public/js/ember-' + emberVersion + '.min.js'));
-      assert.isTrue(fs.existsSync('public/css/skeleton'));
+      assert.isTrue(fs.existsSync('public/js/jquery-'+ jqueryVersion +'.min.js'));
+      assert.isTrue(fs.existsSync('public/css/bootstrap'));
     }
 
   }

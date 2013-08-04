@@ -1,6 +1,6 @@
 {
   "bootstrap": {
-    "description": "Bootstrap CSS Toolkit from Twitter",
+    "description": "Bootstrap CSS Toolkit",
     "version": "3.0.0-rc1",
     "website": "http://getbootstrap.com/",
     "download": "http://getbootstrap.com/bs-v3.0.0-rc1-dist.zip"
