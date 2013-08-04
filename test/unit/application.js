@@ -69,11 +69,7 @@ vows.describe('lib/application.js').addBatch({
     },
 
     'Initializes protos engines': function() {
-      assert.instanceOf(app.engines.eco, protos.lib.engine);
-    },
-
-    'Initializes application engines': function() {
-      assert.instanceOf(app.engines.eco, protos.lib.engine);
+      assert.instanceOf(app.engines.ejs, protos.lib.engine);
     },
     
     'Properly registers inflection shortcut': function() {
@@ -91,26 +87,12 @@ vows.describe('lib/application.js').addBatch({
         'header',
         'widget',
         'mydir_mywidget',
-        'main_coffeekup',
-        'main_dot',
-        'main_eco',
         'main_ejs',
-        'main_haml',
-        'main_hamlcoffee',
         'main_handlebars',
         'mailer_template',
         'main_hogan',
         'main_jade',
-        'main_jazz',
-        'main_jqtpl',
-        'main_jshtml',
-        'main_kernel',
-        'main_liquor',
-        'main_swig',
-        'main_whiskers',
         '$link',
-        '$jazz_link',
-        '$kernel_link',
         '$sanitize',
         '$wrap',
         '$escape',

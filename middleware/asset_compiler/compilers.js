@@ -12,7 +12,7 @@ module.exports = {
   
   less: function(source, file, callback) {
     less.render(source, {
-      filename: pathModule.basename(file),
+      filename: pathModule.basename(file) + '/',
       paths: [pathModule.dirname(file)]
     }, callback);
   },
