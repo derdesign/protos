@@ -19,14 +19,15 @@
     "underscore.string": "2.3.3",
     "node-uuid": "1.4.0",
     "sanitizer": "0.0.15",
+    "hogan.js" : "2.0.0",
     "chokidar": "0.6.2",
     "request": "2.25.0",
     "moment": "2.1.0",
     "multi": "0.1.2",
     "mime": "1.2.10",
     "file": "0.2.1",
-    "qs": "0.6.5",
-    "ejs": "0.8.4"
+    "ejs": "0.8.4",
+    "qs": "0.6.5"
   },
   "devDependencies": {
     "jshint": ">= 2.1.9",
