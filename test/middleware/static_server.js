@@ -133,7 +133,7 @@ vows.describe('Static File Server (middleware)').addBatch({
           r2 = results[12]; // HTTP/1.1 416 Requested Range Not Satisfiable
       assert.equal(r1[1], 'fghijk');
       assert.equal(r1[0].headers.status, '206 Partial Content');
-      assert.equal(r2[1], undefined);
+      assert.equal(r2[1], '');
       assert.equal(r2[0].headers.status, '416 Requested Range Not Satisfiable');
     },
     
