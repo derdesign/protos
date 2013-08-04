@@ -91,9 +91,7 @@ Development tasks (tests, lint, etc):
 - Logging via multiple transports (File, JSON, Mongodb, Redis)
 - Markdown Parser
 - Mailer
-- Message Queue (RabbitMQ)
 - REPL
 - Sessions
 - Shortcodes
-- SocketIO
 - Static File Server
