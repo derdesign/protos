@@ -19,15 +19,16 @@ var origPath;
 
 var commands = {
   
-  /* test: {
-    single: ['single', 'one'],
-    multiple: ['multi', 'many'],
-    switches: ['switch'],
-    args: 1,
-    run: function(args) {
-      console.exit(args);
+  link: {
+    args: 0,
+    validate: validateApp,
+    run: function(data) {
+      var fullpath = pathModule.resolve(__dirname, '../');
+      var targetpath = 'node_modules/protos';
+      if (!fs.existsSync('node_modules')) fs.mkdirSync('node_modules');
+      if (!fs.existsSync(targetpath)) fs.symlinkSync(fullpath, targetpath);
     }
-  }, */
+  },
   
   create: {
     multiple: ['js', 'css', 'model', 'controller'],
@@ -1186,7 +1187,7 @@ Usage: protos [ACTION] [ARGUMENTS] [OPTIONS]\n\n\
 Actions: \n\
          create install server controller handler helper model\n\
          view partial layout static restricted api hook include\n\
-         fetch inspector lint \n\
+         fetch inspector link lint \n\
 Options:\n";
 
 cli.help.after = "\n\

@@ -649,6 +649,41 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created mya
   }
   
 }).addBatch({
+
+    'protos link': {
+      
+      topic: function() {
+        var promise = new EventEmitter();
+        var check = [];
+        var prefixBackup = prefix;
+        
+        protos.command('create myapp2');
+        
+        protos.exec(function() {
+          var target = 'node_modules/protos';
+          prefix += '../';
+          process.chdir('myapp2');
+          protos.command('link');
+          check.push(fs.existsSync(target));
+          protos.exec(function() {
+            check.push(fs.existsSync(target));
+            prefix = prefixBackup;
+            process.chdir('../');
+            promise.emit('success', check);
+          });
+        });
+        
+        return promise;
+        
+      },
+      
+      "Successfully links protos against application": function(check) {
+        assert.deepEqual(check, [false, true]);
+      }
+      
+    }
+    
+}).addBatch({
   
   'Cleanup': {
     
@@ -656,7 +691,7 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created mya
       var promise = new EventEmitter();
 
       process.chdir('../');
-      cp.exec('rm -Rf myapp myapp1', function(err, stdout, stderr) {
+      cp.exec('rm -Rf myapp myapp1 myapp2', function(err, stdout, stderr) {
         promise.emit('success', err);
       });
 
