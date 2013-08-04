@@ -13,9 +13,7 @@ var _ = require('underscore'),
     Multi = require('multi'),
     CommandLine = require('../lib/command.js');
 
-var protos;
-
-var origPath;
+var protos, origPath;
 
 var commands = {
   
@@ -43,14 +41,10 @@ var commands = {
       controller: "Include controllers on application",
     },
     run: function(args) {
-      
       var errored = false;
       var libs = getLibs(args);
-
       if (errored) process.exit();
-      
       createApplication.call(this, args, libs);
-
     }
   },
   
@@ -61,9 +55,9 @@ var commands = {
       
       // Build list of dependencies from dependencies.json
       
-      var depsJson = Protos.prototype.require('dependencies.json'),
-          middleware = depsJson.middleware,
-          engines = depsJson.engines;
+      var depsJson = Protos.prototype.require('dependencies.json');
+      var middleware = depsJson.middleware;
+      var engines = depsJson.engines;
 
       delete depsJson.middleware;
       delete depsJson.engines;
@@ -150,6 +144,7 @@ var commands = {
       
       // Exec downloader queue
       downloader.exec(function(err, results) {});
+
     }
   },
   
@@ -163,7 +158,6 @@ var commands = {
       port: "Port to use for the HTTP Server",
       env: "Environment to use when running server",
       logpath: "File to save output when forking a new process",
-      // watch: "Automatically watches for changes in apps & reloads server"
     },
     run: function(data) {
 
@@ -1179,6 +1173,7 @@ var cli = new CommandLine(commands);
   fetch
   inspector
   lint
+  link
 
 */
 
