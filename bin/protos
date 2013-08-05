@@ -128,8 +128,12 @@ var commands = {
         download: downloadAsset
       });
       
+      var publicDir = 'public/';
+
+      if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir);
+      
       // Switch to public/ before downloading assets
-      process.chdir('public/');
+      process.chdir(publicDir);
       
       // Download client-side CSS
       data.css.forEach(function(lib) {
@@ -259,6 +263,7 @@ var commands = {
     args: 99,
     validate: validateApp,
     run: function(data) {
+      
        var app = pathModule.basename(process.cwd());
        process.chdir('../');
        
@@ -292,9 +297,14 @@ module.exports = function() {\n\
 \n\
 }\n";
 
-      fs.unlink('app/handlers/readme.md');
+      // Remove  readme file
+      var readme = 'app/handlers/readme.md';
+      if (fs.existsSync(readme)) fs.unlinkSync(readme);
       
       var cwd = process.cwd() + '/app/handlers/';
+      
+      // Create directory if doesn't exist
+      if (!fs.existsSync(cwd)) fs.mkdirSync(cwd);
       
       recursivelyCreateFiles('handlers', data, 'js', function(files) {
         files.forEach(function(file) {
@@ -319,7 +329,9 @@ module.exports = function() {\n\
     args: 99,
     validate: validateApp,
     run: function(data) {
-      fs.unlink('app/views/__static/readme.md');
+      // Remove readme file
+      var readme = 'app/views/__static/readme.md';
+      if (fs.existsSync(readme)) fs.unlinkSync(readme);
       recursivelyCreateFiles('views/__static', data);
     }
   },
@@ -338,7 +350,9 @@ module.exports = function() {\n\
     validate: validateApp,
     run: function(data) {
       
-      fs.unlink('hook/readme.md');
+      // Remove readme file
+      var readme = 'hook/readme.md';
+      if (fs.existsSync(readme)) fs.unlinkSync(readme);
       
       var template = ejs.compile("\
 \n\
@@ -383,7 +397,9 @@ module.exports = {\n\
     validate: validateApp,
     run: function(data) {
 
-      fs.unlink('ext/readme.md');
+      // Remove readme file
+      var readme = 'ext/readme.md';
+      if (fs.existsSync(readme)) fs.unlinkSync(readme);
       
       var template = ejs.compile("\
 \n\
@@ -403,7 +419,9 @@ var app = protos.app;\n\
     validate: validateApp,
     run: function(data) {
       
-      fs.unlink('include/readme.md');
+      // Remove readme file
+      var readme = 'include/readme.md';
+      if (fs.existsSync(readme)) fs.unlinkSync(readme);
       
       var template = ejs.compile("\
 \n\
@@ -484,16 +502,21 @@ module.exports = {\n\
   model: {
     single: ['driver', 'context'],
     args: 99,
-    validate: validateApp,
     help: {
       driver: 'Driver to use by the model',
       context: 'Model context to set'
     },
+    validate: validateApp,
     run: function(data) {
        
        var app = pathModule.basename(process.cwd());
 
-       fs.unlink('app/models/readme.md');
+       // Remove readme file
+       var readme = 'app/models/readme.md';
+       if (fs.existsSync(readme)) fs.unlinkSync(readme);
+
+       // Create directory if doesn't exist
+       if (!fs.existsSync('app/models')) fs.mkdirSync('app/models');
 
        process.chdir('../');
        
@@ -508,9 +531,13 @@ module.exports = {\n\
   
   helper: {
     args: 99,
+    validate: validateApp,
     run: function(data) {
        
       var app = pathModule.basename(process.cwd());
+      
+      // Create directory if doesn't exist
+      if (!fs.existsSync('app/helpers')) fs.mkdirSync('app/helpers');
 
       process.chdir('../');
       
@@ -880,7 +907,10 @@ function createView(app, controller, view, partial) {
   
   if (!config.cli) config.cli = {};
   
-  var dir = util.format('%s/app/views/%s', app, controller);
+  var viewsDir = util.format('%s/app/views', app);
+  var dir = util.format('%s/%s', viewsDir, controller);
+  
+  if (!fs.existsSync(viewsDir)) fs.mkdirSync(viewsDir);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
   
   var hasExt = regex.fileWithExtension.test(view);
