@@ -1209,11 +1209,11 @@ var cli = new CommandLine(commands);
 */
 
 cli.help.before = "\n\
-Usage: protos [ACTION] [ARGUMENTS] [OPTIONS]\n\n\
+Usage: protos [ACTION] [OPTIONS] [ARGUMENTS]\n\n\
 Actions: \n\
          create install server config controller handler helper model\n\
          view partial layout static restricted api hook include fetch\n\
-         inspector link lint \n\
+         inspector link lint \n\n\
 Options:\n";
 
 cli.help.after = "\n\
