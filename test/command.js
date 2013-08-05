@@ -60,8 +60,8 @@ vows.describe('Command Line Interface').addBatch({
       var promise = new EventEmitter(),
           results = [];
       
-      protos.command('create myapp --js jquery --css bootstrap --model posts comment --controller admin dashboard');
-      protos.command('create myapp1 --controller test');
+      protos.command('create myapp --skeleton --js jquery --css bootstrap --model posts comment --controller admin dashboard');
+      protos.command('create myapp1 --skeleton --controller test');
       
       protos.exec(function(err, results) {
         setTimeout(function() {
@@ -249,7 +249,7 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
       return promise;
     },
     
-    'Properly files in api/': function(results) {
+    'Properly creates files in api/': function(results) {
       var bufs = results.pop();
       
       // Expect proper output in stdout
@@ -258,6 +258,41 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
       // Api files export methods by default
       assert.equal(bufs['api/cool-method.js'], '\n/* api/cool-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  coolMethod: function() {\n\n  }\n\n}\n');
       assert.equal(bufs['api/some-other-method.js'], '\n/* api/some-other-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  someOtherMethod: function() {\n\n  }\n\n}\n');
+    }
+
+  }
+  
+}).addBatch({
+  
+  'protos config': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      protos.command('config aws session logger');
+      
+      protos.exec(function(err, results) {
+        if (!err) {
+          var bufs = {};
+          ['config/aws.js', 'config/session.js', 'config/logger.js'].forEach(function(file) {
+            bufs[file] = fs.readFileSync(file, 'utf8');
+          });
+          results.push(bufs);
+        }
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    'Properly creates files in config/': function(results) {
+      var bufs = results.pop();
+      
+      // Expect proper output in stdout
+      assert.equal(results[0], '» Created myapp1/config/aws.js\n» Created myapp1/config/session.js\n» Created myapp1/config/logger.js');
+      
+      // Api files export methods by default
+      assert.equal(bufs['config/aws.js'], '\n/* config/aws.js */\n\nmodule.exports = {\n\n}\n');
     }
 
   }

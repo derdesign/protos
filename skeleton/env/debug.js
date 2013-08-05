@@ -3,7 +3,7 @@
 
 function Debug(app) {
   
-  // Access the inspector on http://localhost:3000
+  // Enable node inspector
   protos.enableDebugger();
   
 }

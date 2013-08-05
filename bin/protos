@@ -28,11 +28,11 @@ var commands = {
   
   create: {
     multiple: ['js', 'css', 'model', 'controller'],
-    switches: ['minimal', 'bare', 'nolink'],
+    switches: ['skeleton', 'minimal', 'nolink'],
     args: 1,
     help: {
-      minimal: "Use the minimal directory structure",
-      bare: "Use the bare bones directory structure",
+      skeleton: "Use the full application skeleton",
+      minimal: "Use a minimal directory structure",
       nolink: "Prevents automatic linking of the protos module",
       css: "Bundle client side CSS frameworks",
       js: "Bundle client side JavaScript libraries/frameworks",
@@ -392,6 +392,24 @@ module.exports = {\n\
     }
   },
   
+  config: {
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+  
+      var template = ejs.compile("\
+\n\
+/* <%- relPath %> */\n\
+\n\
+module.exports = {\n\
+\n\
+}\n");
+
+      createJsFilesWithTemplate('config/', data, template);
+    
+    }
+  },
+  
   ext: {
     args: 99,
     validate: validateApp,
@@ -563,16 +581,16 @@ function createApplication(data, libs) {
   
   var cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/log/*.log %s/public/*.css %s/public/*.js", 
     masterPath, app, app, app, app);
-        
-  if (data.minimal || data.bare) {
-    cmd += util.format("; rm -Rf %s/{api,ext,hook,include,lib,priv,script,upload,test}", app);
+
+  if (!data.skeleton) {
+    cmd += util.format("; rm -Rf %s/{api,config,ext,hook,include,lib,log,priv,script,upload,test}", app);
+    cmd += util.format("; rm -Rf %s/app/{handlers,helpers,models}", app);
+    cmd += util.format("; rm -Rf %s/app/views/{__restricted,__static}", app);
   }
-  
-  if (data.bare) {
-    
+
+  if (data.minimal) {
     cmd += util.format("; rm -Rf %s/{config,env,log,public}", app);
-    cmd += util.format("; rm -Rf %s/app/{handlers,helpers,models,views}", app);
-    
+    cmd += util.format("; rm -Rf %s/app/views", app);
   }
   
   // console.exit(cmd);
@@ -584,10 +602,14 @@ function createApplication(data, libs) {
   
   // Copy skeleton dir
   cp.exec(cmd, function(err, stdout, stderr) {
-    if (err) console.exit(stderr);
-    else {
+    
+    if (err) {
       
-      if (data.bare) {
+      console.exit(stderr);
+
+    } else {
+      
+      if (data.minimal) {
         
         // Patch MainController
         var mainControllerPath = util.format("%s/app/controllers/main.js", app);
@@ -600,39 +622,12 @@ function createApplication(data, libs) {
         var config = fs.readFileSync(configPath, 'utf8');
         
         // Set title
-        config = config
-          .replace(/title: "(.+)",/, "title: null,")
-          .replace("rawViews: false,", "rawViews: true,")
-          .replace('return "text/html;', 'return "text/plain;')
-          .replace('pretty: true,', 'pretty: false,');
+        config = config.replace(/title: "(.+)",/, "title: null,")
+        .replace("rawViews: false,", "rawViews: true,")
+        .replace('return "text/html;', 'return "text/plain;')
+        .replace('pretty: true,', 'pretty: false,');
         
         fs.writeFileSync(configPath, config, 'utf8');
-        
-        // Set app overrides
-        fs.mkdirSync(util.format("%s/ext", app));
-        
-        fs.writeFileSync(util.format("%s/ext/application.js", app), '\
-\n\
-/* ext/application.js */\n\
-\n\
-var app = protos.app;\n\
-\n\
-protos.extend(app.constructor.prototype, {\n\
-\n\
-  notFound: function(res) {\n\
-    res.statusCode = 404;\n\
-    res.sendHeaders();\n\
-    res.end("HTTP/404 Page Not Found");\n\
-  },\n\
-\n\
-  serverError: function(res, err) {\n\
-    if (err) app.errorLog(err);\n\
-    res.statusCode = 500;\n\
-    res.sendHeaders();\n\
-    res.end("HTTP/500 Internal Server Error");\n\
-  }\n\
-\n\
-});\n', 'utf8');
         
       }
       
@@ -701,7 +696,9 @@ protos.extend(app.constructor.prototype, {\n\
       }
       
     }
+    
   });
+  
 }
 
 
@@ -1214,9 +1211,9 @@ var cli = new CommandLine(commands);
 cli.help.before = "\n\
 Usage: protos [ACTION] [ARGUMENTS] [OPTIONS]\n\n\
 Actions: \n\
-         create install server controller handler helper model\n\
-         view partial layout static restricted api hook include\n\
-         fetch inspector link lint \n\
+         create install server config controller handler helper model\n\
+         view partial layout static restricted api hook include fetch\n\
+         inspector link lint \n\
 Options:\n";
 
 cli.help.after = "\n\

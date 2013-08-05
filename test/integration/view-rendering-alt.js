@@ -33,7 +33,7 @@ vows.describe('View Rendering').addBatch({
     'Sends responses in plain text with no template': function(data) {
       var err = data[0], buf = data[1], headers = data[2];
       assert.strictEqual(buf, "This is a raw message");
-      assert.strictEqual(headers['content-type'], 'text/plain');
+      assert.strictEqual(headers['content-type'], 'text/plain;charset=utf-8');
       assert.strictEqual(headers['status'], '200 OK');
     }
     

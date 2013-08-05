@@ -1,5 +1,5 @@
 
-/* Application Configuration (accessed directly via app.config) */
+/* Main Configuration */
 
 module.exports = {
   

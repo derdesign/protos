@@ -1,5 +1,5 @@
 
-/* Main Configuration (accessed directly via app.config) */
+/* Main Configuration */
 
 module.exports = {
   
@@ -11,7 +11,7 @@ module.exports = {
   pageTitle: "%s &raquo; %s",
   
   headers: {
-    "Content-Type": function(req, res) { return "text/html; charset=" + this.config.encoding; },
+    "Content-Type": function(req, res) { return "text/html;charset=" + this.config.encoding; },
     "Status": function(req, res) {  return res.statusCode + " " + this.httpStatusCodes[res.statusCode]; },
     "X-Powered-By": 'protos'
   },
@@ -24,7 +24,7 @@ module.exports = {
   cacheControl: {
     maxAge: 10 * 365 * 24 * 60 * 60,
     static: 'public',
-    dynamic: 'private, must-revalidate, max-age=0',
+    dynamic: 'private,must-revalidate,max-age=0',
     error: 'no-cache',
     json: 'private'
   },
