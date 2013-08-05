@@ -16,6 +16,9 @@ var cwd = process.cwd(),
 var skeleton = fs.readdirSync(cwd + '/skeleton/').sort();
 var prefix = '../../../';
 
+// Add node_modules
+skeleton.push('node_modules');
+
 var jsLibs = require('../client/javascript.json');
 var jqueryVersion = jsLibs.jquery.version;
 
@@ -656,7 +659,7 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created mya
         var check = [];
         var prefixBackup = prefix;
         
-        protos.command('create myapp2');
+        protos.command('create myapp2 --nolink');
         
         protos.exec(function() {
           var target = 'node_modules/protos';

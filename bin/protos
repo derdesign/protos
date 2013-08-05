@@ -14,6 +14,7 @@ var _ = require('underscore'),
     CommandLine = require('../lib/command.js');
 
 var protos, origPath;
+var protosPath = pathModule.resolve(__dirname, '../');
 
 var commands = {
   
@@ -21,20 +22,18 @@ var commands = {
     args: 0,
     validate: validateApp,
     run: function(data) {
-      var fullpath = pathModule.resolve(__dirname, '../');
-      var targetpath = 'node_modules/protos';
-      if (!fs.existsSync('node_modules')) fs.mkdirSync('node_modules');
-      if (!fs.existsSync(targetpath)) fs.symlinkSync(fullpath, targetpath);
+      linkProtosDep();
     }
   },
   
   create: {
     multiple: ['js', 'css', 'model', 'controller'],
-    switches: ['minimal', 'bare'],
+    switches: ['minimal', 'bare', 'nolink'],
     args: 1,
     help: {
       minimal: "Use the minimal directory structure",
       bare: "Use the bare bones directory structure",
+      nolink: "Prevents automatic linking of the protos module",
       css: "Bundle client side CSS frameworks",
       js: "Bundle client side JavaScript libraries/frameworks",
       model: "Include models on application",
@@ -613,22 +612,21 @@ protos.extend(app.constructor.prototype, {\n\
       // Replace protos directory
       var bootFile = util.format('./%s/boot.js', app),
           boot = fs.readFileSync(bootFile, 'utf-8').toString();
-      var repl, isGlobal = fs.existsSync('/usr/local/lib/node/protos');
-      
-      if (isGlobal) {
-        // We can use `require('protos')` safely
-        repl = 'protos';
-      } else {
-        // We need to use the global path instead
-        repl = masterPath;
-      }
-      
-      boot = boot.replace("var Protos = require('../');", util.format("var Protos = require('%s');", repl));
       
       fs.writeFileSync(bootFile, boot);
       
       console.log("» Successfully created " + app);
-      
+
+      // Link protos to node_modules
+      if (!data.nolink) {
+        var currentDir = process.cwd();
+        process.chdir(app);
+        linkProtosDep();
+        process.chdir(currentDir);
+      }
+
+      // Create downloader instance
+
       var downloader = new Multi({
         download: downloadAsset
       });
@@ -656,7 +654,6 @@ protos.extend(app.constructor.prototype, {\n\
       try {
         
         // Switch to public/ before downloading assets
-        var currentDir = process.cwd();
         process.chdir(util.format('./%s/public', app));
 
         // Download client-side CSS
@@ -1133,6 +1130,13 @@ function recursivelyCreateFiles(target, data, ext, callback) {
     }
   });
   
+}
+
+function linkProtosDep() {
+  // NOTE: Works from the application's root path
+  var targetpath = 'node_modules/protos';
+  if (!fs.existsSync('node_modules')) fs.mkdirSync('node_modules');
+  if (!fs.existsSync(targetpath)) fs.symlinkSync(protosPath, targetpath);
 }
 
 function getModelContext(string) {
