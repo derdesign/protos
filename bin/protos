@@ -90,24 +90,9 @@ var commands = {
         }
       });
       
-      // Install command
-      var args = ['install', '--save'].concat(packages);
+      // Install
       
-      var npm = cp.spawn('npm', args);
-      var stdout = process.stdout;
-      
-      var logger = function(data) {
-        stdout.write(data);
-      }
-      
-      npm.stdout.on('data', logger);
-      npm.stderr.on('data', logger);
-      
-      npm.on('exit', function(code) {
-        // Remove 'sys' notices
-        var cleanupCmd = util.format('PROTOS_APP_PATH=%s %s/tools/remove-sys-notice', process.cwd(), Protos.path);
-        cp.exec(cleanupCmd);
-      });
+      npmExec(['install', '--save'].concat(packages));
       
     }
   },
@@ -470,6 +455,10 @@ module.exports = {\n\
         view = view.split('/');
         if (view.length === 2) {
           var controller = view[0];
+          if (controller === 'main' && !fs.existsSync('app/views/main')) {
+            if (!fs.existsSync('app/views')) fs.mkdirSync('app/views');
+            fs.mkdirSync('app/views/main');
+          }
           if (fs.existsSync(util.format("app/views/%s", controller))) {
             view.unshift(app);
             view.push(partial || false);
@@ -1186,6 +1175,26 @@ function getModelContext(string) {
   .slice(1)
   .replace(/-/g,'_')
   .replace(/_model$/, '');
+}
+
+function npmExec(args) {
+  
+  var npm = cp.spawn('npm', args);
+  var stdout = process.stdout;
+  
+  var logger = function(data) {
+    stdout.write(data);
+  }
+  
+  npm.stdout.on('data', logger);
+  npm.stderr.on('data', logger);
+  
+  npm.on('exit', function(code) {
+    // Remove 'sys' notices
+    var cleanupCmd = util.format('PROTOS_APP_PATH=%s %s/tools/remove-sys-notice', process.cwd(), Protos.path);
+    cp.exec(cleanupCmd);
+  });
+  
 }
 
 var cli = new CommandLine(commands);
