@@ -583,14 +583,29 @@ function createApplication(data, libs) {
     masterPath, app, app, app, app);
 
   if (!data.skeleton) {
-    cmd += util.format("; rm -Rf %s/{api,config,ext,hook,include,lib,log,priv,script,upload,test}", app);
-    cmd += util.format("; rm -Rf %s/app/{handlers,helpers,models}", app);
-    cmd += util.format("; rm -Rf %s/app/views/{__restricted,__static}", app);
+    
+    ['api', 'config', 'ext', 'hook', 'include', 'lib', 'log', 'priv', 'script', 'upload', 'test'].forEach(function(dir) {
+      cmd += util.format(" %s/%s", app, dir);
+    });
+    
+    ['handlers', 'helpers', 'models'].forEach(function(dir) {
+      cmd += util.format(" %s/app/%s", app, dir);
+    });
+    
+    ['__restricted', '__static'].forEach(function(dir) {
+      cmd += util.format(" %s/app/views/%s", app, dir);
+    });
+    
   }
 
   if (data.minimal) {
-    cmd += util.format("; rm -Rf %s/{config,env,log,public}", app);
-    cmd += util.format("; rm -Rf %s/app/views", app);
+    
+    ['config', 'env', 'log', 'public'].forEach(function(dir) {
+      cmd += util.format(" %s/%s", app, dir);
+    });
+    
+    cmd += util.format(" %s/app/views", app);
+
   }
   
   // console.exit(cmd);
