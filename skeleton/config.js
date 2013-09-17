@@ -8,7 +8,7 @@ module.exports = {
   encoding: 'utf-8',
   rawViews: false,
   
-  pageTitle: "%s &raquo; %s",
+  pageTitle: "{title} &raquo; {desc}",
   
   headers: {
     "Content-Type": function(req, res) { return "text/html;charset=" + this.config.encoding; },
