@@ -50,6 +50,10 @@ var commands = {
   install: {
     args: 99,
     validate: validateApp,
+    switches: ['global'],
+    help: {
+      global: "Install packages on protos path"
+    },
     run: function(data) {
       
       // Build list of dependencies from dependencies.json
@@ -90,9 +94,21 @@ var commands = {
         }
       });
       
-      // Install
-      
-      npmExec(['install', '--save'].concat(packages));
+      if (data.global) {
+        
+        // If global, install on protos dir
+        
+        process.chdir(Protos.path);
+        
+        npmExec(['install'].concat(packages));
+        
+      } else {
+        
+        // Install
+        
+        npmExec(['install', '--save'].concat(packages));
+        
+      }
       
     }
   },
