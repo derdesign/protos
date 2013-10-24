@@ -907,7 +907,8 @@ function getDirPaths(p) {
 function createView(app, controller, view, partial) {
 
   var tpl, file;
-  var baseConfig = process.cwd() + '/' + app + '/config/base.js';
+  var cwd = process.cwd();
+  var baseConfig = process.cwd() + '/' + app + '/config.js';
   
   var config = fs.existsSync(baseConfig) ? require(baseConfig) : {};
   
