@@ -431,6 +431,144 @@ vows.describe('lib/application.js').addBatch({
     }
 
   },
+  
+}).addBatch({
+  
+  'Application::data': {
+    
+    'Sets values': function() {
+      
+      var ret1 = app.data('hello', 99);
+      
+      var ret2 = app.data('testdata', {
+        alpha: 1,
+        beta: [1,2,3,4],
+        name: "John Doe"
+      });
+      
+      assert.isTrue(ret1);
+      
+      assert.isTrue(ret2);
+      
+      assert.deepEqual(app.__data, {
+        hello: 99,
+        testdata: {
+          alpha: 1,
+          beta: [ 1, 2, 3, 4 ],
+          name: 'John Doe' }
+        });
+    },
+    
+    'Sets values with strict option': function() {
+      
+      var ret = app.data('testdata.epsilon.value', 55);
+      
+      assert.isFalse(ret);
+      
+      assert.deepEqual(app.__data, {
+        hello: 99,
+        testdata: {
+          alpha: 1,
+          beta: [ 1, 2, 3, 4 ],
+          name: 'John Doe' }
+        });
+        
+      ret = app.data('testdata.gamma.value', 55, {strict: false});
+      
+      assert.isTrue(ret);
+
+      assert.deepEqual(app.__data, {
+        hello: 99,
+        testdata: {
+          alpha: 1,
+          beta: [ 1, 2, 3, 4 ],
+          gamma: {
+            value: 55
+          },
+          name: 'John Doe' }
+        });
+      
+    },
+    
+    'Sets values with replace option': function() {
+      
+      var ret = app.data('testdata.gamma.value.subvalue', 500, {replace: false});
+      
+      assert.isFalse(ret);
+      
+      assert.deepEqual(app.__data, {
+        hello: 99,
+        testdata: {
+          alpha: 1,
+          beta: [ 1, 2, 3, 4 ],
+          gamma: {
+            value: 55
+          },
+          name: 'John Doe' }
+        });
+        
+        ret = app.data('testdata.gamma.value.subvalue', 500, {strict: true, replace: true}); // Forces strict to false
+        
+        assert.isTrue(ret);
+        
+        assert.deepEqual(app.__data, {
+          hello: 99,
+          testdata: {
+            alpha: 1,
+            beta: [ 1, 2, 3, 4 ],
+            gamma: {
+              value: {
+                subvalue: 500
+              }
+            },
+            name: 'John Doe' }
+          });
+      
+    },
+    
+    'Gets keys': function() {
+      
+      assert.isUndefined(app.data('one'));
+      
+      assert.isUndefined(app.data('one.two'));
+      
+      assert.strictEqual(app.data('hello'), 99);
+      
+      assert.deepEqual(app.data('testdata'), {
+        alpha: 1,
+        beta: [ 1, 2, 3, 4 ],
+        gamma: {
+          value: {
+            subvalue: 500
+          }
+        },
+        name: 'John Doe' });
+        
+      assert.deepEqual(app.data('testdata.beta'), [1,2,3,4]);
+      
+      assert.strictEqual(app.data('testdata.gamma.value.subvalue'), 500);
+      
+    },
+    
+    'Gets data object': function() {
+      
+      assert.deepEqual(app.data(), {
+        hello: 99,
+        testdata: {
+         alpha: 1,
+         beta: [ 1, 2, 3, 4 ],
+         gamma: {
+           value: {
+             subvalue: 500
+           }
+         },
+         name: 'John Doe' 
+        }
+      });
+
+    }
+
+  }
 
 }).addBatch({
 
