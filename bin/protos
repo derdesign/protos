@@ -321,7 +321,13 @@ module.exports = function() {\n\
     args: 99,
     validate: validateApp,
     run: function(data) {
-      recursivelyCreateFiles('views/__layout', data);
+      
+      // Use extension from config.cli.partialExt
+      var config = require(process.cwd() + '/config.js');
+      var ext = data.ext ? data.ext : (config.cli && config.cli.partialExt)
+      
+      recursivelyCreateFiles('views/__layout', data, ext);
+
     }
   },
   
@@ -908,6 +914,7 @@ function createView(app, controller, view, partial) {
 
   var tpl, file;
   var cwd = process.cwd();
+  
   var baseConfig = process.cwd() + '/' + app + '/config.js';
   
   var config = fs.existsSync(baseConfig) ? require(baseConfig) : {};
@@ -1130,8 +1137,8 @@ function recursivelyCreateFiles(target, data, ext, callback) {
   var dirs = [];
   var tpl = data.template;
   var cwd = process.cwd();
-  var baseConfig = cwd + '/config/base.js';
-  var config = fs.existsSync(baseConfig) ? require(baseConfig) : {};
+  var baseConfig = cwd + '/config.js';
+  var config = require(baseConfig);
   
   if (!config.cli) config.cli = {};
   
