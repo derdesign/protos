@@ -47,7 +47,7 @@ var protos = Protos.bootstrap(testSkeleton, {
       events: {
         components: function(protos) {
           // Load framework components
-          protos.loadDrivers('mongodb', 'mysql', 'postgres');
+          protos.loadDrivers('mongodb', 'mysql', 'postgres', 'sqlite');
           protos.loadStorages('mongodb', 'redis');
           protos.loadEngines('ejs', 'handlebars', 'hogan', 'jade', 'plain', 'markdown');
         },
@@ -75,10 +75,12 @@ var protos = Protos.bootstrap(testSkeleton, {
           testConfig.mongodb.port = parseInt(testConfig.mongodb.port, 10);
 
           // Attach storages
+          testConfig.sqlite.storage = 'redis';
           testConfig.mysql.storage = 'redis';
           testConfig.postgres.storage = 'redis';
           testConfig.mongodb.storage = 'redis';
           
+          app.config.drivers.sqlite = testConfig.sqlite;
           app.config.drivers.mysql = testConfig.mysql;
           app.config.drivers.postgres = testConfig.postgres;
           app.config.drivers.mongodb = testConfig.mongodb;
