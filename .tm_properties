@@ -1,7 +1,7 @@
 
 # Files to include
 
-myExtraIncludes = ".tm_properties,.gitignore"
+myExtraIncludes = ".tm_properties,.gitignore,.travis.yml"
 fileBrowserGlob  = "{*,$myExtraIncludes}"
 include = "{$include,$myExtraIncludes}"
 

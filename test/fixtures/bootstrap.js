@@ -2,6 +2,10 @@
 // Prevent timezone conflicts
 process.env.TZ = '';
 
+process.on('uncaughtException', function(err) {
+  console.log(err.stack);
+});
+
 var env,
     _ = require('underscore'),
     fs = require('fs'),
