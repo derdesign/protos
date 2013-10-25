@@ -1,6 +1,10 @@
 
 // Prevent timezone conflicts
+
 process.env.TZ = '';
+
+// Make sure test errors are shown, otherwise there
+// will be a "Callback not fired" error in vows
 
 process.on('uncaughtException', function(err) {
   console.log(err.stack);
