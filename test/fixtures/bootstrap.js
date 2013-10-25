@@ -1,6 +1,14 @@
 
 // Prevent timezone conflicts
+
 process.env.TZ = '';
+
+// Make sure test errors are shown, otherwise there
+// will be a "Callback not fired" error in vows
+
+process.on('uncaughtException', function(err) {
+  console.log(err.stack);
+});
 
 var env,
     _ = require('underscore'),
@@ -30,13 +38,18 @@ Protos.on('bootstrap_config', function(bootstrap) {
 
 // Automatically detect test skeleton: Allows to test the app with different names
 // Just make sure the name ends with 'skeleton', and it'll be fine...
+
 var skelDir, testSkeleton;
+
 fs.readdirSync('test/fixtures').forEach(function(dir) {
   if (/skeleton$/.test(dir)) {
     skelDir = dir;
     testSkeleton = Protos.path + '/test/fixtures/' + dir;
   }
 });
+
+// Create temporary test directory
+fs.mkdirSync("test/fixtures/tmp");
 
 // console.exit(testSkeleton);
 
@@ -47,7 +60,7 @@ var protos = Protos.bootstrap(testSkeleton, {
       events: {
         components: function(protos) {
           // Load framework components
-          protos.loadDrivers('mongodb', 'mysql', 'postgres');
+          protos.loadDrivers('mongodb', 'mysql', 'postgres', 'sqlite');
           protos.loadStorages('mongodb', 'redis');
           protos.loadEngines('ejs', 'handlebars', 'hogan', 'jade', 'plain', 'markdown');
         },
@@ -75,10 +88,12 @@ var protos = Protos.bootstrap(testSkeleton, {
           testConfig.mongodb.port = parseInt(testConfig.mongodb.port, 10);
 
           // Attach storages
+          testConfig.sqlite.storage = 'redis';
           testConfig.mysql.storage = 'redis';
           testConfig.postgres.storage = 'redis';
           testConfig.mongodb.storage = 'redis';
           
+          app.config.drivers.sqlite = testConfig.sqlite;
           app.config.drivers.mysql = testConfig.mysql;
           app.config.drivers.postgres = testConfig.postgres;
           app.config.drivers.mongodb = testConfig.mongodb;

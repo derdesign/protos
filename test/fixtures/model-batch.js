@@ -3,6 +3,12 @@ var assert = require('assert'),
     EventEmitter = require('events').EventEmitter;
 
 var testData = {
+  SQLite: { // pkey constraint, need auto_increment
+    insert: [
+      {username: 'user'+process.pid, password: 'pass1'},
+      {username: 'user2', password: 'pass2'},
+      {username: '!@#$%', password: 'pass3'}] // invalid
+  },
   MySQL: { // pkey constraint, need auto_increment
     insert: [
       {username: 'user'+process.pid, password: 'pass1'},

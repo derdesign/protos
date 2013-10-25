@@ -1,4 +1,8 @@
 {
+  "sqlite": {
+    "filename": "test/fixtures/tmp/data.sqlite",
+    "table": "test_table"
+  },
   "mysql": {
     "host": "localhost",
     "port": "3306",
