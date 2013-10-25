@@ -13,7 +13,7 @@ var fs = require('fs'),
 var sqlite, multi, model, storageMulti, modelBatch;
 var dbFile = "test/fixtures/tmp/data.sqlite";
 
-if (fs.existsSync(dbFile)) fs.unlinkSync(dbFile);
+fs.writeFileSync(dbFile, '', 'binary');
 
 var config = app.config.drivers.sqlite,
     client = new sqlite3.Database(dbFile),
