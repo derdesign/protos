@@ -38,29 +38,8 @@ function MongoStorage(config) {
    
    if (typeof config.port != 'number') config.port = parseInt(config.port, 10);
    
-   /**
-    Storage Configuration
-    
-      config: {
-        host: 'localhost',
-        port: 27017,
-        database: 'store',
-        collection: 'keyvalue'
-      }
-    
-    @property config
-    @type object
-   */
-   
    this.config = config;
    
-   /**
-    Class name
-    
-    @private
-    @property className
-    @type string
-   */
    this.className = this.constructor.name;
    
    app.debug(util.format('Initializing MongoStorage for %s@%s:%s', config.username, config.host, config.port));
@@ -98,8 +77,7 @@ function MongoStorage(config) {
              
              if (err) {
                
-               var msg = util.format('MongoStorage: unable to authenticate %s@%s', config.username, config.host);
-               app.log(new Error(msg));
+               app.log(util.format('MongoStorage: unable to authenticate %s@%s', config.username, config.host));
                throw err;
                
              } else {

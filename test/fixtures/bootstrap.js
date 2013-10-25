@@ -49,7 +49,10 @@ fs.readdirSync('test/fixtures').forEach(function(dir) {
 });
 
 // Create temporary test directory
-fs.mkdirSync("test/fixtures/tmp");
+
+var tmpDir = "test/fixtures/tmp";
+
+if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
 
 // console.exit(testSkeleton);
 
@@ -61,7 +64,7 @@ var protos = Protos.bootstrap(testSkeleton, {
         components: function(protos) {
           // Load framework components
           protos.loadDrivers('mongodb', 'mysql', 'postgres', 'sqlite');
-          protos.loadStorages('mongodb', 'redis');
+          protos.loadStorages('mongodb', 'redis', 'sqlite');
           protos.loadEngines('ejs', 'handlebars', 'hogan', 'jade', 'plain', 'markdown');
         },
         pre_init: function(app) {
@@ -100,6 +103,14 @@ var protos = Protos.bootstrap(testSkeleton, {
 
           app.config.storages.redis = testConfig.redis;
           app.config.storages.mongodb = testConfig.mongodb;
+          
+          var sqliteStorageFile = "test/fixtures/tmp/storages.sqlite";
+          
+          fs.writeFileSync(sqliteStorageFile, '', 'binary');
+          
+          app.config.storages.sqlite = {
+            filename: sqliteStorageFile
+          }
           
           // #### Travis Database Configuration #### 
           

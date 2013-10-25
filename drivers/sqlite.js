@@ -3,6 +3,7 @@
 
 var app = protos.app;
 var _ = require('underscore'),
+    fs = require('fs'),
     sqlite3 = protos.requireDependency('sqlite3', 'SQLite Driver', 'sqlite'),
     util = require('util'),
     regex = { endingComma: /, ?$/};
@@ -25,13 +26,24 @@ var _ = require('underscore'),
 
 function SQLite(config) {
   
+  /*jshint bitwise: false */
+  
   var self = this;
   
   config = config || {};
   config.mode = config.mode || (sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE);
   
-  // Exit if no filename provided
-  if (!config.filename) throw new Error("No filename provided for SQLite Database");
+  if (!config.filename) {
+    
+    // Exit if no filename provided
+    throw new Error("No filename provided for SQLite Driver");
+    
+  } else if (config.filename != ":memory:" && !fs.existsSync(config.filename)) {
+    
+    // Create file if it doesn't exist
+    fs.writeFileSync(config.filename, '', 'binary');
+
+  }
   
   this.className = this.constructor.name;
   

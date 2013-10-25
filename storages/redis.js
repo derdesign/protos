@@ -24,44 +24,15 @@ function RedisStorage(config) {
    config = protos.extend({
      host: 'localhost',
      port: 6379,
+     db: undefined,
+     password: undefined
    }, config || {});
    
    app.debug(util.format('Initializing Redis Storage for %s:%s', config.host, config.port));
    
-   /**
-    Redis database
-    
-    @private
-    @property db
-    @type integer
-    @default 0
-   */
-   
    this.db = 0;
    
-   /**
-    Storage configuration
-    
-      config = { 
-        host: 'localhost',
-        port: 6379,
-        db: 1,
-        password: 'password'
-      }
-    
-    @property config
-    @type object
-    */
-    
    this.config = config;
-   
-   /**
-    Class name
-    
-    @private
-    @property className
-    @type string
-   */
    
    this.className = this.constructor.name;
    
@@ -74,14 +45,19 @@ function RedisStorage(config) {
 
    // Handle error event
    self.client.on('error', function(err) {
-     app.log("RedisStorage: " + err.toString());
+     throw err;
    });
 
    // Select db if specified
    if (typeof config.db == 'number' && config.db !== 0) {
+     app.addReadyTask();
      self.db = config.db;
      self.client.select(config.db, function(err, res) {
-       if (err) throw err;
+       if (err) {
+         throw err;
+       } else {
+         app.flushReadyTask();
+       }
      });
    }
 
@@ -156,7 +132,7 @@ RedisStorage.prototype.set = function(key, value, callback) {
       }
     });
     
-  // If key is an array
+  // If key is an object
   } else if (typeof key == 'object') {
     
     // Set multiple values
