@@ -34,13 +34,18 @@ Protos.on('bootstrap_config', function(bootstrap) {
 
 // Automatically detect test skeleton: Allows to test the app with different names
 // Just make sure the name ends with 'skeleton', and it'll be fine...
+
 var skelDir, testSkeleton;
+
 fs.readdirSync('test/fixtures').forEach(function(dir) {
   if (/skeleton$/.test(dir)) {
     skelDir = dir;
     testSkeleton = Protos.path + '/test/fixtures/' + dir;
   }
 });
+
+// Create temporary test directory
+fs.mkdirSync("test/fixtures/tmp");
 
 // console.exit(testSkeleton);
 
