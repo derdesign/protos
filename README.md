@@ -1,10 +1,9 @@
 
 # Protos [![Build Status](https://secure.travis-ci.org/derdesign/protos.png)](http://travis-ci.org/derdesign/protos)
 
-Protos is a Web Application Framework for Node.js focused on building Highly Scalable Web Applications. 
-Runs on UNIX Systems such as **Linux**, **FreeBSD** & **Mac OSX**.
+Protos is a Web Application Framework for Node.js. Runs on UNIX Systems such as **Linux**, **FreeBSD** & **OSX**.
 
-## Getting Started
+## Usage
 
 Install:
 
@@ -22,76 +21,65 @@ Create a minimal project:
 
     protos create myapp --minimal
 
-Start the Server:
+Start server:
     
     node boot.js
 
-Server can also be started anywhere within the project's path:
+Start server within project's path:
 
     protos server
 
-Start a production server on port 8000:
+Start production server on port 8000:
 
     protos server --env production --port 8000
     
-Start the server and make a request:
+Start server and make a CURL request:
 
-    node boot.js /
+    node boot.js -X GET /
     
 Command Line Help:
 
     protos --help
-    
-Development tasks (tests, lint, etc):
 
-    make
-    
 
 ## Features
 
-- Powerful Routing
-- Environment-based configuration
-- Multicore friendly (IPC using event-based communication)
-- Hot Code Reloading (update the app without restarting)
-- Namespaced routes using Controllers
-- Authentication for each Controller
-- Route Filters for route preprocessing
-- Application Server supports SSL
-- Database Drivers (Mongodb, MySQL, PostgreSQL)
-- NoSQL Storages for Caching and Sessions (mongodb, redis)
-- Drivers & Storages share a similar API
-- Models with Object-Relational Mapping
-- Views, Helpers and Partials
-- Multiple View Engines supported out of the box
-- Synchronous and Asynchronous view engines
-- Built-in Node Inspector for Debugging
-- Organized Directory Structure
-- FileManager class to handle file uploads
-- Validator class to handle validation
-- JSON Responses, File Downloads
-- Get/Set Request specific data (shared between route handlers)
-- File-based Route Handlers (reusable request handlers)
-- File-based Business Logic
+- Regex-based Routing
+- Environment based configuration
+- Event based IPC
+- Hot Code Reloading
+- Authentication & Filters
+- SSL Server Support
+- Database Drivers: **MongoDB**, **MySQL**, **PostgreSQL**, **SQLite**
+- Storages for Caching and Sessions: **MongoDB**, **Redis**, **SQLite**
+- ORM Models API
+- View Engines: **EJS**, **Handlebars**, **Hogan.js**, **Markdown**, **Jade**
+- Debugging using Webkit Inspector
+- File Downloads, JSON Responses
+- File-based API
+- File-based Request Handlers
 - File-based Configuration
-- File-based Event Handlers (Hooks)
-- File-based Application Extensions
-- Client-side asset download via command line
-- Code Generation via command line
-
+- File-based Event Handlers
+- File-based Extensions
+- Code Generation
 
 ## Middleware
 
-- Asset Compiler and Minifier (LESS, CoffeeScript and Stylus)
+- Static File Server
+- Asset Compiler and Minifier: **LESS**, **CoffeeScript**, **Stylus**
+- Image Processing: **GraphicsMagick**, **ImageMagick**
+- Logger with Transports: **File**, **JSON**, **MongoDB**, **Redis**
 - Amazon Web Services
-- Bcrypt Password Hashing
 - Body Parser
 - Cookie Parser
 - CSRF Protection
-- Image Processing (GraphicsMagick, ImageMagick)
-- Logging via multiple transports (File, JSON, Mongodb, Redis)
-- Markdown Parser
+- Markdown
 - Mailer
 - REPL
+- BCrypt
 - Sessions
 - Shortcodes
-- Static File Server
+
+## License
+
+`protos` is [MIT Licensed](https://github.com/derdesign/protos/blob/master/LICENSE)
