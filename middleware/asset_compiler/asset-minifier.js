@@ -3,6 +3,7 @@
 
 var app = protos.app,
     fs = require('fs'),
+    path = require('path'),
     util = require('util'),
     config = app.asset_compiler,
     Multi = require('multi');
@@ -13,10 +14,12 @@ var uglifyjs = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_co
 var minifyTargets = Object.keys(config.minify);
 
 var compiler = new Multi({
-  getSource: function(file, callback) {
-    file = app.fullPath('public/' + file);
+  getSource: function(f, target, callback) {
+    file = app.fullPath('public/' + f);
     var ext = getExt(file);
-    var source = fs.readFileSync(file, 'utf-8').toString();
+    var source = fs.readFileSync(file, 'utf8').toString();
+    source = app.applyFilters('asset_compiler_minify_source', source, ext, f);
+    source = resolvePaths(source, f, target);
     if (ext in config.compilers) {
       config.compilers[ext](source, file, callback);
     } else {
@@ -32,7 +35,7 @@ function minification() {
     sources = config.minify[target];
     if (!Array.isArray(sources)) sources = [sources];
     sources.forEach(function(item, i) {
-      compiler.getSource(item);
+      compiler.getSource(item, target);
     });
     compiler.exec(function(err, compiled) {
       if (err) throw err;
@@ -54,6 +57,29 @@ function minification() {
       }
     });
   }
+}
+
+function resolvePaths(source, file, target) {
+  var root = app.fullPath('public');
+  var matches = source.match(/url\([^\)]+\)/g);
+  var targetPath = util.format('%s/%s', root, path.dirname(target));
+  if (matches) {
+    matches.forEach(function(match) {
+      var data = match.replace(/(^url\(|\)$)/g, '');
+      if (/^['"]*(data|http):/.test(data) === false ) { // Ignore data:uris and http://
+        var p = data.replace(/['"]+/g, '');
+        var filePath = path.resolve(util.format('%s/%s/%s', root, path.dirname(file), p));
+        p = path.relative(targetPath, filePath);
+        var replStr = util.format('url("%s")', p);
+        if (replStr != match) { // Avoid infinite loop
+          while (source.indexOf(match) >= 0) {
+            source = source.replace(match, replStr);
+          }
+        }
+      }
+    });
+  }
+  return source;
 }
 
 function minifyJS(code) {

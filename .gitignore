@@ -9,7 +9,9 @@
 /skeleton/public/test
 /test/fixtures/tmp
 /test/fixtures/*skeleton/public/*-style.css
+/test/fixtures/*skeleton/public/min.js
 /test/fixtures/*skeleton/public/assets/*.js
+/test/fixtures/*skeleton/public/min.css
 /test/fixtures/*skeleton/public/assets/*.css
 /test/fixtures/*skeleton/public/css/*.css
 /test/fixtures/*skeleton/public/css/subdir/*.css
