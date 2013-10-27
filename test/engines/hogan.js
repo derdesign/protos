@@ -9,4 +9,4 @@ app.addFilter(engine + '_template', function(data) {
   return data;
 });
 
-app.createEngineBatch('Hogan', engine, '/hogan.hg.html', module);
+app.createEngineBatch('Hogan', engine, '/hogan.mustache', module);

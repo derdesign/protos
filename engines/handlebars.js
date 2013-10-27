@@ -17,7 +17,7 @@ function Handlebars() {
 
   this.module = handlebars;
   this.multiPart = true;
-  this.extensions = ['handlebars', 'handlebars.html', 'hb.html'];
+  this.extensions = ['hb', 'hb.html'];
   partials = {partials: app.views.partials};
 
 }

@@ -11,7 +11,7 @@ function Plain() {
 
   this.module = null;
   this.multiPart = true;
-  this.extensions = ['txt', 'plain.html', 'plain.js'];
+  this.extensions = ['txt', 'txt.html'];
 
 }
 

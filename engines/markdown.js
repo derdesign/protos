@@ -32,7 +32,7 @@ function Markdown() {
 
   this.module = marked;
   this.multiPart = true;
-  this.extensions = ['md', 'markdown'];
+  this.extensions = ['md', 'md.html'];
 
 }
 

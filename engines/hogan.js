@@ -19,7 +19,7 @@ function Hogan() {
   
   this.module = hogan;
   this.multiPart = true;
-  this.extensions = ['hogan', 'hogan.html', 'hg.html', 'mustache'];
+  this.extensions = ['mustache'];
 
   app.once('after_init', function() {
     // App partials

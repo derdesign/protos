@@ -44,7 +44,7 @@ vows.describe('View Rendering').addBatch({
   'Plain View Engine': {
     
     'Registers valid extensions': function() {
-      assert.deepEqual(app.engines.plain.extensions, ['txt', 'plain.html', 'plain.js']);
+      assert.deepEqual(app.engines.plain.extensions, ['txt', 'txt.html']);
     },
     
     'Returns valid view buffer': function() {
@@ -58,7 +58,7 @@ vows.describe('View Rendering').addBatch({
   'Markdown View Engine': {
 
     'Registers valid extensions': function() {
-      assert.deepEqual(app.engines.markdown.extensions, ['md', 'markdown']);
+      assert.deepEqual(app.engines.markdown.extensions, ['md', 'md.html']);
     },
     
     'Returns valid view buffer': function() {
