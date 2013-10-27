@@ -85,7 +85,7 @@ function resolvePaths(source, file, target) {
 function minifyJS(code) {
   var ast, compressor, stream;
   ast = uglifyjs.parse(code, {});
-  compressor = uglifyjs.Compressor();
+  compressor = uglifyjs.Compressor({warnings: false});
   ast.figure_out_scope();
   ast = ast.transform(compressor);
   ast.figure_out_scope();
