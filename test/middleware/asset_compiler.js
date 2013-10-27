@@ -9,7 +9,7 @@ var app = require('../fixtures/bootstrap'),
     
 var multi = new Multi(app);
 
-var compiledLess, compiledStylus, compiledCoffee;
+var compiledLess, compiledStylus, compiledCoffee, assetCompilerMinifyComplete;
 
 vows.describe('Asset Compiler (middleware)').addBatch({
   
@@ -34,6 +34,11 @@ vows.describe('Asset Compiler (middleware)').addBatch({
             break;
         }
         return source;
+      });
+      
+      // Asset compiler minify complete event
+      app.on('asset_compiler_minify_complete', function() {
+        assetCompilerMinifyComplete = true;
       });
       
       // Load dependencies
@@ -162,6 +167,10 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
       var compiled2 = fs.readFileSync(app.fullPath('public/css/subdir/stylus-test.css')).toString('utf8');
       assert.equal(compiled1, '#layout {\n  width: 500px;\n}\n/* Coming from stylus-style.styl */\nbody {\n  background: #f2f2f2;\n}\n');
       assert.equal(compiled2, '/* Import using <updir> */\n#layout {\n  width: 500px;\n}\n');
+    },
+    
+    "Emits asset_compiler_minify_complete": function() {
+      assert.isTrue(assetCompilerMinifyComplete);
     }
     
   }

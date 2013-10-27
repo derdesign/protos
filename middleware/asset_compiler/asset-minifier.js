@@ -56,6 +56,8 @@ function minification() {
         minification();
       }
     });
+  } else {
+    app.emit('asset_compiler_minify_complete');
   }
 }
 
