@@ -711,12 +711,15 @@ vows.describe('lib/application.js').addBatch({
       });
 
       var promise = new EventEmitter();
+      
       multi.curl('/request-test');
       multi.curl('-X PUT /');
       multi.curl('-i http://google.com');
+
       multi.exec(function(err, results) {
         promise.emit('success', err || results);
       });
+      
       return promise;
     },
 

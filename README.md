@@ -3,6 +3,7 @@
 
 Protos is a Web Application Framework for Node.js. Runs on UNIX Systems such as **Linux**, **FreeBSD** & **OSX**.
 
+
 ## Usage
 
 Install:
@@ -55,6 +56,7 @@ Command Line Help:
 - ORM Models API
 - View Engines: **EJS**, **Handlebars**, **Hogan.js**, **Markdown**, **Jade**
 - Debugging using Webkit Inspector
+- Built-in Shortcode Parser
 - File Downloads, JSON Responses
 - File-based API
 - File-based Request Handlers
@@ -62,6 +64,7 @@ Command Line Help:
 - File-based Event Handlers
 - File-based Extensions
 - Code Generation
+
 
 ## Middleware
 
@@ -78,7 +81,7 @@ Command Line Help:
 - REPL
 - BCrypt
 - Sessions
-- Shortcodes
+
 
 ## License
 
