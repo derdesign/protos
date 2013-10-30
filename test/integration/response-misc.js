@@ -436,12 +436,13 @@ vows.describe('Response Misc').addBatch({
       });
       
       // Note: specific_context is set by doing res.setContext('specific')
+      // Note: Using app.filterContext() to test the method too
 
-      app.addFilter('specific_context', function(buffer, locals) {
+      app.filterContext('specific', function(buffer, locals) {
         return new Buffer(buffer).toString('base64');
       });
       
-      app.addFilter('another_context', function(buffer, locals) {
+      app.filterContext('another', function(buffer, locals) {
         return buffer + ' <<ANOTHER CONTEXT>>';
       });
       

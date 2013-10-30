@@ -43,6 +43,10 @@ vows.describe('lib/application.js').addBatch({
     'Sets application path': function() {
       assert.equal(app.path, protos.constructor.path + '/test/fixtures/' + app.skelDir);
     },
+    
+    'Sets shortcode object': function() {
+      assert.strictEqual(app.shortcode, protos.require('shortcode-parser'));
+    },
 
     'Sets default controller': function() {
       assert.instanceOf(app.controller, protos.lib.controller);
@@ -96,7 +100,7 @@ vows.describe('lib/application.js').addBatch({
         '$sanitize',
         '$wrap',
         '$escape',
-        '$safe_str' ];
+        '$sanitize_escape' ];
         
       var partials = Object.keys(app.views.partials);
         

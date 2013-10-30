@@ -21,7 +21,7 @@ function Hogan() {
   this.multiPart = true;
   this.extensions = ['mustache'];
 
-  app.once('after_init', function() {
+  app.once('init', function() {
     // App partials
     for (var p in app.views.partials) {
       var func = app.views.partials[p];
