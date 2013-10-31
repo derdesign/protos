@@ -18,24 +18,8 @@ hotCodeLoading = ./test/hot-code-loading.js
 # Make commands
 
 default:
-		@echo
-		@echo "Project Tasks:\n"
-		@echo "make deps             Install Dependencies"
-		@echo "make deps-all         Install All Dependencies"
-		@echo "make deps-clean       Removes the node_modules directory"
-		@echo "make lint             Run Code Analysis tool (scans entire project)"
-		@echo
-		@echo "Test Suites:\n"
-		@echo "make tests            Run All tests"
-		@echo "make test-unit        Run Unit tests"
-		@echo "make test-sto         Run Storage tests (testconfig required)"
-		@echo "make test-drv         Run Driver tests (testconfig required)"
-		@echo "make test-eng         Run View Engine tests"
-		@echo "make test-int         Run Integration tests"
-		@echo "make test-mid         Run Middleware tests"
-		@echo "make test-cmd         Run command line tests"
-		@echo
-
+		@echo; echo "Actions: tests | lint"; echo
+		
 deps:
 		@npm install -d
 		@./tools/remove-sys-notice
@@ -82,4 +66,4 @@ test-mid:
 test-cmd:
 		@${vows} ${vowsOpts} ${commandline}
 
-.PHONY: test docs
+.PHONY: test

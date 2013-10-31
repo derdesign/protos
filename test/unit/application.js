@@ -91,6 +91,7 @@ vows.describe('lib/application.js').addBatch({
         'header',
         'widget',
         'mydir_mywidget',
+        'shortcode_test',
         'main_ejs',
         'main_handlebars',
         'mailer_template',
@@ -99,6 +100,7 @@ vows.describe('lib/application.js').addBatch({
         '$link',
         '$sanitize',
         '$wrap',
+        '$uppercase',
         '$escape',
         '$sanitize_escape' ];
         
@@ -137,6 +139,7 @@ vows.describe('lib/application.js').addBatch({
         'language',
         'encoding',
         'rawViews',
+        'shortcodeFilter',
         'pageTitle',
         'headers',
         'cli',

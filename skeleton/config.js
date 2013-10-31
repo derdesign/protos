@@ -1,17 +1,17 @@
 
-/* Main Configuration */
-
 module.exports = {
   
-  title: "My Application",
+  title: 'My Application',
   language: 'en-US',
   encoding: 'utf-8',
-  rawViews: false,
   
-  pageTitle: "{title} &raquo; {desc}",
+  rawViews: false,
+  shortcodeFilter: true,
+  
+  pageTitle: '{title} &raquo; {desc}',
   
   headers: {
-    "Content-Type": function(req, res) { return "text/html;charset=" + this.config.encoding; },
+    "Content-Type": function(req, res) { return 'text/html;charset=' + this.config.encoding; },
     "Status": function(req, res) {  return res.statusCode + " " + this.httpStatusCodes[res.statusCode]; },
     "X-Powered-By": 'protos'
   },

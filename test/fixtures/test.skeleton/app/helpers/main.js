@@ -9,4 +9,8 @@ function MainHelper(app) {
   
 }
 
+MainHelper.prototype.uppercase = function(text) {
+  return text.toUpperCase();
+}
+
 module.exports = MainHelper;

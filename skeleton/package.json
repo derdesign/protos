@@ -1,6 +1,6 @@
 {
-  "name": "skeleton",
-  "description": "Protos Application Skeleton",
+  "name": "application",
+  "description": "Application",
   "version": "0.0.0",
   "main": "boot.js",
   "private": "true",

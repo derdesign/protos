@@ -299,6 +299,12 @@ function MainController(app) {
     res.json({success: 'true', url: req.url});
   });
   
+  /* Shortcodes */
+  
+  get('/shortcodes', function(req, res) {
+    res.render('shortcodes', true);
+  });
+  
 }
 
 module.exports = MainController;

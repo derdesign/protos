@@ -1,0 +1,18 @@
+{{! 
+
+  Tested in this partial:
+
+  * View locals can be accessed
+  * The locals object is available (__proto__ is working)
+  * Shortcode parameters can be accessed
+  * Shortcodes are parsed within partial output recursively
+  * Wrapped content is passed in content parameter, exposed as a view local
+
+}}<!-- [start] -->
+<h2 id="page-title">{{locals.app.config.title}}</h2>
+{{#upper}}[#uppercase]{{/upper}}<p>Your name is {{name}}{{#cool}}, and you are awesome!!!{{/cool}}</p>{{#upper}}[/uppercase]{{/upper}}{{#content}}
+<h2>Something about you:</h2>
+<div class="content">
+{{{content}}}
+</div><!-- .content -->{{/content}}
+<!-- [/end] -->

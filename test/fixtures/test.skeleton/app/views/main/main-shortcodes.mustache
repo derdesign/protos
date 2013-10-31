@@ -1,0 +1,14 @@
+[shortcode_test upper name=Ernie cool=true /]
+
+[shortcode_test name="Sir John Doe" cool=false]
+... This is some content ...
+[/shortcode_test]
+
+[#escape]<strong>Hello World! [Brackets] and {Braces} are escaped!!!.</strong>[/escape]
+
+[#uppercase][#sanitize_escape]
+<div class="valid" id="blah">
+  <p data-bad-value="1">Hello World!</p>
+  <script type="text/javascript">window.location = 'http://google.com';</script>
+</div><!-- .valid -->
+[/sanitize_escape][/uppercase]

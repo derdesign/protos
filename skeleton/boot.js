@@ -9,13 +9,11 @@ Protos.bootstrap(__dirname, {
     host: 'localhost',
     port: 8080,
     multiProcess: false,
-    stayUp: 'production'
+    stayUp: true
   },
 
   environments: {
-    default: 'development',
-    development: function(app) { },
-    production: function(app) { }
+    default: 'development'
   },
   
   events: {
