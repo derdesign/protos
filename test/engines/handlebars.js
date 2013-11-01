@@ -9,4 +9,4 @@ app.addFilter(engine + '_template', function(data) {
   return data;
 });
 
-app.createEngineBatch('Handlebars', engine, '/handlebars.hb.html', module);
+app.createEngineBatch('Handlebars', engine, '/handlebars.hbs', module);
