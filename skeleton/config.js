@@ -11,9 +11,9 @@ module.exports = {
   pageTitle: '{title} &raquo; {desc}',
   
   headers: {
-    "Content-Type": function(req, res) { return 'text/html;charset=' + this.config.encoding; },
-    "Status": function(req, res) {  return res.statusCode + " " + this.httpStatusCodes[res.statusCode]; },
-    "X-Powered-By": 'protos'
+    'Content-Type': function(req, res) { return 'text/html;charset=' + this.config.encoding; },
+    'Status': function(req, res) {  return res.statusCode + ' ' + this.httpStatusCodes[res.statusCode]; },
+    'X-Powered-By': 'protos'
   },
   
   cli: {

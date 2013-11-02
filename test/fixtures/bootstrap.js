@@ -67,6 +67,9 @@ var protos = Protos.bootstrap(testSkeleton, {
           protos.loadStorages('mongodb', 'redis', 'sqlite');
           protos.loadEngines('ejs', 'handlebars', 'hogan', 'jade', 'plain', 'markdown');
         },
+        middleware: function(app) {
+          app.__middlewareEventEmitted = true;
+        },
         pre_init: function(app) {
           
           // Partials watching

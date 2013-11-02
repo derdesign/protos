@@ -14,7 +14,7 @@ MainHelper.prototype.uppercase = function(text) {
 }
 
 MainHelper.prototype.hbtest = function(text, options) {
-  return JSON.stringify([].slice.call(arguments, 0));
+  return JSON.stringify(Array.prototype.slice.call(arguments, 0));
 }
 
 module.exports = MainHelper;

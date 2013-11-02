@@ -121,6 +121,10 @@ vows.describe('lib/application.js').addBatch({
 
     },
     
+    "Properly emits the 'middleware' event": function() {
+      assert.isTrue(app.__middlewareEventEmitted);
+    },
+    
     "Properly emits the 'view_partials_loaded' event": function() {
       assert.strictEqual(app.__viewPartialsEventParam, app.views.partials);
     },

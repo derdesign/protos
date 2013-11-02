@@ -60,8 +60,8 @@ function Markdown(config, middleware) {
     configurable: true
   });
   
-  // Register Markdown view helpers
-  registerViewHelpers(this);
+  // Expose markdown.parse as `$markdown` view helper
+  app.registerViewHelper('markdown', this.parse, this);
   
 }
 
@@ -90,18 +90,6 @@ Markdown.prototype.parse = function(str, sanitize) {
   var html = marked(str, this.config), type = typeof sanitize;
   if ( (type == 'undefined' && this.sanitize) || (type == 'boolean' && sanitize) ) sanitize = true;
   return sanitize ? sanitizer.sanitize(html, this.sanitizeURI) : html;
-}
-
-/**
-  Registers View Helpers
-  
-  @param {object} markdown
-  @private
- */
-
-function registerViewHelpers(markdown) {
-  // Expose markdown.parse as `$markdown`
-  app.registerViewHelper('markdown', markdown.parse, markdown);
 }
 
 module.exports = Markdown;

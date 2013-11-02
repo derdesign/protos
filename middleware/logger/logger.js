@@ -22,14 +22,9 @@ var app = protos.app,
     pathModule = require('path'),
     inflect = protos.require('./lib/support/inflect.js');
 
-// Create log directory if present
-app.mkdir('log');
-    
 var slice = Array.prototype.slice;
 
-var Application = app.constructor;
-
-var accessLog;
+var accessLog, Application = app.constructor;
 
 function Logger(config, middleware) {
   
@@ -144,6 +139,9 @@ Logger.prototype.unmute = function() {
 }
 
 Logger.prototype.enableAccessLog = function(config) {
+
+  // Create log directory if file transport used
+  if (config.file) app.mkdir('log');
   
   // Cache access log format function
   var self = this, format, accessLogFormat;
@@ -244,7 +242,7 @@ function getLogCallback(level) {
 
 function createLoggingLevels(config) {
 
-  var level, options, transports;
+  var level, options, transports, createDir;
   this.transports = {};
 
   for (level in config) {
@@ -264,6 +262,9 @@ function createLoggingLevels(config) {
       if (!transports[transport]) continue; // Ignore if transport's config is false
 
       if (transport in logTransports) {
+        
+        if (transport == 'file') app.mkdir('log'); // Create log directory if using file transport
+        
         var instance, evt = level + '_log',
         Ctor = logTransports[transport];
 
@@ -295,8 +296,11 @@ function createLoggingLevels(config) {
         } else {
           throw new Error("Logger: transport not found: " + transport);
         }
+        
       }
+      
     }
+
   }
 
 module.exports = Logger;

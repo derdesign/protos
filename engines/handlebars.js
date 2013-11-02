@@ -4,7 +4,7 @@
 var app = protos.app;
 var handlebars = protos.requireDependency('handlebars', 'Handlebars Engine');
 var util = require('util');
-var slice = [].slice;
+var slice = Array.prototype.slice;
 
 var SafeString = handlebars.SafeString;
     
@@ -80,7 +80,7 @@ app.on('view_partials_loaded', function(ob) {
     throw new Error("The 'partial' helper is reserved by the Handlebars Engine.");
   }
 
-  var slice = [].slice;
+  var slice = Array.prototype.slice;
   
   Object.keys(ob).forEach(function(name) {
     var func = ob[name];

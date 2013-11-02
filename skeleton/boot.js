@@ -1,7 +1,5 @@
 
-var Protos = require('protos');
-
-Protos.bootstrap(__dirname, {
+module.exports = require('protos').bootstrap(__dirname, {
 
   debugLog: false,
 
@@ -20,14 +18,11 @@ Protos.bootstrap(__dirname, {
     components: function(protos) {
       protos.loadDrivers();
       protos.loadStorages();
-      protos.loadEngines('ejs');
+      protos.loadEngines('handlebars');
     },
-    init: function(app) {
+    middleware: function(app) {
       app.use('logger');
     }
   }
 
-});
-
-module.exports = protos.app;
-
+}).app;
