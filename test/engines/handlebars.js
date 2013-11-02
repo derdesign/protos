@@ -5,7 +5,6 @@ var engine = 'handlebars';
 
 app.addFilter(engine + '_template', function(data) {
   data = app.addEnginePartials(engine, data, '{{> main_%s}}');
-  // console.exit(data);
   return data;
 });
 

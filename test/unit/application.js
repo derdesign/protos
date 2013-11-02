@@ -97,6 +97,8 @@ vows.describe('lib/application.js').addBatch({
         'mailer_template',
         'main_hogan',
         'main_jade',
+        'handlebars_test',
+        '$hbtest',
         '$link',
         '$sanitize',
         '$wrap',
@@ -119,11 +121,15 @@ vows.describe('lib/application.js').addBatch({
 
     },
     
+    "Properly emits the 'view_partials_loaded' event": function() {
+      assert.strictEqual(app.__viewPartialsEventParam, app.views.partials);
+    },
+    
     'Properly runs application event hooks': function() {
       assert.isTrue(app.hooks.init.__loaded);
       assert.isTrue(app.hooks.pre_init.__loaded);
     }
-    
+
   }
 
 }).addBatch({

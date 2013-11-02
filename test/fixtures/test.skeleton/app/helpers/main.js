@@ -13,4 +13,8 @@ MainHelper.prototype.uppercase = function(text) {
   return text.toUpperCase();
 }
 
+MainHelper.prototype.hbtest = function(text, options) {
+  return JSON.stringify([].slice.call(arguments, 0));
+}
+
 module.exports = MainHelper;

@@ -38,6 +38,8 @@ vows.describe('View Shortcodes').addBatch({
       'main_handlebars',
       'main_hogan',
       'main_jade',
+      'handlebars_test',
+      '#hbtest',
       '#wrap',
       '#sanitize',
       '#escape',
@@ -49,6 +51,10 @@ vows.describe('View Shortcodes').addBatch({
         assert.isFunction(app.__shortcodeContext[handler]);
       });
       
+    },
+    
+    "The 'view_shortcodes_loaded' event is emitted": function() {
+      assert.strictEqual(app.__viewShortcodesEventParam, app.__shortcodeContext);
     }
     
   },

@@ -5,6 +5,8 @@ var app = protos.app;
 var handlebars = protos.requireDependency('handlebars', 'Handlebars Engine');
 var util = require('util');
 var slice = [].slice;
+
+var SafeString = handlebars.SafeString;
     
 /**
   Handlebars engine class
@@ -49,9 +51,13 @@ function partialHelper() {
   var params = options.hash;
   var partial = args[0];
   if (partial && partial in partials) {
-    this.__proto__ = args[1] || params.locals || {};
+    if (this.locals !== this) {
+      // Avoid cyclic __proto__ value by checking if
+      // the 'this' object is is indeed the locals object
+      this.__proto__ = args[1] || params.locals || {};
+    }
     params.__proto__ = this;
-    return new handlebars.SafeString(partials[partial](params));
+    return new SafeString(partials[partial](params));
   } else {
     return '';
   }
@@ -84,7 +90,8 @@ app.on('view_partials_loaded', function(ob) {
         var options = args.pop();
         var params = options.hash;
         var content = options.fn instanceof Function ? options.fn(this) : '';
-        return func.apply(null, [content].concat(args).concat([params]));
+        var out = func.apply(null, [content].concat(args).concat([params]));
+        return new SafeString(out);
       }
     } else { // Partials
       optionsContext.partials[name] = ob[name]; // Can be passed as-is

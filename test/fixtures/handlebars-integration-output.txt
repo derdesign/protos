@@ -1,0 +1,118 @@
+# Helpers
+
+["","one","two","three",{}]
+["","one","two","three",{"alpha":1,"beta":2,"gamma":3}]
+["",{"alpha":1,"beta":2,"gamma":3}]
+["",{}]
+[".",{}]
+["..","one","two",{}]
+["...","one","two",{"alpha":1,"beta":2,"gamma":3}]
+["....",{"alpha":1,"beta":2,"gamma":3}]
+
+# Partial running on global context
+
+[locals] app.config.title: "My Application"
+
+# Partial running on context
+
+[locals] app.config.title: ""
+[context] title: "One"
+
+[locals] app.config.title: ""
+[context] title: "Two"
+
+[locals] app.config.title: ""
+[context] title: "Three"
+
+# Partial running with partials helper
+
+[locals] app.config.title: ""
+[context] title: "One"
+
+[locals] app.config.title: ""
+[context] title: "Two"
+
+[locals] app.config.title: ""
+[context] title: "Three"
+
+# Partial running with partials helper + locals argument
+
+[locals] app.config.title: "My Application"
+[context] title: "One"
+
+[locals] app.config.title: "My Application"
+[context] title: "Two"
+
+[locals] app.config.title: "My Application"
+[context] title: "Three"
+
+# Partial running with partials helper + locals parameter
+
+[locals] app.config.title: "My Application"
+[context] title: "One"
+
+[locals] app.config.title: "My Application"
+[context] title: "Two"
+
+[locals] app.config.title: "My Application"
+[context] title: "Three"
+
+# Partial running with partials helper + parameters
+
+[locals] app.config.title: ""
+[context] title: "One"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+[locals] app.config.title: ""
+[context] title: "Two"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+[locals] app.config.title: ""
+[context] title: "Three"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+# Partial running with partials helper + parameters + local argument
+
+[locals] app.config.title: "My Application"
+[context] title: "One"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+[locals] app.config.title: "My Application"
+[context] title: "Two"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+[locals] app.config.title: "My Application"
+[context] title: "Three"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+# Partial running with partials helper + parameters + local parameter
+
+[locals] app.config.title: "My Application"
+[context] title: "One"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+[locals] app.config.title: "My Application"
+[context] title: "Two"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"
+
+[locals] app.config.title: "My Application"
+[context] title: "Three"
+[params] alpha: "1"
+[params] beta: "2"
+[params] gamma: "3"

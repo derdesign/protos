@@ -5,7 +5,7 @@ var app = require('../fixtures/bootstrap'),
     assert = require('assert'),
     Multi = require('multi'),
     EventEmitter = require('events').EventEmitter;
-
+    
 vows.describe('View Rendering').addBatch({
   
   'View Messages (#msg template not present)': {
@@ -70,32 +70,33 @@ vows.describe('View Rendering').addBatch({
     
   }
   
+}).addBatch({
+  
+  'Handlebars Integration': {
+    
+    topic: function() {
+      
+      var multi = new Multi(app);
+      var promise = new EventEmitter();
+      
+      multi.curl('/handlebars-integration');
+      
+      multi.on('pre_exec', app.backupFilters);
+      multi.on('post_exec', app.restoreFilters);
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results[0])
+      });
+          
+      return promise;
+      
+    },
+    
+    "Provides expected output": function(buf) {
+      var output = fs.readFileSync('test/fixtures/handlebars-integration-output.txt', 'utf8');
+      assert.equal(buf, output);
+    }
+    
+  }
+  
 }).export(module);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

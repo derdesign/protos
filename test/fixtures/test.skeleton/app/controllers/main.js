@@ -305,6 +305,14 @@ function MainController(app) {
     res.render('shortcodes', true);
   });
   
+  /* Handlebars Integration */
+  
+  get('/handlebars-integration', function(req, res) {
+    res.render('handlebars-integration', {
+      posts: [{title: "One"}, {title: "Two"}, {title: "Three"}]
+    }, true);
+  });
+  
 }
 
 module.exports = MainController;

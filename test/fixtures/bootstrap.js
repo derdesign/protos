@@ -75,6 +75,16 @@ var protos = Protos.bootstrap(testSkeleton, {
           // Handler tests
           app.handlerTests = {};
           
+          // View Partial and Shortcode Events
+          
+          app.on('view_partials_loaded', function(partials) {
+            app.__viewPartialsEventParam = partials;
+          });
+          
+          app.on('view_shortcodes_loaded', function(shortcodes) {
+            app.__viewShortcodesEventParam = shortcodes;
+          });
+          
           // Test skeleton properties
           app.skelDir = skelDir;
           app.__initBootstrapEvent = true;

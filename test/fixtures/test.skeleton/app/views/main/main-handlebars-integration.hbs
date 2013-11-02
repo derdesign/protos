@@ -1,0 +1,43 @@
+# Helpers
+
+{{hbtest "one" "two" "three"}}
+{{hbtest "one" "two" "three" alpha=1 beta=2 gamma=3}}
+{{hbtest alpha=1 beta=2 gamma=3}}
+{{#hbtest}}{{/hbtest}}
+{{#hbtest}}.{{/hbtest}}
+{{#hbtest "one" "two"}}..{{/hbtest}}
+{{#hbtest "one" "two" alpha=1 beta=2 gamma=3}}...{{/hbtest}}
+{{#hbtest alpha=1 beta=2 gamma=3}}....{{/hbtest}}
+
+# Partial running on global context
+
+{{> handlebars_test}}
+
+# Partial running on context
+{{#each posts}}
+{{> handlebars_test}}
+{{/each}}
+# Partial running with partials helper
+{{#each posts}}
+{{partial "handlebars_test"}}
+{{/each}}
+# Partial running with partials helper + locals argument
+{{#each posts}}
+{{partial "handlebars_test" ../locals}}
+{{/each}}
+# Partial running with partials helper + locals parameter
+{{#each posts}}
+{{partial "handlebars_test" locals=../locals}}
+{{/each}}
+# Partial running with partials helper + parameters
+{{#each posts}}
+{{partial "handlebars_test" alpha=1 beta=2 gamma=3}}
+{{/each}}
+# Partial running with partials helper + parameters + local argument
+{{#each posts}}
+{{partial "handlebars_test" ../locals alpha=1 beta=2 gamma=3}}
+{{/each}}
+# Partial running with partials helper + parameters + local parameter
+{{#each posts}}
+{{partial "handlebars_test" alpha=1 beta=2 gamma=3 locals=../locals}}
+{{/each}}
