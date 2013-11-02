@@ -53,7 +53,7 @@ function partialHelper() {
   if (partial && partial in partials) {
     if (this.locals !== this) {
       // Avoid cyclic __proto__ value by checking if
-      // the 'this' object is is indeed the locals object
+      // the 'this' object is indeed the locals object
       this.__proto__ = args[1] || params.locals || {};
     }
     params.__proto__ = this;
