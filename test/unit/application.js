@@ -151,7 +151,6 @@ vows.describe('lib/application.js').addBatch({
         'cli',
         'cacheControl',
         'json',
-        'engines',
         'viewExtensions',
         'alpha',
         'beta',

@@ -17,8 +17,8 @@ module.exports = {
   },
   
   cli: {
-    viewExt: 'html',
-    partialExt: 'html'
+    viewExt: 'hbs',
+    partialExt: 'hbs'
   },
   
   cacheControl: {
@@ -35,11 +35,7 @@ module.exports = {
     contentType: 'application/json;charset=utf-8',
     connection: 'close'
   },
-  
-  engines: {
-    ejs: {open: '<?', close: '?>'}
-  },
-  
+
   viewExtensions: {
     html: 'ejs'
   }

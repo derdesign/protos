@@ -82,8 +82,8 @@ Created myapp/app/controllers/admin.js\n» \
 Created myapp/app/controllers/dashboard.js\n» \
 Created myapp/app/helpers/admin.js\n» \
 Created myapp/app/helpers/dashboard.js\n» \
-Created myapp/app/views/admin/admin-index.html\n» \
-Created myapp/app/views/dashboard/dashboard-index.html\n» \
+Created myapp/app/views/admin/admin-index.hbs\n» \
+Created myapp/app/views/dashboard/dashboard-index.hbs\n» \
 Downloading Skeleton Mobile-Friendly Responsive Framework\n» \
 Downloading Ember.js JavaScript Framework';
 
@@ -107,9 +107,9 @@ Downloading Ember.js JavaScript Framework';
     },
     
     "Creates views": function() {
-      assert.isTrue(fs.existsSync('myapp/app/views/main/main-index.html'));
-      assert.isTrue(fs.existsSync('myapp/app/views/admin/admin-index.html'));
-      assert.isTrue(fs.existsSync('myapp/app/views/dashboard/dashboard-index.html'));
+      assert.isTrue(fs.existsSync('myapp/app/views/main/main-index.hbs'));
+      assert.isTrue(fs.existsSync('myapp/app/views/admin/admin-index.hbs'));
+      assert.isTrue(fs.existsSync('myapp/app/views/dashboard/dashboard-index.hbs'));
     }
     
   }
@@ -135,13 +135,13 @@ Downloading Ember.js JavaScript Framework';
     "Properly generates controllers": function(results) {
       var r1 = results[0];
       var expected =  '» Created myapp1/app/controllers/blog.js\n» Created myapp1/app/controllers/admin.js\n\
-» Created myapp1/app/views/blog/blog-index.html\n» Created myapp1/app/views/admin/admin-index.html';
+» Created myapp1/app/views/blog/blog-index.hbs\n» Created myapp1/app/views/admin/admin-index.hbs';
 
       assert.equal(r1, expected);
       assert.isTrue(fs.existsSync('app/controllers/blog.js'));
       assert.isTrue(fs.existsSync('app/controllers/admin.js'));
-      assert.isTrue(fs.existsSync('app/views/blog/blog-index.html'));
-      assert.isTrue(fs.existsSync('app/views/admin/admin-index.html'));
+      assert.isTrue(fs.existsSync('app/views/blog/blog-index.hbs'));
+      assert.isTrue(fs.existsSync('app/views/admin/admin-index.hbs'));
       
       var expectedBuf = fs.readFileSync('app/controllers/blog.js', 'utf8').trim();
       
@@ -415,7 +415,7 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
       var promise = new EventEmitter();
 
       protos.command('view main/info blog/post admin/settings.jade,update.mustache,user');
-      protos.command('view main/m1 blog/m2 admin/m3 --ext eco.html');
+      protos.command('view main/m1 blog/m2 admin/m3 --ext eco.hbs');
 
       protos.exec(function(err, results) {
         promise.emit('success', err || results);
@@ -427,27 +427,27 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
     "Properly generates views": function(results) {
       var r1 = results[0];
       
-      var expected = '» Created myapp1/app/views/main/main-info.html\n» Created myapp1/app/views/blog/blog-post.html\n» \
+      var expected = '» Created myapp1/app/views/main/main-info.hbs\n» Created myapp1/app/views/blog/blog-post.hbs\n» \
 Created myapp1/app/views/admin/settings.jade\n» Created myapp1/app/views/admin/update.mustache\n» \
-Created myapp1/app/views/admin/admin-user.html';
+Created myapp1/app/views/admin/admin-user.hbs';
 
       assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('app/views/main/main-info.html'));
-      assert.isTrue(fs.existsSync('app/views/blog/blog-post.html'));
+      assert.isTrue(fs.existsSync('app/views/main/main-info.hbs'));
+      assert.isTrue(fs.existsSync('app/views/blog/blog-post.hbs'));
       assert.isTrue(fs.existsSync('app/views/admin/settings.jade'));
       assert.isTrue(fs.existsSync('app/views/admin/update.mustache'));
-      assert.isTrue(fs.existsSync('app/views/admin/admin-user.html'));
+      assert.isTrue(fs.existsSync('app/views/admin/admin-user.hbs'));
     },
     
     "Uses custom extensions when using --ext": function(results) {
       var r2 = results[1];
-      var expected =  '» Created myapp1/app/views/main/main-m1.eco.html\n» \
-Created myapp1/app/views/blog/blog-m2.eco.html\n» Created myapp1/app/views/admin/admin-m3.eco.html';
+      var expected =  '» Created myapp1/app/views/main/main-m1.eco.hbs\n» \
+Created myapp1/app/views/blog/blog-m2.eco.hbs\n» Created myapp1/app/views/admin/admin-m3.eco.hbs';
 
       assert.equal(r2, expected);
-      assert.isTrue(fs.existsSync('app/views/main/main-m1.eco.html'));
-      assert.isTrue(fs.existsSync('app/views/blog/blog-m2.eco.html'));
-      assert.isTrue(fs.existsSync('app/views/admin/admin-m3.eco.html'));
+      assert.isTrue(fs.existsSync('app/views/main/main-m1.eco.hbs'));
+      assert.isTrue(fs.existsSync('app/views/blog/blog-m2.eco.hbs'));
+      assert.isTrue(fs.existsSync('app/views/admin/admin-m3.eco.hbs'));
     }
     
     
@@ -473,11 +473,11 @@ Created myapp1/app/views/blog/blog-m2.eco.html\n» Created myapp1/app/views/admi
 
       "Properly generates view partials": function(results) {
         var r1 = results[0];
-        var expected =  '» Created myapp1/app/views/blog/partials/post.html\n» Created myapp1/app/views/admin/partials/widget.html';
+        var expected =  '» Created myapp1/app/views/blog/partials/post.hbs\n» Created myapp1/app/views/admin/partials/widget.hbs';
 
         assert.equal(r1, expected);
-        assert.isTrue(fs.existsSync('app/views/blog/partials/post.html'));
-        assert.isTrue(fs.existsSync('app/views/admin/partials/widget.html'));
+        assert.isTrue(fs.existsSync('app/views/blog/partials/post.hbs'));
+        assert.isTrue(fs.existsSync('app/views/admin/partials/widget.hbs'));
       },
 
       "Uses custom extensions when using --ext": function(results) {
@@ -510,16 +510,16 @@ Created myapp1/app/views/blog/blog-m2.eco.html\n» Created myapp1/app/views/admi
 
     "Properly generates layout partials": function(results) {
       var r1 = results[0];
-      var expected =  '» Created myapp1/app/views/__layout/sidebar/display.html\n» Created myapp1/app/views/__layout/sidebar\
-/posts.jade\n» Created myapp1/app/views/__layout/sidebar/pages.html\n» Created myapp1/app/views/__layout/hello.mustache\n» \
-Created myapp1/app/views/__layout/nice/partial.html';
+      var expected =  '» Created myapp1/app/views/__layout/sidebar/display.hbs\n» Created myapp1/app/views/__layout/sidebar\
+/posts.jade\n» Created myapp1/app/views/__layout/sidebar/pages.hbs\n» Created myapp1/app/views/__layout/hello.mustache\n» \
+Created myapp1/app/views/__layout/nice/partial.hbs';
       
       assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('app/views/__layout/sidebar/display.html'));
+      assert.isTrue(fs.existsSync('app/views/__layout/sidebar/display.hbs'));
       assert.isTrue(fs.existsSync('app/views/__layout/sidebar/posts.jade'));
-      assert.isTrue(fs.existsSync('app/views/__layout/sidebar/pages.html'));
+      assert.isTrue(fs.existsSync('app/views/__layout/sidebar/pages.hbs'));
       assert.isTrue(fs.existsSync('app/views/__layout/hello.mustache'));
-      assert.isTrue(fs.existsSync('app/views/__layout/nice/partial.html'));
+      assert.isTrue(fs.existsSync('app/views/__layout/nice/partial.hbs'));
     },
 
     "Uses custom extensions when using --ext": function(results) {
@@ -552,17 +552,17 @@ Created myapp1/app/views/__layout/nice/partial.html';
 
     "Properly generates static views": function(results) {
       var r1 = results[0];
-      var expected =  '» Created myapp1/app/views/__static/category/post.html\n» Created myapp1/app/views/__static/category/\
-archive.jade\n» Created myapp1/app/views/__static/category/display.html\n» Created myapp1/app/views/__static/about.html\n» \
-Created myapp1/app/views/__static/archive/2009/09/index.html\n» Created myapp1/app/views/__static/archive/2009/09/display\
+      var expected =  '» Created myapp1/app/views/__static/category/post.hbs\n» Created myapp1/app/views/__static/category/\
+archive.jade\n» Created myapp1/app/views/__static/category/display.hbs\n» Created myapp1/app/views/__static/about.hbs\n» \
+Created myapp1/app/views/__static/archive/2009/09/index.hbs\n» Created myapp1/app/views/__static/archive/2009/09/display\
 .mustache';
       
       assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('app/views/__static/category/post.html'));
+      assert.isTrue(fs.existsSync('app/views/__static/category/post.hbs'));
       assert.isTrue(fs.existsSync('app/views/__static/category/archive.jade'));
-      assert.isTrue(fs.existsSync('app/views/__static/category/display.html'));
-      assert.isTrue(fs.existsSync('app/views/__static/about.html'));
-      assert.isTrue(fs.existsSync('app/views/__static/archive/2009/09/index.html'));
+      assert.isTrue(fs.existsSync('app/views/__static/category/display.hbs'));
+      assert.isTrue(fs.existsSync('app/views/__static/about.hbs'));
+      assert.isTrue(fs.existsSync('app/views/__static/archive/2009/09/index.hbs'));
       assert.isTrue(fs.existsSync('app/views/__static/archive/2009/09/display.mustache'));
     },
 
@@ -596,17 +596,17 @@ Created myapp1/app/views/__static/archive/2009/09/index.html\n» Created myapp1/
 
     "Properly generates restricted views": function(results) {
       var r1 = results[0];
-      var expected =  '» Created myapp1/app/views/__restricted/category/post.html\n» Created myapp1/app/views/__restricted/category/\
-archive.jade\n» Created myapp1/app/views/__restricted/category/display.html\n» Created myapp1/app/views/__restricted/about.html\n» \
-Created myapp1/app/views/__restricted/archive/2009/09/index.html\n» Created myapp1/app/views/__restricted/archive/2009/09/display\
+      var expected =  '» Created myapp1/app/views/__restricted/category/post.hbs\n» Created myapp1/app/views/__restricted/category/\
+archive.jade\n» Created myapp1/app/views/__restricted/category/display.hbs\n» Created myapp1/app/views/__restricted/about.hbs\n» \
+Created myapp1/app/views/__restricted/archive/2009/09/index.hbs\n» Created myapp1/app/views/__restricted/archive/2009/09/display\
 .mustache';
 
       assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('app/views/__restricted/category/post.html'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/category/post.hbs'));
       assert.isTrue(fs.existsSync('app/views/__restricted/category/archive.jade'));
-      assert.isTrue(fs.existsSync('app/views/__restricted/category/display.html'));
-      assert.isTrue(fs.existsSync('app/views/__restricted/about.html'));
-      assert.isTrue(fs.existsSync('app/views/__restricted/archive/2009/09/index.html'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/category/display.hbs'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/about.hbs'));
+      assert.isTrue(fs.existsSync('app/views/__restricted/archive/2009/09/index.hbs'));
       assert.isTrue(fs.existsSync('app/views/__restricted/archive/2009/09/display.mustache'));
     },
 

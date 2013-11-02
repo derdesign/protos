@@ -176,12 +176,12 @@ vows.describe('Request Misc').addBatch({
 
     "Sets default page title": function(results) {
       var r = results[0];
-      assert.equal(r, '{My Application}');
+      assert.equal(r, '#My Application#');
     },
     
     "Sets custom page title": function(results) {
       var r = results[1];
-      assert.equal(r, '{My Application &raquo; Hello World}');
+      assert.equal(r, '#My Application &raquo; Hello World#');
     },
     
     "Gets & Sets metadata/view locals": function(results) {

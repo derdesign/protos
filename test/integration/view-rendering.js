@@ -36,32 +36,32 @@ vows.describe('View Rendering').addBatch({
     },
 
     'Returns valid paths for aliases & filenames': function(res) {
-      assert.strictEqual(res.getViewPath('index'), vPath('main/main-index.html'));
-      assert.strictEqual(res.getViewPath('main-index'), vPath('main/main-index.html'));
-      assert.strictEqual(res.getViewPath('main-index.html'), vPath('main/main-index.html'));
-      assert.strictEqual(res.getViewPath('index.html'), vPath('main/index.html'));
+      assert.strictEqual(res.getViewPath('index'), vPath('main/main-index.hbs'));
+      assert.strictEqual(res.getViewPath('main-index'), vPath('main/main-index.hbs'));
+      assert.strictEqual(res.getViewPath('main-index.hbs'), vPath('main/main-index.hbs'));
+      assert.strictEqual(res.getViewPath('index.hbs'), vPath('main/index.hbs'));
     },
 
     'Returns valid paths for @layout views': function(res) {
       assert.strictEqual(res.getViewPath('@header'), vPath('__layout/header.mustache'));
-      assert.strictEqual(res.getViewPath('@header.html'), vPath('__layout/header.html'));
+      assert.strictEqual(res.getViewPath('@header.hbs'), vPath('__layout/header.hbs'));
     },
 
     'Returns valid paths for #restricted views': function(res) {
       assert.strictEqual(res.getViewPath('#404'), vPath('__restricted/404.mustache'));
-      assert.strictEqual(res.getViewPath('#404.html'), vPath('__restricted/404.html'));
+      assert.strictEqual(res.getViewPath('#404.hbs'), vPath('__restricted/404.hbs'));
       assert.strictEqual(res.getViewPath('#dir/view'), vPath('__restricted/dir/view.mustache'));
-      assert.strictEqual(res.getViewPath('#dir/view.html'), vPath('__restricted/dir/view.html'));
+      assert.strictEqual(res.getViewPath('#dir/view.hbs'), vPath('__restricted/dir/view.hbs'));
     },
 
     'Returns valid paths relative to views/': function(res) {
-      assert.strictEqual(res.getViewPath('main/index'), vPath('main/main-index.html'));
-      assert.strictEqual(res.getViewPath('/main/index'), vPath('main/main-index.html'));
-      assert.strictEqual(res.getViewPath('main/index.html'), vPath('main/index.html'));
+      assert.strictEqual(res.getViewPath('main/index'), vPath('main/main-index.hbs'));
+      assert.strictEqual(res.getViewPath('/main/index'), vPath('main/main-index.hbs'));
+      assert.strictEqual(res.getViewPath('main/index.hbs'), vPath('main/index.hbs'));
     },
 
     'Returns valid paths for static views': function(res) {
-      assert.strictEqual(res.getViewPath('/static'), vPath('__static/static.html'));
+      assert.strictEqual(res.getViewPath('/static'), vPath('__static/static.hbs'));
       assert.strictEqual(res.getViewPath('/static.mustache'), vPath('__static/static.mustache'));
     }
 
