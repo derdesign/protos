@@ -1,0 +1,46 @@
+
+# This is a heading
+
+A paragraph **with** some *text* and a [Link](http://example.com).
+
+# Prettify extension
+
+Should render the proper class:
+
+```javascript
+var http = require('http');
+```
+
+This is some `code`.
+
+# Rendering misc
+
+> The contents 
+> of a
+> blockquote
+
+And some amazing ~~strikethrough~~ text (github extension enabled by default)
+
+# Sanitize
+
+The sanitize option is enabled by default, so nothing should be 
+visible below this line.
+
+<script type="text/javascript">window.location = 'http://example.com'</script>
+
+# Sanitize URL Policy
+
+According to the sanitize URL policy, links will be filtered according to
+the specified policy in config:
+
+[Link](http://example.com)
+[Link](http://google.com)
+
+# Tables
+
+The tables extension is enabled by default
+
+| Col 1   | Col 2                                              |
+|======== |====================================================|
+|**bold** | ![Valid XHTML] (http://w3.org/Icons/valid-xhtml10) |
+| Plain   | Value                                              |

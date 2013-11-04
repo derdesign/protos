@@ -24,9 +24,11 @@
     
  */
 
-var app = protos.app,
-    marked = protos.requireDependency('marked', 'Markdown Middleware', 'markdown'),
-    sanitizer = require('sanitizer');
+var app = protos.app;
+var _ = require('underscore');
+var sanitizer = require('sanitizer');
+
+var Showdown = protos.requireDependency('showdown', 'Markdown Middleware', 'markdown');
 
 function Markdown(config, middleware) {
   
@@ -35,30 +37,18 @@ function Markdown(config, middleware) {
   
   // Configuration defaults
   config = protos.extend({
-    gfm: true,
-    tables: true,
-    breaks: false,
-    pedantic: false,
+    extensions: ['github', 'table', this.customExtension],
     sanitize: true,
-    smartLists: false,
-    silent: true,
-    highlight: null,
-    langPrefix: 'lang-'
-  }, config);
+    sanitizeURIPolicy: function(url) {
+      return url;
+    }
+  }, config || {});
   
-  // Setup Caja sanitizer
-  this.sanitize = config.sanitize;
-
-  // Will use sanitizer module instead
-  config.sanitize = false;
-
-  // Define config property
-  Object.defineProperty(this, 'config', {
-    value: config,
-    writable: true,
-    enumerable: false,
-    configurable: true
-  });
+  // Attach config
+  this.config = config;
+  
+  // Set converter
+  initializeConverter.call(this);
   
   // Expose markdown.parse as `$markdown` view helper
   app.registerViewHelper('markdown', this.parse, this);
@@ -66,15 +56,56 @@ function Markdown(config, middleware) {
 }
 
 /**
-  Filter method that determines if a URL will be accepted by the sanitizer 
-  
-  @param {string} url URI to process
-  @return {string} url The same value of the url argument if passed (otherwise null)
-  @public
-  */
+  Adds a showdown extension
 
-Markdown.prototype.sanitizeURI = function(url) {
-  return url;
+  @param {function|string} func Function (or showdown extension name) to pass containing
+  @public
+ */
+
+Markdown.prototype.addExtension = function(arg) {
+  this.config.extensions.push(arg);
+  initializeConverter.call(this);
+}
+
+/**
+  Sets showdown extensions
+
+  @param {array} arr Array containing showdown extension names or functions
+  @public
+ */
+
+Markdown.prototype.setExtensions = function(arr) {
+  this.config.extensions = arr;
+  initializeConverter.call(this);
+}
+
+/**
+  Custom showdown extensions
+
+  @public
+ */
+
+Markdown.prototype.customExtension = function(converter) {
+  return [
+    {
+      // Provide proper prettify class when language specified
+      type: 'output',
+      filter: function(source){
+        return source.replace(/<pre><code class="([^"]+)">/gi, function(match, klass) {
+          return '<pre><code class="prettyprint lang-'+ klass +'">';
+        });
+      }
+    },
+    {
+      // Remove heading id's
+      type: 'output',
+      filter: function(source) {
+        return source.replace(/<(h[123456]) id="[^"]+">/gi, function(match, tag) {
+          return '<' + tag + '>';
+        });
+      }
+    }
+  ]
 }
 
 /**
@@ -86,10 +117,24 @@ Markdown.prototype.sanitizeURI = function(url) {
   @public
  */
 
-Markdown.prototype.parse = function(str, sanitize) {
-  var html = marked(str, this.config), type = typeof sanitize;
-  if ( (type == 'undefined' && this.sanitize) || (type == 'boolean' && sanitize) ) sanitize = true;
-  return sanitize ? sanitizer.sanitize(html, this.sanitizeURI) : html;
+Markdown.prototype.parse = function(str, options) {
+  var html = this.converter.makeHtml(str);
+  var config = options || {};
+  config.__proto__ = this.config;
+  if (config.sanitize) {
+    html = sanitizer.sanitize(html, config.sanitizeURIPolicy);
+  }
+  return html;
+}
+
+/**
+  Initializes the showdown converter
+ 
+  @private
+ */
+
+function initializeConverter() {
+  this.converter = new Showdown.converter({extensions: this.config.extensions});
 }
 
 module.exports = Markdown;

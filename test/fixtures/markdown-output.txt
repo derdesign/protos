@@ -1,0 +1,63 @@
+<h1>This is a heading</h1>
+
+<p>A paragraph <strong>with</strong> some <em>text</em> and a <a>Link</a>.</p>
+
+<h1>Prettify extension</h1>
+
+<p>Should render the proper class:</p>
+
+<pre><code class="prettyprint lang-javascript">var http = require('http');
+</code></pre>
+
+<p>This is some <code>code</code>.</p>
+
+<h1>Rendering misc</h1>
+
+<blockquote>
+  <p>The contents 
+  of a
+  blockquote</p>
+</blockquote>
+
+<p>And some amazing <del>strikethrough</del> text (github extension enabled by default)</p>
+
+<h1>Sanitize</h1>
+
+<p>The sanitize option is enabled by default, so nothing should be 
+visible below this line.</p>
+
+
+
+<h1>Sanitize URL Policy</h1>
+
+<p>According to the sanitize URL policy, links will be filtered according to
+the specified policy in config:</p>
+
+<p><a>Link</a>
+<a href="http://google.com">Link</a></p>
+
+<h1>Tables</h1>
+
+<p>The tables extension is enabled by default</p>
+
+<table>
+<thead>
+<tr>
+<th id="col_1"> Col 1   </th>
+<th id="col_2"> Col 2                                              </th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><p><strong>bold</strong> </p></td>
+<td><p><img alt="Valid XHTML" title=""> </p></td>
+</tr>
+
+<tr>
+<td><p>Plain   </p></td>
+<td><p>Value                                              </p></td>
+</tr>
+
+</tbody>
+</table>
