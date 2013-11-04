@@ -116,3 +116,8 @@
 [params] alpha: "1"
 [params] beta: "2"
 [params] gamma: "3"
+
+# Partial running with block content
+[locals] app.config.title: "My Application"
+[content] content: "..."
+

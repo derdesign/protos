@@ -56,6 +56,10 @@ function partialHelper() {
       // the 'this' object is indeed the locals object
       this.__proto__ = args[1] || params.locals || {};
     }
+    if (options.fn instanceof Function) {
+      // Add wrapped content into params.content
+      params.content = options.fn(this);
+    }
     params.__proto__ = this;
     return new SafeString(partials[partial](params));
   } else {
