@@ -54,7 +54,7 @@ Command Line Help:
 - Database Drivers: **MongoDB**, **MySQL**, **PostgreSQL**, **SQLite**
 - Storages for Caching and Sessions: **MongoDB**, **Redis**, **SQLite**
 - ORM Models API
-- View Engines: **EJS**, **Handlebars**, **Hogan.js**, **Markdown**, **Jade**
+- View Engines: **Handlebars**, **Hogan.js**, **EJS**, **Jade**
 - Debugging using Webkit Inspector
 - Built-in Shortcode Parser
 - File Downloads, JSON Responses
@@ -76,7 +76,7 @@ Command Line Help:
 - Body Parser
 - Cookie Parser
 - CSRF Protection
-- Markdown
+- Markdown Parser
 - Mailer
 - REPL
 - BCrypt

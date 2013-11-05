@@ -52,22 +52,7 @@ vows.describe('View Rendering').addBatch({
       var tpl = app.engines.plain.render(buf);
       assert.strictEqual(buf, tpl(buf));
     }
-    
-  },
-  
-  'Markdown View Engine': {
 
-    'Registers valid extensions': function() {
-      assert.deepEqual(app.engines.markdown.extensions, ['md', 'md.html']);
-    },
-    
-    'Returns valid view buffer': function() {
-      var buf = "# Hello World \nSomething **very** important _indeed_";
-      var tpl = app.engines.markdown.render(buf);
-      var expected = '<h1>Hello World</h1>\n<p>Something <strong>very</strong> important <em>indeed</em></p>\n';
-      assert.strictEqual(tpl(buf), expected);
-    }
-    
   }
   
 }).addBatch({

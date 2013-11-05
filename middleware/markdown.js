@@ -5,16 +5,15 @@
   Provides markdown support for applications & views.
   
   » References:
-    https://github.com/chjj/marked
+    https://github.com/coreyti/showdown
     https://github.com/theSmaw/Caja-HTML-Sanitizer
     http://code.google.com/p/google-caja/source/browse/trunk/src/com/google/caja/plugin/html-sanitizer.js
     
   » Configuration Options:
   
-    {boolean} gfm: Enable github flavored markdown (enabled by default)
-    {boolean} pedantic: onform to obscure parts of markdown.pl as much as possible
-    {boolean} sanitize: Sanitize the output.
-    {function} highlight: A callback to highlight code blocks.
+    {array} extensions: Array containing extension names or functions for showdown
+    {boolean} sanitize: If set to true, will sanitize the markdown output
+    {function} sanitizeURIPolicy: Function used to sanitize urls
 
   » Example:
   
