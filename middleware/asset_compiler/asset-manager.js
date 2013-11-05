@@ -135,7 +135,13 @@ function compileSrc(file, compiler, ext) {
   var src, outFile, relPath;
   src = fs.readFileSync(file, 'utf8');
   compiler(src, file, function(err, code) {
-    if (err) app.log(err);
+    if (err) {
+      if (err.constructor.name) {
+        err = new Error(util.inspect(err));
+        err.stack = '';
+      }
+      app.log(err);
+    }
     outFile = file.replace(extRegex, '.' + config.compileExts[ext]);
     relPath = app.relPath(outFile);
     fs.writeFileSync(outFile, code, 'utf8');
