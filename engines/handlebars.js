@@ -58,10 +58,10 @@ function partialHelper() {
     }
     if (options.fn instanceof Function) {
       // Add wrapped content into params.content
-      params.content = options.fn(this);
+      params.content = new SafeString(options.fn(this));
     }
     params.__proto__ = this;
-    return new SafeString(partials[partial](params));
+    return new SafeString(partials[partial].call(null, params));
   } else {
     return '';
   }
@@ -92,13 +92,14 @@ app.on('view_partials_loaded', function(ob) {
         var args = slice.call(arguments, 0);
         var options = args.pop();
         var params = options.hash;
-        var content = options.fn instanceof Function ? options.fn(this) : '';
+        var content = options.fn instanceof Function ? new SafeString(options.fn(this)) : '';
         var out = ob[name].apply(null, [content].concat(args).concat([params]));
         return new SafeString(out);
       }
     } else { // Partials
       optionsContext.partials[name] = function() {
-        return ob[name].apply(null, arguments);
+        var out = ob[name].apply(null, arguments);
+        return new SafeString(out);
       };
     }
   });
