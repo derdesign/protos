@@ -3,11 +3,11 @@
 ["","one","two","three",{}]
 ["","one","two","three",{"alpha":1,"beta":2,"gamma":3}]
 ["",{"alpha":1,"beta":2,"gamma":3}]
-["",{}]
-[".",{}]
-["..","one","two",{}]
-["...","one","two",{"alpha":1,"beta":2,"gamma":3}]
-["....",{"alpha":1,"beta":2,"gamma":3}]
+[{"string":""},{}]
+[{"string":"."},{}]
+[{"string":".."},"one","two",{}]
+[{"string":"..."},"one","two",{"alpha":1,"beta":2,"gamma":3}]
+[{"string":"...."},{"alpha":1,"beta":2,"gamma":3}]
 
 # Partial running on global context
 
