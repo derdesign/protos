@@ -16,6 +16,11 @@ var SafeString = handlebars.SafeString;
 
 var partials, optionsContext = {};
 
+var context = {
+  get partials() { return optionsContext.partials; },
+  get helpers() { return optionsContext.helpers; }
+}
+
 function Handlebars() {
 
   this.module = handlebars;
@@ -32,7 +37,6 @@ Handlebars.prototype.render = function(data) {
   var tpl, func = this.getCachedFunction(arguments);
   if (func === null) {
     var fn = handlebars.compile(data);
-    var context = optionsContext;
     func = function(data) {
       return fn(data, context);
     }
