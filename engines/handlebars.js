@@ -38,11 +38,11 @@ Handlebars.prototype.render = function(data) {
   if (func === null) {
     var fn = handlebars.compile(data);
     func = function(data) {
-      return fn(data, context);
+      return fn(data, context).toString(); // Ensure a string is returned (could be SafeString instance)
     }
     this.cacheFunction(func, arguments);
   }
-  return this.evaluate(func, arguments, true);
+  return this.evaluate(func, arguments, false); // Passing partials manually, hence false.
 }
 
 Handlebars.prototype.returnPartials = function() {
