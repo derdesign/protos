@@ -4,7 +4,7 @@ var _ = require('underscore'),
     _s = require('underscore.string'),
     fs = require('fs'),
     cp = require('child_process'),
-    ejs = require('ejs'),
+    handlebars = require('handlebars'),
     util = require('util'),
     regex = require('../lib/regex.js'),
     pathModule = require('path'),
@@ -357,13 +357,13 @@ module.exports = function() {\n\
     validate: validateApp,
     run: function(data) {
       
-      var template = ejs.compile("\
+      var template = handlebars.compile("\
 \n\
-/* <%- relPath %> */\n\
+/* {{{relPath}}} */\n\
 \n\
 var app = protos.app;\n\
 \n\
-module.exports = function <%- fileWithoutExtension %>() {\n\
+module.exports = function {{{fileWithoutExtension}}}() {\n\
 \n\
 }");
       
@@ -377,15 +377,15 @@ module.exports = function <%- fileWithoutExtension %>() {\n\
     validate: validateApp,
     run: function(data) {
     
-      var template = ejs.compile("\
+      var template = handlebars.compile("\
 \n\
-/* <%- relPath %> */\n\
+/* {{{relPath}}} */\n\
 \n\
 var app = protos.app;\n\
 \n\
 module.exports = {\n\
 \n\
-  <%- lowerCamelCase %>: function() {\n\
+  {{{lowerCamelCase}}}: function() {\n\
 \n\
   }\n\
 \n\
@@ -401,9 +401,9 @@ module.exports = {\n\
     validate: validateApp,
     run: function(data) {
   
-      var template = ejs.compile("\
+      var template = handlebars.compile("\
 \n\
-/* <%- relPath %> */\n\
+/* {{{relPath}}} */\n\
 \n\
 module.exports = {\n\
 \n\
@@ -419,9 +419,9 @@ module.exports = {\n\
     validate: validateApp,
     run: function(data) {
 
-      var template = ejs.compile("\
+      var template = handlebars.compile("\
 \n\
-/* <%- relPath %> */\n\
+/* {{{relPath}}} */\n\
 \n\
 var app = protos.app;\n\
 \n\
@@ -437,9 +437,9 @@ var app = protos.app;\n\
     validate: validateApp,
     run: function(data) {
       
-      var template = ejs.compile("\
+      var template = handlebars.compile("\
 \n\
-/* <%- relPath %> */\n\
+/* {{{relPath}}} */\n\
 \n\
 module.exports = {\n\
 \n\
