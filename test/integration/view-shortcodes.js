@@ -38,6 +38,7 @@ vows.describe('View Shortcodes').addBatch({
       'main_handlebars',
       'main_hogan',
       'main_jade',
+      'main_swig',
       'handlebars_test',
       '#hbtest',
       '#wrap',

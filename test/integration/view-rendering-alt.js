@@ -83,5 +83,32 @@ vows.describe('View Rendering').addBatch({
     }
     
   }
+
+
+
+}).addBatch({
+  
+  'Swig Integration': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      var multi = new Multi(app);
+      
+      multi.curl('/swig-integration');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results[0]);
+      });
+      
+      return promise;
+      
+    },
+    
+    "Template inheritance works as expected": function(buf) {
+      assert.strictEqual(buf, '\n<p>This is the alpha block</p>\n<p>This is the beta block</p>\n<p>This is the gamma block</p>\n');
+    }
+    
+  }
   
 }).export(module);

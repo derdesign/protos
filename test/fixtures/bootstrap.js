@@ -65,7 +65,7 @@ var protos = Protos.bootstrap(testSkeleton, {
           // Load framework components
           protos.loadDrivers('mongodb', 'mysql', 'postgres', 'sqlite');
           protos.loadStorages('mongodb', 'redis', 'sqlite');
-          protos.loadEngines('ejs', 'handlebars', 'hogan', 'jade', 'plain');
+          protos.loadEngines('ejs', 'handlebars', 'hogan', 'jade', 'plain', 'swig');
         },
         middleware: function(app) {
           app.__middlewareEventEmitted = true;

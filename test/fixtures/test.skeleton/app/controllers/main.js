@@ -313,6 +313,12 @@ function MainController(app) {
     }, true);
   });
   
+  /* Swig Integration */
+  
+  get('/swig-integration', function(req, res) {
+    res.render('#extends-test', true);
+  });
+  
 }
 
 module.exports = MainController;

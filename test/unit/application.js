@@ -97,6 +97,7 @@ vows.describe('lib/application.js').addBatch({
         'mailer_template',
         'main_hogan',
         'main_jade',
+        'main_swig',
         'handlebars_test',
         '$hbtest',
         '$link',
