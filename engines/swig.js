@@ -16,7 +16,7 @@ function Swig() {
   var opts = (app.config.engines && app.config.engines.swig) || {};
   
   this.options = protos.extend({
-    cache: app.viewCaching ? true : false
+    cache: false
   }, opts);
   
   swig.setDefaults(this.options); // Set options for swig
