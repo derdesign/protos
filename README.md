@@ -54,7 +54,7 @@ Command Line Help:
 - Database Drivers: **MongoDB**, **MySQL**, **PostgreSQL**, **SQLite**
 - Storages for Caching and Sessions: **MongoDB**, **Redis**, **SQLite**
 - ORM Models API
-- View Engines: **Handlebars**, **Hogan.js**, **EJS**, **Jade**
+- View Engines: **Handlebars**, **Swig**, **Hogan.js**, **EJS**, **Jade**
 - Debugging using Webkit Inspector
 - Built-in Shortcode Parser
 - File Downloads, JSON Responses
