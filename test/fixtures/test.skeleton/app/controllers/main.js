@@ -319,6 +319,13 @@ function MainController(app) {
     res.render('#extends-test', true);
   });
   
+  /* Request Integrity */
+  
+  get('/request-integrity', function(req, res) {
+    var out = (req.__controller === this) && (res.__controller === this) && (req.__controller === res.__controller);
+    res.end(out ? '1' : '0');
+  });
+  
 }
 
 module.exports = MainController;

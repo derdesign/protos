@@ -112,6 +112,30 @@ automateVowsBatches(); // Creates the nifty automated tests
 
 vows.describe('Application Controllers').addBatch(batch).addBatch({
   
+  'Integrity Checks': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+
+      multi.curl('/request-integrity');
+      
+      multi.exec(function(err, results) {
+        promise.emit('success', err || results[0].trim());
+      });
+      
+      return promise;
+      
+    },
+    
+    'Controller can be accessed via request and response': function(buf) {
+      assert.strictEqual(buf, '1');
+    }
+    
+  }
+  
+}).addBatch({
+  
   'Controller Validation: GET': {
     
     topic: function() {
