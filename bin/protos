@@ -11,12 +11,81 @@ var _ = require('underscore'),
     inflect = require('../lib/support/inflect.js'),
     Protos = require('../lib/protos.js'),
     Multi = require('multi'),
+    Utility = require('../lib/utility.js'),
     CommandLine = require('../lib/command.js');
 
 var protos, origPath;
 var protosPath = pathModule.resolve(__dirname, '../');
 
 var commands = {
+  
+  validate: {
+    args: 1,
+    run: function(data) {
+      
+      var sanitizer = require('sanitizer');
+      var colorize = Utility.prototype.colorize;
+      var request = require('request');
+      
+      var url = data.args[0];
+      
+      request(url, function(err, res, html) {
+        
+        if (err) {
+          throw err;
+        } else {
+          
+          request({
+            method: 'POST',
+            uri: 'http://html5.validator.nu',
+            headers: {
+              'content-type': 'multipart/form-data' 
+            },
+            multipart: [{
+              'Content-Disposition': 'form-data; name="content"',
+              body: html
+            }]
+          }, function(err, res, buf) {
+            
+            var errors = /<li class="error">(.*?)<\/li>/g;
+            var matches = buf.match(errors);
+      
+            if (matches) {
+        
+              console.log(util.format('\nFound %d Errors:', matches.length));
+        
+              matches.forEach(function(match, i) {
+          
+                match = match.replace(/(<p class="location">)/, '\n$1');
+                match = match.replace(/<\/?.*?>/g, '');
+                match = sanitizer.unescapeEntities(match);
+                match = match.split('\n');
+          
+                var err = match[0];
+                var code = match[1].split('↩').pop().replace(/(From|At) line \d+, column \d+; to line \d+, column \d+/, '').trim();
+                
+                code = code;
+          
+                err = colorize(err, '1');
+                code = colorize(code, '0;31');
+          
+                console.log(util.format('\n%d. %s\n%s', (i+1), err, code));
+          
+              });
+        
+              console.log();
+      
+            } else {
+        
+              console.exit('\nDocument validates successfully as HTML5 + ARIA + SVG 1.1 + MathML 2.0\n');
+        
+            }
+            
+          });
+        }
+      });
+    }
+  },
   
   link: {
     args: 0,
