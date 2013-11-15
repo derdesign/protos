@@ -80,8 +80,16 @@ vows.describe('Models').addBatch({
     
     'Allows context override': function() {
       assert.equal(app.contextModel.context, 'my_custom_context');
+    },
+    
+    'Driver is assigned by reference': function() {
+      assert.strictEqual(app.accountsModel.driver, app.buddiesModel.driver);
+      assert.strictEqual(app.accountsModel.driver, app.companiesModel.driver);
+      assert.strictEqual(app.accountsModel.driver, app.contextModel.driver);
+      assert.strictEqual(app.accountsModel.driver, app.groupsModel.driver);
+      assert.strictEqual(app.accountsModel.driver, app.websitesModel.driver);
     }
-
+    
   }
 
 }).addBatch({
