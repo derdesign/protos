@@ -290,6 +290,14 @@ vows.describe('lib/validator.js').addBatch({
       some: null
     });
     
+  },
+  
+  'Throws on invalid validation data': function() {
+    try {
+      app.validator().add({value: 99})
+    } catch(e) {
+      assert.strictEqual(e.toString(), "Error: Validator: invalid validation data provided");
+    }
   }
   
 }).export(module);
