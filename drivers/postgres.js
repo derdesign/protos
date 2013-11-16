@@ -596,7 +596,6 @@ PostgreSQL.prototype.__modelMethods = {
       
     } else {
       
-      console.log(id);
       callback.call(self, new Error(util.format("%s: Wrong value for `id` parameter", this.className)));
       
     }
