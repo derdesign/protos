@@ -133,6 +133,12 @@ vows.describe('lib/application.js').addBatch({
     'Properly runs application event hooks': function() {
       assert.isTrue(app.hooks.init.__loaded);
       assert.isTrue(app.hooks.pre_init.__loaded);
+    },
+    
+    'Properly sets the noop function': function() {
+      assert.isFunction(app.noop);
+      assert.strictEqual(app.noop, protos.noop);
+      assert.strictEqual(app.noop.toString(), 'function () {}');
     }
 
   }
