@@ -458,24 +458,38 @@ PostgreSQL.prototype.__modelMethods = {
   
   /* Model API get */
   
-  get: function(o, callback) {
+  get: function(o, fields, callback) {
+    
     var self = this;
     
+    if (callback == null) {
+      callback = fields;
+      fields = null;
+    } else if (fields instanceof Array) {
+      if (fields.indexOf('id') === -1) {
+        fields.unshift('id'); // Ensure ID is included in query
+      }
+      fields = fields.join(', ');
+    }
+    
     if (typeof o == 'number') { 
+      
       // If `o` is number: Convert to object
       o = {id: o};
+
     } else if (util.isArray(o)) {
       
       // If `o` is an array of params, process args recursively using multi
-      var arr = o, 
-          multi = this.multi();
+      var arr = o;
+      var multi = this.multi();
+      
       for (var i=0; i < arr.length; i++) {
-        multi.get(arr[i]);
+        multi.get(arr[i], fields);
       }
-      multi.exec(function(err, results) {
+      
+      return multi.exec(function(err, results) {
         callback.call(self, err, results);
       });
-      return;
       
     } else if (typeof o == 'object') {
       
@@ -484,8 +498,7 @@ PostgreSQL.prototype.__modelMethods = {
       
     } else {
       
-      callback.call(self, new Error(util.format("%s: Wrong value for `o` argument", this.className)), null);
-      return;
+      return callback.call(self, new Error(util.format("%s: Wrong value for `o` argument", this.className)), null);
       
     }
       
@@ -500,8 +513,7 @@ PostgreSQL.prototype.__modelMethods = {
     
     // Prevent empty args
     if (keys.length === 0) {
-      callback.call(self, new Error(util.format("%s: Empty arguments", this.className)));
-      return;
+      return callback.call(self, new Error(util.format("%s: Empty arguments", this.className)));
     } else {
       var len;
       condition = [];
@@ -514,13 +526,16 @@ PostgreSQL.prototype.__modelMethods = {
     // Get model data & return generated model (if found)
     this.driver.queryWhere({
       condition: condition,
+      columns: fields || undefined,
       params: values,
       table: this.context,
     }, function(err, results) {
-      if (err) callback.call(self, err, null);
-      else {
-        if (results.length === 0) callback.call(self, null, []);
-        else {
+      if (err) {
+        callback.call(self, err, null);
+      } else {
+        if (results.length === 0) {
+          callback.call(self, null, []);
+        } else {
           for (var models=[],i=0; i < results.length; i++) {
             models.push(self.createModel(results[i]));
           }

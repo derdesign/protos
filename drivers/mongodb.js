@@ -478,25 +478,39 @@ MongoDB.prototype.__modelMethods = {
 
   /* Model API get */
 
-  get: function(o, callback) {
+  get: function(o, fields, callback) {
+    
     var self = this;
 
+    if (callback == null) {
+      callback = fields;
+      fields = null;
+    } else if (fields instanceof Array) {
+      fields = fields.reduce(function(ob, current) {
+        ob[current] = 1;
+        return ob;
+      }, {});
+    }
+
     if (typeof o == 'number' || typeof o == 'string' || o instanceof ObjectID) { 
+      
       // If `o` is number: Convert to object
       o = {_id: o};
+      
     } else if (o instanceof Array) {
 
       // If `o` is an array of params, process args recursively using multi
-      var arr = o, 
-          multi = this.multi();
+      var arr = o;
+      var multi = this.multi();
+      
       for (var i=0; i < arr.length; i++) {
-        multi.get(arr[i]);
+        multi.get(arr[i], fields);
       }
-      multi.exec(function(err, docs) {
+      
+      return multi.exec(function(err, docs) {
         callback.call(self, err, docs);
       });
-      return;
-
+      
     } else if (o.constructor === Object) {
       
       // IF `o` is object: Validate without checking required fields
@@ -504,18 +518,14 @@ MongoDB.prototype.__modelMethods = {
 
     } else {
 
-      callback.call(self, new Error(util.format("%s: Wrong value for `o` argument", this.className)), null);
-      return;
+      return callback.call(self, new Error(util.format("%s: Wrong value for `o` argument", this.className)), null);
 
     }
-    
-    // TODO: automatically detect which fields should be retrieved based
-    // on this.properties
     
     this.driver.queryWhere({
       collection: this.context,
       condition: o,
-      fields: {}
+      fields: fields || {}
     }, function(err, docs) {
       if (err) callback.call(self, err, null);
       else {

@@ -86,11 +86,13 @@ function ModelBatch() {
     },
     
     get: {
-
+      
       'Model API: get + cacheFilters': {
 
         topic: function() {
           var promise = new EventEmitter();
+
+          multi.get([1,2], ['username']);
 
           // object + model cache store
           multi.queryCached({
@@ -124,7 +126,9 @@ function ModelBatch() {
         },
 
         'Returns valid results': function(results) {
+          
           var expected = [
+            [ [ { username: 'user'+process.pid, id: 1 } ], [ { username: 'user2', id: 2 } ] ], // Get by field works ok
             [{ username: 'user'+process.pid, password: 'pass1', id: 1, filterValue: "OK1"}], // Proves that filters work
             [{ username: 'user'+process.pid, password: 'pass1', id: 1, filterValue: "OK2"}], // Proves that filters work
             [ [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
@@ -140,7 +144,7 @@ function ModelBatch() {
         }
 
       }
-
+      
     },
     
     save: {
