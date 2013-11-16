@@ -52,14 +52,11 @@ vows.describe('Models').addBatch({
   'Preliminaries': {
 
     topic: function() {
-      if (app.initialized) return app.models.users;
-      else {
-        var promise = new EventEmitter();
-        app.on('init', function() {
-          promise.emit('success', app.models.users);
-        });
-        return promise;
-      }
+      var promise = new EventEmitter();
+      app.onInitialize(function() {
+        promise.emit('success', app.models.users);
+      });
+      return promise;
     },
 
     'Initialized test model': function(topic) {
@@ -91,7 +88,7 @@ vows.describe('Models').addBatch({
     }
     
   }
-
+  
 }).addBatch({
   
   'Initial model data': {
@@ -133,6 +130,62 @@ vows.describe('Models').addBatch({
       assert.isNotNull(r1);
       assert.isNotNull(r2);
       assert.isNotNull(r3);
+    }
+    
+  }
+  
+}).addBatch({
+
+  'Model::getValidationFor': {
+    
+    topic: function() {
+      return app.testModel;
+    },
+    
+    'Throws if property does not exist': function(m) {
+      try {
+        m.getValidationFor('hello');
+      } catch(e) {
+        assert.equal(e.toString(), "Error: TestModel: property 'hello' does not exist");
+      }
+    },
+    
+    'Throws if validation not defined for property': function(m) {
+      try {
+        m.getValidationFor('notdef');
+      } catch(e) {
+        assert.equal(e.toString(), "Error: TestModel: validation not defined for 'notdef' property");
+      }
+    },
+    
+    'Throws if validation data type invalid': function(m) {
+      try {
+        m.getValidationFor('invdtype');
+      } catch(e) {
+        assert.equal(e.toString(), "Error: TestModel: invalid validation data type for 'invdtype' property");
+      }
+    },
+    
+    'Returns app regex when not specified in validation': function(m) {
+      assert.strictEqual(m.getValidationFor('appregex'), app.regex.password);
+    },
+    
+    'Returns overridden regex when specified in this.validation': function(m) {
+      assert.instanceOf(m.overridden, RegExp);
+      assert.strictEqual(m.getValidationFor('override'), m.overridden);
+    },
+    
+    'Returns expected values for valid parameters': function(m) {
+      
+      assert.instanceOf(m.getValidationFor('regex'), RegExp);
+      assert.strictEqual(m.getValidationFor('regex'), m.regex);
+      
+      assert.instanceOf(m.getValidationFor('custom'), RegExp);
+      assert.strictEqual(m.getValidationFor('custom'), m.custom_regex);
+      
+      assert.instanceOf(m.getValidationFor('func'), Function);
+      assert.strictEqual(m.getValidationFor('func'), m.func);
+
     }
     
   }
