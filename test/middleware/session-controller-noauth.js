@@ -82,7 +82,6 @@ function testRouteMethod(tmethod, rfunc) {
 function automateVowsBatches() {
   
   controllerCtor.prototype.routeMethods.forEach(function(m) {
-    if (m.indexOf('raw_') === 0) return; // Raw routes do not apply
     var method;
     if (m != 'super_' && controllerCtor.hasOwnProperty(m) && (method=controllerCtor[m]) instanceof Function ) {
       var hm = m.slice(m.lastIndexOf('_') + 1).toUpperCase();

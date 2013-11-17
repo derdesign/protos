@@ -336,38 +336,4 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
     
   }
   
-}).addBatch({
-  
-  'Raw Routes': {
-    
-    topic: function() {
-      
-      var promise = new EventEmitter();
-      
-      multi.curl('-i /raw/hello/normal');
-      multi.curl('-i /raw/hello/');
-      
-      multi.exec(function(err, results) {
-        promise.emit('success', err || results);
-      });
-      
-      return promise;
-      
-    },
-    
-    'Are executed and matched properly (no filters run, support queued callbacks)': function(results) {
-      var r1 = results[0],
-          r2 = results[1];
-          
-      // Runs all filters and queued callbacks
-      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r1.indexOf('{"filter1":true,"filter2":true,"pre_callback":true}') >= 0);
-
-      // Skips all filters and only runs queued callbacks
-      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r2.indexOf('{"pre_callback":true}') >= 0);
-    }
-    
-  }
-  
 }).export(module);
