@@ -156,32 +156,6 @@ vows.describe('Response Misc').addBatch({
   
 }).addBatch({
   
-  'Redirection (unauthorized)': {
-    
-    topic: function() {
-      var promise = new EventEmitter();
-      
-      var login = app.loginUrl;
-      app.loginUrl = null;
-      
-      app.curl('-i /redirect/login', function(err, buf) {
-        app.loginUrl = login;
-        promise.emit('success', err || buf);
-      });
-      
-      return promise;
-    },
-    
-    'Application::login responds w/401 when app.loginUrl is null': function(results) {
-      var r = results;
-      // console.exit(r);
-      assert.isTrue(r.indexOf('HTTP/1.1 401 Unauthorized') >= 0);
-    }
-    
-  }
-  
-}).addBatch({
-  
   'JSON Response': {
     
     topic: function() {
