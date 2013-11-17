@@ -252,8 +252,8 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
       assert.equal(results[0], '» Created myapp1/api/sample-method.js\n» Created myapp1/api/cool-method.js\n» Created myapp1/api/some-other-method.js');
       
       // Api files export methods by default
-      assert.equal(bufs['api/cool-method.js'], '\n/* api/cool-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  coolMethod: function() {\n\n  }\n\n}\n');
-      assert.equal(bufs['api/some-other-method.js'], '\n/* api/some-other-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  someOtherMethod: function() {\n\n  }\n\n}\n');
+      assert.equal(bufs['api/cool-method.js'], '\n/* api/cool-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  coolMethod: function() {\n\n  }\n\n}');
+      assert.equal(bufs['api/some-other-method.js'], '\n/* api/some-other-method.js */\n\nvar app = protos.app;\n\nmodule.exports = {\n\n  someOtherMethod: function() {\n\n  }\n\n}');
     }
 
   }
@@ -288,7 +288,7 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
       assert.equal(results[0], '» Created myapp1/config/aws.js\n» Created myapp1/config/session.js\n» Created myapp1/config/logger.js');
       
       // Api files export methods by default
-      assert.equal(bufs['config/aws.js'], '\n/* config/aws.js */\n\nmodule.exports = {\n\n}\n');
+      assert.equal(bufs['config/aws.js'], '\n/* config/aws.js */\n\nmodule.exports = {\n\n}');
     }
 
   }
@@ -397,8 +397,8 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
       assert.equal(results[0], '» Created myapp1/include/filters.js\n» Created myapp1/include/locals.js');
       
       // Verify proper code generation
-      assert.equal(bufs['include/filters.js'], '\n/* include/filters.js */\n\nmodule.exports = {\n\n}\n');
-      assert.equal(bufs['include/locals.js'], '\n/* include/locals.js */\n\nmodule.exports = {\n\n}\n');
+      assert.equal(bufs['include/filters.js'], '\n/* include/filters.js */\n\nmodule.exports = {\n\n}');
+      assert.equal(bufs['include/locals.js'], '\n/* include/locals.js */\n\nmodule.exports = {\n\n}');
     }
     
   }
@@ -648,7 +648,7 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.hbs\n» Created myap
         assert.isTrue(fs.existsSync('app/handlers/main/world.js'));
         
         var buf = results[1];
-        var expectedBuf = '\n/* [handler] main/hello.js */\n\nmodule.exports = function() {\n\n  var app = protos.app;\n\n  return function(req, res) {\n\n  }\n\n}\n';
+        var expectedBuf = '\n/* [handler] main/hello.js */\n\nmodule.exports = function() {\n\n  var app = protos.app;\n\n  return function(req, res) {\n\n  }\n\n}';
         
         assert.equal(buf, expectedBuf);
       }

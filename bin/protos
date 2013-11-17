@@ -323,7 +323,7 @@ module.exports = function() {\n\
 \n\
   }\n\
 \n\
-}\n";
+}";
 
       // Remove  readme file
       var readme = 'app/handlers/readme.md';
@@ -416,7 +416,7 @@ module.exports = {\n\
 \n\
   }\n\
 \n\
-}\n");
+}");
 
       createJsFilesWithTemplate('api/', data, template);
       
@@ -434,7 +434,7 @@ module.exports = {\n\
 \n\
 module.exports = {\n\
 \n\
-}\n");
+}");
 
       createJsFilesWithTemplate('config/', data, template);
     
@@ -470,7 +470,7 @@ var app = protos.app;\n\
 \n\
 module.exports = {\n\
 \n\
-}\n");
+}");
 
       createJsFilesWithTemplate('include/', data, template);
       
@@ -746,8 +746,7 @@ function %s(app) {\n\
 \n\
 }\n\
 \n\
-module.exports = %s;\n\
-";
+module.exports = %s;";
   tpl = util.format(tpl, model, (opts.driver || 'default'), (opts.context || getModelContext(model)), model, model);
   
   var file = util.format('%s/app/models/%s.js', app, name);
@@ -783,7 +782,7 @@ function %s(app) {\n\
 \n\
 }\n\
 \n\
-module.exports = %s;\n";
+module.exports = %s;";
 
   tpl = util.format(tpl, controller, controller);
 
@@ -894,8 +893,7 @@ function %s(app) {\n\
 \n\
 }\n\
 \n\
-module.exports = %s;\n\
-";
+module.exports = %s;";
 
   tpl = util.format(tpl, helper, helper);
 
