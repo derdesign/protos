@@ -1,8 +1,0 @@
-{
-  "bootstrap": {
-    "description": "Bootstrap CSS Toolkit",
-    "version": "3.0.0",
-    "website": "http://getbootstrap.com/",
-    "download": "https://github.com/twbs/bootstrap/archive/v3.0.0.zip"
-  }
-}

@@ -103,16 +103,13 @@ var commands = {
       skeleton: "Use the full application skeleton",
       minimal: "Use a minimal directory structure",
       nolink: "Prevents automatic linking of the protos module",
-      css: "Bundle client side CSS frameworks",
-      js: "Bundle client side JavaScript libraries/frameworks",
       model: "Include models on application",
       controller: "Include controllers on application",
     },
     run: function(args) {
       var errored = false;
-      var libs = getLibs(args);
       if (errored) process.exit();
-      createApplication.call(this, args, libs);
+      createApplication.call(this, args);
     }
   },
   
@@ -179,45 +176,6 @@ var commands = {
         
       }
       
-    }
-  },
-  
-  fetch: {
-    multiple: ['js', 'css'],
-    args: 0,
-    validate: validateApp,
-    run: function(data) {
-      
-      if (data.css.length === 0 && data.js.length === 0) {
-        this.printHelp();
-      }
-      
-      var libs = getLibs(data);
-      
-      var downloader = new Multi({
-        download: downloadAsset
-      });
-      
-      var publicDir = 'public/';
-
-      if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir);
-      
-      // Switch to public/ before downloading assets
-      process.chdir(publicDir);
-      
-      // Download client-side CSS
-      data.css.forEach(function(lib) {
-        downloader.download(libs.css[lib]);
-      });
-      
-      // Download client-side JavaScript
-      data.js.forEach(function(lib) {
-        downloader.download(libs.javascript[lib]);
-      });
-      
-      // Exec downloader queue
-      downloader.exec(function(err, results) {});
-
     }
   },
   
@@ -642,7 +600,7 @@ module.exports = {\n\
 var viewsBatch = [];
 var helpersBatch = [];
 
-function createApplication(data, libs) {
+function createApplication(data) {
   
   var app = data.args[0];
   var path = process.cwd() + '/' + app;
@@ -731,12 +689,6 @@ function createApplication(data, libs) {
         process.chdir(currentDir);
       }
 
-      // Create downloader instance
-
-      var downloader = new Multi({
-        download: downloadAsset
-      });
-      
       // Create models
       data.model.forEach(function(model) {
         createModel.call(data, app, model);
@@ -757,117 +709,8 @@ function createApplication(data, libs) {
         createView.apply(data, args);
       });
       
-      try {
-        
-        // Switch to public/ before downloading assets
-        process.chdir(util.format('./%s/public', app));
-
-        // Download client-side CSS
-        data.css.forEach(function(lib) {
-          downloader.download(libs.css[lib]);
-        });
-
-        // Download client-side JavaScript
-        data.js.forEach(function(lib) {
-          downloader.download(libs.javascript[lib]);
-        });
-
-        // Exec downloader queue
-        downloader.exec(function(err, results) {});
-        
-      } catch(e) {
-        
-      }
-      
     }
     
-  });
-  
-}
-
-
-var jsFile = /\.js$/i,
-    zipFile = /\.zip$/i,
-    tgzFile = /\.(tgz|tar\.gz)$/i,
-    tbzFile = /\.tar\.bz2$/i;
-
-function downloadAsset(lib, callback) {
-
-  var cmd = util.format('wget --no-check-certificate -q %s', lib.download);
-  
-  if (lib.extension) cmd += util.format(' -O %s-%s.%s', lib.id, lib.version, lib.extension);
-  
-  // console.exit(cmd);
-  
-  console.log(util.format("» Downloading %s", lib.description));
-  
-  fs.mkdirSync('./tmp');
-  process.chdir('./tmp');
-  
-  cp.exec(cmd, function(err, stderr, stdout) {
-    if (err) {
-      console.log(err);
-      console.exit(util.format("Error downloading %s: %s", lib.id, stderr));
-    } else {
-      var file, files = listFiles('.');
-      if (files.length === 1) {
-        file = files.pop();
-
-        // Detect extract commands
-        var exCmd = null;
-        if (zipFile.test(file)) {
-          exCmd = 'unzip ' + file;
-        } else if (tgzFile.test(file)) {
-          exCmd = 'tar xzf ' + file;
-        } else if (tbzFile.test(file)) {
-          exCmd = 'tar xjf ' + file;
-        }
-        
-        if (exCmd) {
-          cp.exec(exCmd, function(err, stdout, stderr) {
-            if (err) {
-              console.log(err);
-              callback(err);
-            } else {
-              var files = listFiles('.');
-              if (files.length > 2) {
-                console.exit(util.format("Invalid extraction for %s: %s", lib.id, files.toString()));
-              } else {
-                for (var f,i=0; i < files.length; i++) {
-                  f = files[i];
-                  if (f != file) {
-                    fs.mkdir('../'+lib.type, function(err) {
-                      cp.exec(util.format('mv %s ../%s/%s', f, lib.type, lib.id), function(err, stdout, stderr) {
-                        if (err) console.log(util.format("Error downloading %s: %s", lib.id, err));
-                        process.chdir('../');
-                        cp.exec('rm -Rf tmp/', function(err) {
-                          if (err) console.log(err);
-                          callback(err);
-                        });
-                      });
-                    });
-                    break;
-                  }
-                }
-              }
-            }
-          });
-        } else if (jsFile.test(file)) {
-          fs.mkdir('../'+lib.type, function(err) {
-            cp.exec(util.format('mv %s ../%s/', file, lib.type), function(err, stdout, stderr) {
-              if (err) console.log(util.format("Error downloading %s: %s", lib.id, err));
-              process.chdir('../');
-              cp.exec('rm -Rf tmp/', function(err) {
-                if (err) console.log(err);
-                callback(err);
-              });
-            });
-          });
-        }
-      } else {
-        console.exit(util.format("Error downloading %s: Multiple files downloaded: %s", lib.id, files.toString()));
-      }
-    }
   });
   
 }
@@ -1069,32 +912,6 @@ module.exports = %s;\n\
 
   console.log(util.format("» Created %s", file));
 
-}
-
-function getLibs(args) {
-  var libs = {
-    css: require('../client/css.json'),
-    javascript: require('../client/javascript.json')
-  }
-  
-  args.css.forEach(function(lib) {
-    if (lib in libs.css) {
-      libs.css[lib].id = lib;
-      libs.css[lib].type = 'css';
-    } else {
-      console.exit("CSS Framework not bundled by Protos: " + lib);
-    }
-  });
-  
-  args.js.forEach(function(lib) {
-    if (lib in libs.javascript) {
-      libs.javascript[lib].id = lib;
-      libs.javascript[lib].type = 'js';
-    } else {
-      console.exit("JavaScript Library not bundled by Protos: " + lib);
-    }
-  });
-  return libs;
 }
 
 function listFiles(path, regex) {
@@ -1322,7 +1139,7 @@ cli.help.before = "\n\
 Usage: protos [ACTION] [OPTIONS] [ARGUMENTS]\n\n\
 Actions: \n\
          create install server config controller handler helper model\n\
-         view partial layout static restricted api hook include fetch\n\
+         view partial layout static restricted api hook include\n\
          inspector link lint validate \n\n\
 Options:\n";
 

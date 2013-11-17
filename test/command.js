@@ -19,9 +19,6 @@ var prefix = '../../../';
 // Add node_modules
 skeleton.push('node_modules');
 
-var jsLibs = require('../client/javascript.json');
-var jqueryVersion = jsLibs.jquery.version;
-
 var protos = new Multi({
   command: function(str, callback) {
     cp.exec(util.format(prefix + 'bin/protos %s', str), function(err, stdout, stderr) {
@@ -57,15 +54,16 @@ vows.describe('Command Line Interface').addBatch({
   'protos create': {
     
     topic: function() {
+      
       var promise = new EventEmitter(),
           results = [];
       
-      protos.command('create myapp --skeleton --js jquery --css bootstrap --model posts comment --controller admin dashboard');
+      protos.command('create myapp --skeleton --model posts comment --controller admin dashboard');
       protos.command('create myapp1 --skeleton --controller test');
       
       protos.exec(function(err, results) {
         setTimeout(function() {
-          // Account for Disk/IO in Travis VM
+          // Account for Disk/IO on Travis VM
           promise.emit('success', err || results);
         }, 1000);
       });
@@ -83,9 +81,7 @@ Created myapp/app/controllers/dashboard.js\n» \
 Created myapp/app/helpers/admin.js\n» \
 Created myapp/app/helpers/dashboard.js\n» \
 Created myapp/app/views/admin/admin-index.hbs\n» \
-Created myapp/app/views/dashboard/dashboard-index.hbs\n» \
-Downloading Skeleton Mobile-Friendly Responsive Framework\n» \
-Downloading Ember.js JavaScript Framework';
+Created myapp/app/views/dashboard/dashboard-index.hbs';
 
       assert.deepEqual(fs.readdirSync('myapp').sort(), skeleton.sort());
       
@@ -658,32 +654,6 @@ Created myapp1/app/views/__restricted/archive/2009/09/index.hbs\n» Created myap
       }
 
     }
-  
-}).addBatch({
-  
-  'protos fetch': {
-
-    topic: function() {
-      var promise = new EventEmitter();
-
-      protos.command('fetch --js jquery --css bootstrap');
-
-      protos.exec(function(err, results) {
-        promise.emit('success', err || results);
-      });
-
-      return promise;
-    },
-
-    "Properly downloads & extracts assets into public/": function(results) {
-      var r1 = results[0];
-      var expected = '» Downloading Bootstrap CSS Toolkit\n» Downloading jQuery JavaScript Library';
-      assert.equal(r1, expected);
-      assert.isTrue(fs.existsSync('public/js/jquery-'+ jqueryVersion +'.min.js'));
-      assert.isTrue(fs.existsSync('public/css/bootstrap'));
-    }
-
-  }
   
 }).addBatch({
 
