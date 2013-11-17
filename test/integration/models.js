@@ -85,6 +85,15 @@ vows.describe('Models').addBatch({
       assert.strictEqual(app.accountsModel.driver, app.contextModel.driver);
       assert.strictEqual(app.accountsModel.driver, app.groupsModel.driver);
       assert.strictEqual(app.accountsModel.driver, app.websitesModel.driver);
+    },
+    
+    'Prototype methods are preserved': function() {
+      assert.isFalse(app.usersModel.hasOwnProperty('alpha'));
+      assert.isFalse(app.usersModel.hasOwnProperty('beta'));
+      assert.strictEqual(app.usersModel.alpha, protos.noop);
+      assert.strictEqual(app.usersModel.beta, protos.noop);
+      assert.strictEqual(app.usersModel.constructor.prototype.alpha, protos.noop);
+      assert.strictEqual(app.usersModel.constructor.prototype.beta, protos.noop);
     }
     
   }

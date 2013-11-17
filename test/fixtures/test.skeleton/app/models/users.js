@@ -35,5 +35,12 @@ UsersModel.methods = {
   
 }
 
+protos.extend(UsersModel.prototype, {
+  
+  alpha: protos.noop,
+  
+  beta: protos.noop
+  
+});
 
 module.exports = UsersModel;
