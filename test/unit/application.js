@@ -99,6 +99,7 @@ vows.describe('lib/application.js').addBatch({
         'main_jade',
         'main_swig',
         'handlebars_test',
+        'hbtest',
         '$hbtest',
         '$link',
         '$sanitize',

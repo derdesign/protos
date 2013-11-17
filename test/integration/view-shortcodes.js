@@ -40,6 +40,7 @@ vows.describe('View Shortcodes').addBatch({
       'main_jade',
       'main_swig',
       'handlebars_test',
+      'hbtest',
       '#hbtest',
       '#wrap',
       '#sanitize',

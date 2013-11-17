@@ -46,7 +46,11 @@ Handlebars.prototype.render = function(data) {
 }
 
 Handlebars.prototype.returnPartials = function() {
-  return partials;
+  // Returning empty partials object, because we are using handlebars optimized partials
+  // If the partials object is passed, then these functions will be called by using the
+  // double stashes {{}} (because handlebars runs functions inside these) which provides
+  // undesired results. This is done so we can use the partials as helpers.
+  return {}; 
 }
 
 function partialHelper() {
@@ -54,7 +58,7 @@ function partialHelper() {
   var options = args.pop();
   var params = options.hash;
   var partial = args[0];
-  if (partial && partial in partials) {
+  if (partial && partial in partials) { // Make sure we are always using the updated partials object
     if (this.locals !== this) {
       // Avoid cyclic __proto__ value by checking if
       // the 'this' object is indeed the locals object
@@ -75,7 +79,7 @@ app.on('view_partials_loaded', function(ob) {
   
   // Initialize to support hot code loading
   
-  partials = app.views.partials;
+  partials = app.views.partials; // Used by the partial helper
   
   optionsContext = {
     helpers: {
@@ -89,7 +93,9 @@ app.on('view_partials_loaded', function(ob) {
   }
 
   var slice = Array.prototype.slice;
-  
+
+  // Create handlebars helpers and partials
+
   Object.keys(ob).forEach(function(name) {
     if (name[0] == '$') { // Helpers
       optionsContext.helpers[name.slice(1)] = function() {
@@ -105,6 +111,20 @@ app.on('view_partials_loaded', function(ob) {
         var out = ob[name].apply(null, arguments);
         return new SafeString(out);
       };
+    }
+  });
+  
+  // Enable partials to be able to be run as helpers, by making
+  // the necessary adjustments. The partials will only be registered
+  // as helpers only if there is not a helper with the same name.
+  
+  Object.keys(optionsContext.partials).forEach(function(partial) {
+    if ( !(partial in optionsContext.helpers) ) {
+      optionsContext.helpers[partial] = function() {
+        var args = slice.call(arguments, 0);
+        args.unshift(partial);
+        return partialHelper.apply(this, args);
+      }
     }
   });
   
