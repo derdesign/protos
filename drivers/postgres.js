@@ -460,7 +460,7 @@ PostgreSQL.prototype.__modelMethods = {
   
   get: function(o, fields, callback) {
     
-    var self = this;
+    var single, self = this;
     
     if (callback == null) {
       callback = fields;
@@ -476,6 +476,7 @@ PostgreSQL.prototype.__modelMethods = {
       
       // If `o` is number: Convert to object
       o = {id: o};
+      single = true;
 
     } else if (util.isArray(o)) {
       
@@ -488,6 +489,9 @@ PostgreSQL.prototype.__modelMethods = {
       }
       
       return multi.exec(function(err, results) {
+        results = results.filter(function(val) {
+          return val; // Filter null values
+        });
         callback.call(self, err, results);
       });
       
@@ -534,7 +538,9 @@ PostgreSQL.prototype.__modelMethods = {
         callback.call(self, err, null);
       } else {
         if (results.length === 0) {
-          callback.call(self, null, []);
+          callback.call(self, null, single ? null : []);
+        } else if (single) {
+          callback.call(self, null, self.createModel(results[0]));
         } else {
           for (var models=[],i=0; i < results.length; i++) {
             models.push(self.createModel(results[i]));

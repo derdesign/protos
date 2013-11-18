@@ -449,7 +449,7 @@ SQLite.prototype.__modelMethods = {
   
   get: function(o, fields, callback) {
     
-    var self = this;
+    var single, self = this;
     
     if (callback == null) {
       callback = fields;
@@ -465,6 +465,7 @@ SQLite.prototype.__modelMethods = {
       
       // If `o` is number: Convert to object
       o = {id: o};
+      single = true;
 
     } else if (util.isArray(o)) {
       
@@ -477,6 +478,9 @@ SQLite.prototype.__modelMethods = {
       }
       
       return multi.exec(function(err, results) {
+        results = results.filter(function(val) {
+          return val; // Filter null values
+        });
         callback.call(self, err, results);
       });
       
@@ -515,10 +519,14 @@ SQLite.prototype.__modelMethods = {
       params: values,
       table: this.context,
     }, function(err, results) {
-      if (err) callback.call(self, err, null);
-      else {
-        if (results.length === 0) callback.call(self, null, []);
-        else {
+      if (err) {
+        callback.call(self, err, null);
+      } else {
+        if (results.length === 0) {
+          callback.call(self, null, single ? null : []);
+        } else if (single) {
+          callback.call(self, null, self.createModel(results[0]));
+        } else {
           for (var models=[],i=0; i < results.length; i++) {
             models.push(self.createModel(results[i]));
           }
@@ -531,6 +539,7 @@ SQLite.prototype.__modelMethods = {
   /* Model API save */
   
   save: function(o, callback) {
+
     var id, self = this;
     
     // // Get id, and prepare update data

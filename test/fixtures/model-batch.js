@@ -57,14 +57,16 @@ function ModelBatch() {
 
             // ################### QUERY CACHING TESTS [DRIVER] #####################
 
-            // Insert second item
-            multi.insert(data.insert[1]);
+            // Insert second item. Ensures item is retrieved back and returned
+            // NOTE: Using new, which uses insert under the hood
+            multi.new(data.insert[1]);
 
             // Attempt to insert data that does not validate => err is returned
-            multi.insert(data.insert[2])
+            // Using create, which is an alias of new
+            multi.create(data.insert[2]);
 
             multi.exec(function(err, results) {
-              promise.emit('success', err || results);
+              promise.emit('success', [err, results]);
             });
             
           });
@@ -73,12 +75,21 @@ function ModelBatch() {
 
         },
 
-        'Inserts new models': function(results) {
-          assert.isArray(results);
-          assert.equal(results.length, 3);
-          assert.isNull(results[0]);
-          assert.isNull(results[1]);
-          assert.equal(results[2].toString(), "Error: TestModel: Unable to validate 'username': !@#$%");
+        'Inserts new models': function(args) {
+          
+          var err = args[0], results = args[1];
+          
+          // Assert proper errors returned
+          assert.isArray(err);
+          assert.equal(err.length, 3);
+          assert.isNull(err[0]);
+          assert.isNull(err[1]);
+          assert.equal(err[2].toString(), "Error: TestModel: Unable to validate 'username': !@#$%");
+          
+          // Assert proper return values
+          // NOTE: Tests if .new() returns created object
+          assert.deepEqual(results, [1, { id: 2, username: 'user2', password: 'pass2' }, null]);
+          
         }
 
       }
@@ -110,37 +121,60 @@ function ModelBatch() {
             cacheID: 'another_cache',
             cacheTimeout: 3600,
             cacheFilter: function(err, found) {
-              found[0].filterValue = "OK2";
+              found.filterValue = "OK2";
               return [err, found];
             }
           }, 'get', 1);
           
           // array
           multi.get([1,2]);
+          
+          // Returns null when id not found
+          multi.get(99);
+          
+          // Returns empty array when group of id's not found
+          multi.get([99, 100, 101]);
+          
+          // Returns empty array when custom query returns no results
+          multi.get({
+            username: 'blah'
+          });
 
           multi.exec(function(err, results) {
             promise.emit('success', err || results);
           });
-
+          
           return promise;
         },
 
         'Returns valid results': function(results) {
           
+          // console.exit(results);
+          
           var expected = [
-            [ [ { username: 'user'+process.pid, id: 1 } ], [ { username: 'user2', id: 2 } ] ], // Get by field works ok
-            [{ username: 'user'+process.pid, password: 'pass1', id: 1, filterValue: "OK1"}], // Proves that filters work
-            [{ username: 'user'+process.pid, password: 'pass1', id: 1, filterValue: "OK2"}], // Proves that filters work
-            [ [{ username: 'user'+process.pid, password: 'pass1', id: 1 }],
-              [{ username: 'user2', password: 'pass2', id: 2 }] ] ];
-
-          // var util = require('util');
-          // 
-          // console.log(util.inspect(expected, false, 99));
-          // 
-          // console.exit(util.inspect(results, false, 99));
+            [ { id: 1, username: 'user'+process.pid }, { id: 2, username: 'user2' } ],
+            [ { id: 1, username: 'user'+process.pid, password: 'pass1', filterValue: 'OK1' } ],
+              { id: 1, username: 'user'+process.pid, password: 'pass1', filterValue: 'OK2' },
+            [ { id: 1, username: 'user'+process.pid, password: 'pass1' }, { id: 2, username: 'user2', password: 'pass2' }],
+            null,
+            [],
+            []
+          ];
+          
+          assert.equal(results[0][0].className, 'TestModelObject');
+          assert.equal(results[0][1].className, 'TestModelObject');
+          assert.equal(results[2].className, 'TestModelObject');
+          assert.equal(results[3][0].className, 'TestModelObject');
+          assert.equal(results[3][1].className, 'TestModelObject');
+          
+          assert.equal(results[0][0].constructor.name, 'ModelObject');
+          assert.equal(results[0][1].constructor.name, 'ModelObject');
+          assert.equal(results[2].constructor.name, 'ModelObject');
+          assert.equal(results[3][0].constructor.name, 'ModelObject');
+          assert.equal(results[3][1].constructor.name, 'ModelObject');
           
           assert.deepEqual(results, expected);
+          
         }
 
       }
@@ -212,7 +246,7 @@ function ModelBatch() {
 
       }
 
-    },
+    }
     
   }
   

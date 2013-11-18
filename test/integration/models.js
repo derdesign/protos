@@ -313,8 +313,8 @@ vows.describe('Models').addBatch({
         object: {apple: 'green', banana: 'yellow', number: 33, array: [1,2,3]},
         array: [1,2,3]
       }, function(err, instance) {
-        user = instance[0];
-        promise.emit('success', err || instance[0]);
+        user = instance;
+        promise.emit('success', err || user);
       });
 
       return promise;

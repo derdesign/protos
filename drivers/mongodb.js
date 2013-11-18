@@ -480,7 +480,7 @@ MongoDB.prototype.__modelMethods = {
 
   get: function(o, fields, callback) {
     
-    var self = this;
+    var single, self = this;
 
     if (callback == null) {
       callback = fields;
@@ -496,6 +496,7 @@ MongoDB.prototype.__modelMethods = {
       
       // If `o` is number: Convert to object
       o = {_id: o};
+      single = true;
       
     } else if (o instanceof Array) {
 
@@ -508,6 +509,9 @@ MongoDB.prototype.__modelMethods = {
       }
       
       return multi.exec(function(err, docs) {
+        docs = docs.filter(function(val) {
+          return val; // Filter null values
+        });
         callback.call(self, err, docs);
       });
       
@@ -529,8 +533,11 @@ MongoDB.prototype.__modelMethods = {
     }, function(err, docs) {
       if (err) callback.call(self, err, null);
       else {
-        if (docs.length === 0) callback.call(self, null, []);
-        else {
+        if (docs.length === 0) {
+          callback.call(self, null, single ? null : []);
+        } else if (single) {
+          callback.call(self, null, self.createModel(docs[0]));
+        } else {
           for (var models=[],i=0; i < docs.length; i++) {
             models.push(self.createModel(docs[i]));
           }
