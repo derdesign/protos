@@ -58,7 +58,7 @@ vows.describe('Command Line Interface').addBatch({
       var promise = new EventEmitter(),
           results = [];
       
-      protos.command('create myapp --skeleton --model posts comment --controller admin dashboard');
+      protos.command('create myapp --skeleton --model posts comments --controller admin dashboard');
       protos.command('create myapp1 --skeleton --controller test');
       
       protos.exec(function(err, results) {
@@ -157,7 +157,7 @@ res.render(\'index\');\n  });\n\n}\n\nmodule.exports = BlogController;';
       topic: function() {
         var promise = new EventEmitter();
 
-        protos.command('model posts comments');
+        protos.command('model --pluralize post comment');
         protos.command('model books --driver mongodb:books --context bookstore');
 
         protos.exec(function(err, results) {

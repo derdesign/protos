@@ -546,10 +546,12 @@ module.exports = {\n\
   
   model: {
     single: ['driver', 'context'],
+    switches: ['pluralize'],
     args: 99,
     help: {
       driver: 'Driver to use by the model',
-      context: 'Model context to set'
+      context: 'Model context to set',
+      pluralize: 'Pluralize model names'
     },
     validate: validateApp,
     run: function(data) {
@@ -720,8 +722,9 @@ function createModel(app, name, opts) {
   
   if (!opts) opts = {};
   
-  // Note: names will be pluralized
-  name = inflect.pluralize(name.toLowerCase().replace(/(-|_)?model$/,''));
+  name = name.toLowerCase().replace(/(-|_)?model$/,'');
+  
+  if (opts.pluralize) name = inflect.pluralize(name);
   
   var model = inflect.camelize(name) + 'Model';
   
@@ -747,6 +750,7 @@ function %s(app) {\n\
 }\n\
 \n\
 module.exports = %s;";
+
   tpl = util.format(tpl, model, (opts.driver || 'default'), (opts.context || getModelContext(model)), model, model);
   
   var file = util.format('%s/app/models/%s.js', app, name);
@@ -765,7 +769,6 @@ module.exports = %s;";
 
 function createController(app, name) {
   
-  // Note: names will be pluralized
   name = name.toLowerCase().replace(/(-|_)?controller$/,'');
   controller = inflect.camelize(name) + 'Controller';
 
@@ -882,7 +885,6 @@ function createView(app, controller, view, partial) {
 
 function createHelper(app, name) {
 
-  // Note: names will be pluralized
   name = name.toLowerCase().replace(/(-|_)?helper$/,'');
   helper = inflect.camelize(name) + 'Helper';
 
