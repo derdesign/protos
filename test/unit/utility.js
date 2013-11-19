@@ -29,9 +29,14 @@ vows.describe('lib/utility.js').addBatch({
       assert.isNull(f('null'));
     },
     
+    'Converts undefined': function(f) {
+      assert.isUndefined(f('undefined'));
+    },
+    
     'Converts boolean': function(f) {
-      assert. isTrue(f('true'));
-    }
+      assert.isTrue(f('true'));
+      assert.isFalse(f('false'));
+    },
     
   },
   

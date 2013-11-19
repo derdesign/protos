@@ -483,7 +483,7 @@ Session.prototype.createHash = function(guest) {
 
 Session.prototype.typecast = function(data) {
   var tvars = this.config.typecastVars;
-  for (var key,i=0; i < tvars.length; i++) {
+  for (var key,i=0,len=tvars.length; i < len; i++) {
     key = tvars[i];
     if (data[key] != null) data[key] = protos.util.typecast(data[key]);
   }

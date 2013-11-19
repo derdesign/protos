@@ -2,7 +2,8 @@
 var app =require('../fixtures/bootstrap'),
     vows = require('vows'),
     assert = require('assert'),
-    util = require('util');
+    util = require('util'),
+    sanitizer = require('sanitizer');
 
 vows.describe('lib/validator.js').addBatch({
   
@@ -288,6 +289,63 @@ vows.describe('lib/validator.js').addBatch({
       name: null,
       age: null,
       some: null
+    });
+    
+  },
+  
+  'Built-in filters return valid results': function() {
+    
+    var validator = app.validator();
+    
+    var exclude = [
+      'typecast',
+      'escape',
+      'sanitize',
+      'md5',
+      'encodeURI',
+      'encodeURIComponent',
+      'decodeURI',
+      'decodeURIComponent'];
+    
+    for (var method in validator.fn) {
+      if (exclude.indexOf(method) === -1) {
+        var ob = {}, filter = {};
+        ob[method] = 'anything';
+        filter[method] = validator.fn[method];
+        validator.add(ob);
+        validator.filter(filter);
+      }
+    }
+    
+    assert.strictEqual(validator.fn.typecast, protos.util.typecast);
+    assert.strictEqual(validator.fn.escape, sanitizer.escape);
+    assert.strictEqual(validator.fn.sanitize, sanitizer.sanitize);
+    assert.strictEqual(validator.fn.md5, app.md5);
+    assert.strictEqual(validator.fn.encodeURI, encodeURI);
+    assert.strictEqual(validator.fn.encodeURIComponent, encodeURIComponent);
+    assert.strictEqual(validator.fn.decodeURI, decodeURI);
+    assert.strictEqual(validator.fn.decodeURIComponent, decodeURIComponent);
+    
+    var subject = {
+      sanitizeEscape: '<p>Hello <script type="text/javascript">throw new Error();</script></p>',
+      base64: 'Hello World!',
+      toInteger: '5',
+      toFloat: '2.5',
+      toLowerCase: 'Hello World',
+      toUpperCase: 'Hello World'
+    }
+    
+    var err = validator.validate(subject);
+    
+    assert.isNull(err);
+    
+    assert.deepEqual(subject, {
+      sanitizeEscape: '&lt;p&gt;Hello &lt;/p&gt;',
+      base64: 'SGVsbG8gV29ybGQh',
+      toInteger: 5,
+      toFloat: 2.5,
+      toLowerCase: 'hello world',
+      toUpperCase: 'HELLO WORLD'
     });
     
   },

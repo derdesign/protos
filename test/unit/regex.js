@@ -140,11 +140,6 @@ var validation = {
     valid: ['1', '1234', '1.99', '111111.99', '123.456'],
     invalid: ['.1', '99.', 'abc', '.', ' ']
   },
-  null: {
-    regex: /^null$/i,
-    valid: ['null', 'NULL', 'Null'],
-    invalid: ['0null', 'null.', 'hello', '.', '']
-  },
   boolean: {
     regex: /^(true|false)$/i,
     valid: ['true', 'TRUE', 'True', 'false', 'FALSE', 'False'],
