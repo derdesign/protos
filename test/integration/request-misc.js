@@ -157,17 +157,21 @@ vows.describe('Request Misc').addBatch({
     topic: function() {
       
       var promise = new EventEmitter();
+      var oldTitle = app.config.title;
+      
+      app.config.title = "<"+ oldTitle +">";
       
       // Page title, default
       multi.curl("/request/title");
       
       // Specific Page Title
-      multi.curl('-G -d "msg=Hello%20World" /request/title');
+      multi.curl('-G -d "msg=<strong>Hello%20World</strong>" /request/title');
       
       // Request metadata
       multi.curl('/request/metadata');
       
       multi.exec(function(err, results) {
+        app.config.title = oldTitle;
         promise.emit('success', err || results);
       });
       
@@ -176,12 +180,12 @@ vows.describe('Request Misc').addBatch({
 
     "Sets default page title": function(results) {
       var r = results[0];
-      assert.equal(r, '#My Application#');
+      assert.equal(r, '#&lt;My Application&gt;#');
     },
     
     "Sets custom page title": function(results) {
       var r = results[1];
-      assert.equal(r, '#My Application &raquo; Hello World#');
+      assert.equal(r, '#&lt;My Application&gt; &raquo; &lt;strong&gt;Hello World&lt;/strong&gt;#');
     },
     
     "Gets & Sets metadata/view locals": function(results) {

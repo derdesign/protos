@@ -283,7 +283,7 @@ function MainController(app) {
     });
   });
   
-  get('/request/title', {msg: 'alpha_dashes'}, function(req, res) {
+  get('/request/title', {msg: 'anything'}, function(req, res) {
     var msg = req.queryData.msg;
     if (msg) req.setPageTitle(msg);
     res.render('page-title', true);
