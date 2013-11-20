@@ -137,7 +137,7 @@ function ModelBatch() {
           
           // Returns empty array when custom query returns no results
           multi.get({
-            username: 'blah'
+            id: 9999 // Querying by ID is valid because ID is an implicit property
           });
 
           multi.exec(function(err, results) {

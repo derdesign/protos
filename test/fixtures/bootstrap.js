@@ -274,7 +274,6 @@ app.createEngineBatch = function(className, engine, testUrl, __module__) {
 
 // Common model properties
 app.locals.commonModelProps = {
-  id    : {type: 'integer'},
   username  : {type: 'string', required: true, validates: 'alnum_underscores'},
   password  : {type: 'string', required: true, validates: 'alnum_underscores'},
 }
