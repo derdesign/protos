@@ -387,9 +387,11 @@ PostgreSQL.prototype.updateWhere = function(o, callback) {
   query += createInsertParams(values);
   
   var vals = _.values(values);
+  
+  condition = condition.replace(/\$(\d)+/g, '${$1}');
 
   for (var i=1, len=params.length, vl=vals.length; i <= len; i++) {
-    condition = condition.replace('$'+i, '$'+(i+vl));
+    condition = condition.replace('${'+i+'}', '$'+(i+vl));
   }
   
   query += util.format(" WHERE %s %s", condition, appendSql);

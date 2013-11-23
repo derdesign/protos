@@ -321,9 +321,10 @@ var batch = vows.describe('drivers/postgres.js').addBatch({
 
       // condition + table + values
       multi.updateWhere({
-        condition: 'id=1',
+        condition: 'id=$1 AND username=$2',
+        params: [1, 'username'],
         table: table,
-        values: {username: '__user', password: '__pass'}
+        values: {username: '__user'} // With one value to update and more than one param, confirm that param reordering works
       });
 
       // condition + params + table + values
