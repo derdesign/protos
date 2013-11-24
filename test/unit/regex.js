@@ -381,7 +381,7 @@ var validation = {
     invalid: ['http:/google.com', 'google.com', 'some:8080', '']
   },
   email: {
-    regex: /^[_a-z0-9\-"'\/]+(\.[_a-z0-9\-"'\/]+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*\.(([0-9]{1,3})|([a-z]{2,3})|(aero|coop|info|museum|name|local))$/i,
+    regex: /^[_a-z0-9\-"'\/]+(\.[_a-z0-9\-"'\/]+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*\.(([0-9]{1,3})|([a-z]{2,3})|(aero|coop|info|museum|name|local|localhost))$/i,
     valid: ['email@some.com', '1@2.com', 'some@imac.local', 'email@doman.example.eu'],
     invalid: ['some@','@some', 'some@', 'some@domain']
   },
