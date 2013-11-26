@@ -356,6 +356,43 @@ vows.describe('lib/validator.js').addBatch({
     } catch(e) {
       assert.strictEqual(e.toString(), "Error: Validator: invalid validation data provided");
     }
+  },
+  
+  'Properly sets and gets contexts': function() {
+    
+    var validator = app.validator();
+    var Validator = validator.constructor;
+    var arglen = {};
+    var instance = {};
+    
+    var foo = validator.context('foo', function() {
+      instance.foo = this;
+      arglen.foo = arguments.length;
+    });
+    
+    var bar = validator.context('bar', function() {
+      instance.bar = this;
+      arglen.bar = arguments.length;
+    });
+    
+    assert.strictEqual(foo, validator);
+    assert.strictEqual(bar, validator);
+    assert.strictEqual(instance.foo, validator.context('foo'));
+    assert.strictEqual(instance.bar, validator.context('bar'));
+    assert.strictEqual(instance.foo, validator.__context.foo);
+    assert.strictEqual(instance.bar, validator.__context.bar);
+    assert.instanceOf(instance.foo, Validator);
+    assert.instanceOf(instance.bar, Validator);
+    assert.isFalse(instance.foo === instance.bar);
+    assert.deepEqual(arglen, {foo: 0, bar: 0});
+    
+    try {
+      validator.context('foo', 1);
+    } catch(e) {
+      assert.instanceOf(e, Error);
+      assert.equal(e.toString(), 'Error: Expecting function');
+    }
+    
   }
   
 }).export(module);
