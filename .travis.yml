@@ -16,3 +16,4 @@ notifications:
   
 services:
   - mongodb
+  - redis-server
