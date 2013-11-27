@@ -502,6 +502,7 @@ MySQL.prototype.__modelMethods = {
       columns: fields || undefined,
       params: values,
       table: this.context,
+      appendSql: "ORDER BY id DESC"
     }, function(err, results) {
       if (err) callback.call(self, err, null);
       else {

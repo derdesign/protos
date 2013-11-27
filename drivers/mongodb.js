@@ -351,20 +351,22 @@ MongoDB.prototype.queryWhere = function(o, callback) {
       collection = o.collection || '',
       fields = o.fields || {},
       condition = o.condition,
+      exArgs = o.exArgs || {},
       _id = (condition && condition._id);
-      
+  
   if (!condition) {
     callback.call(self, new Error("MongoDB::queryWhere: 'condition' is missing"));
     return;
   }
-
+  
   // If _id is passed other conditions will be ignored
   if (_id != null) condition = constructIdCondition(_id);
-
+  
   this.client.collection(collection, function(err, collection) {
-    if (err) callback.call(self, err);
-    else {
-      collection.__find(condition, fields, function(err, docs) {
+    if (err) {
+      callback.call(self, err);
+    } else {
+      collection.__find(condition, fields, exArgs, function(err, docs) {
         callback.call(self, err, docs);
       });
     }
@@ -399,19 +401,21 @@ MongoDB.prototype.queryWhere = function(o, callback) {
 MongoDB.prototype.queryById = function(o, callback) {
   var self = this,
       collection = o.collection || '',
-      fields = o.fields || {};
+      fields = o.fields || {},
+      exArgs = o.exArgs || {};
   
   if (typeof o._id == 'undefined') {
     callback.call(self, new Error("MongoDB::queryById: '_id' is missing"));
     return;
   }
-    
+  
   var condition = constructIdCondition(o._id);
   
   this.client.collection(collection, function(err, collection) {
-    if (err) callback.call(self, err);
-    else {
-      collection.__find(condition, fields, function(err, docs) {
+    if (err) {
+      callback.call(self, err);
+    } else {
+      collection.__find(condition, fields, exArgs, function(err, docs) {
         callback.call(self, err, docs);
       });
     }
@@ -529,7 +533,10 @@ MongoDB.prototype.__modelMethods = {
     this.driver.queryWhere({
       collection: this.context,
       condition: o,
-      fields: fields || {}
+      fields: fields || {},
+      exArgs: {
+        sort: [['_id', 'desc']]
+      }
     }, function(err, docs) {
       if (err) callback.call(self, err, null);
       else {

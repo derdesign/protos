@@ -54,12 +54,24 @@ function ModelBatch() {
             multi.queryCached({
              cacheInvalidate: 'user_cache'
             }, 'insert', data.insert[0]);
-
+            
             // ################### QUERY CACHING TESTS [DRIVER] #####################
 
             // Insert second item. Ensures item is retrieved back and returned
             // NOTE: Using new, which uses insert under the hood
             multi.new(data.insert[1]);
+            
+            // Insert a few more records to test order of retrieval
+            if (model.driver.className == 'MongoDB') {
+              multi.create({id: 3, username: 'foo', password: 'bar'});
+              multi.create({id: 4, username: 'foo1', password: 'bar'});
+              multi.create({id: 5, username: 'foo2', password: 'bar'});
+            } else {
+              multi.create({username: 'foo', password: 'bar'});
+              multi.create({username: 'foo1', password: 'bar'});
+              multi.create({username: 'foo2', password: 'bar'});
+            }
+            
 
             // Attempt to insert data that does not validate => err is returned
             // Using create, which is an alias of new
@@ -81,14 +93,22 @@ function ModelBatch() {
           
           // Assert proper errors returned
           assert.isArray(err);
-          assert.equal(err.length, 3);
+          assert.equal(err.length, 6);
           assert.isNull(err[0]);
           assert.isNull(err[1]);
-          assert.equal(err[2].toString(), "Error: TestModel: Unable to validate 'username': !@#$%");
+          assert.isNull(err[2]);
+          assert.isNull(err[3]);
+          assert.isNull(err[4]);
+          assert.equal(err[5].toString(), "Error: TestModel: Unable to validate 'username': !@#$%");
           
           // Assert proper return values
           // NOTE: Tests if .new() returns created object
-          assert.deepEqual(results, [1, { id: 2, username: 'user2', password: 'pass2' }, null]);
+          assert.deepEqual(results, [ 1,
+            { id: 2, username: 'user2', password: 'pass2' },
+            { id: 3, username: 'foo', password: 'bar' },
+            { id: 4, username: 'foo1', password: 'bar' },
+            { id: 5, username: 'foo2', password: 'bar' },
+            null ]);
           
         }
 
@@ -140,6 +160,11 @@ function ModelBatch() {
             id: 9999 // Querying by ID is valid because ID is an implicit property
           });
 
+          // Returns multiple items ordered by id and descending
+          multi.get({
+            password: 'bar' 
+          });
+          
           multi.exec(function(err, results) {
             promise.emit('success', err || results);
           });
@@ -158,7 +183,10 @@ function ModelBatch() {
             [ { id: 1, username: 'user'+process.pid, password: 'pass1' }, { id: 2, username: 'user2', password: 'pass2' }],
             null,
             [],
-            []
+            [],
+            [ { id: 5, username: 'foo2', password: 'bar' }, // Gets items ordered by ID and in DESC order
+              { id: 4, username: 'foo1', password: 'bar' },
+              { id: 3, username: 'foo', password: 'bar' } ]
           ];
           
           assert.equal(results[0][0].className, 'TestModelObject');
@@ -166,12 +194,18 @@ function ModelBatch() {
           assert.equal(results[2].className, 'TestModelObject');
           assert.equal(results[3][0].className, 'TestModelObject');
           assert.equal(results[3][1].className, 'TestModelObject');
+          assert.equal(results[7][0].className, 'TestModelObject');
+          assert.equal(results[7][1].className, 'TestModelObject');
+          assert.equal(results[7][2].className, 'TestModelObject');
           
           assert.equal(results[0][0].constructor.name, 'ModelObject');
           assert.equal(results[0][1].constructor.name, 'ModelObject');
           assert.equal(results[2].constructor.name, 'ModelObject');
           assert.equal(results[3][0].constructor.name, 'ModelObject');
           assert.equal(results[3][1].constructor.name, 'ModelObject');
+          assert.equal(results[7][0].constructor.name, 'ModelObject');
+          assert.equal(results[7][1].constructor.name, 'ModelObject');
+          assert.equal(results[7][2].constructor.name, 'ModelObject');
           
           assert.deepEqual(results, expected);
           
