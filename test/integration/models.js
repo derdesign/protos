@@ -70,9 +70,25 @@ vows.describe('Models').addBatch({
       assert.isTrue(model.driver instanceof protos.lib.driver);
     },
     
-    'Alternative shortcut set (app.xxxModel)': function() {
-      assert.equal(app.usersModel.className, 'UsersModel');
-      assert.isTrue(app.usersModel instanceof protos.lib.model);
+    'Alternate shortcut set for models (app.xxxModel)': function() {
+      assert.strictEqual(app.accountsModel, app.models.accounts);
+      assert.strictEqual(app.buddiesModel, app.models.buddies);
+      assert.strictEqual(app.companiesModel, app.models.companies);
+      assert.strictEqual(app.groupsModel, app.models.groups);
+      assert.strictEqual(app.testModel, app.models.test);
+      assert.strictEqual(app.usersModel, app.models.users);
+      assert.strictEqual(app.websitesModel, app.models.websites);
+    },
+    
+    
+    'Alternate shortcut set for drivers (app.xxxDriver)': function() {
+      assert.strictEqual(app.accountsModel.driver, app.accountsDriver);
+      assert.strictEqual(app.buddiesModel.driver, app.buddiesDriver);
+      assert.strictEqual(app.companiesModel.driver, app.companiesDriver);
+      assert.strictEqual(app.groupsModel.driver, app.groupsDriver);
+      assert.strictEqual(app.testModel.driver, app.testDriver);
+      assert.strictEqual(app.usersModel.driver, app.usersDriver);
+      assert.strictEqual(app.websitesModel.driver, app.websitesDriver);
     },
     
     'Allows context override': function() {
