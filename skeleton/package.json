@@ -8,6 +8,6 @@
     "node": "0.10.x"
   },
   "dependencies": {
-    "protos": ">= 0.4.7"
+    "protos": ">= 0.4.8-pre"
   }
 }
