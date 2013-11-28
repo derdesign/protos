@@ -20,7 +20,9 @@ function TestModel(app) {
     regex:    {type: 'string', validates: this.regex},
     notdef:   {type: 'string', default: null},
     invdtype: {type: 'string', validates: 99},
-    appregex: {type: 'string', validates: 'password'}
+    appregex: {type: 'string', validates: 'password'},
+    intval:   {type: 'integer', validates: 'integer'},
+    intval_req: {type: 'integer', required: true, validates: 'integer'}
   }
 
 }

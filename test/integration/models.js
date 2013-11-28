@@ -430,7 +430,31 @@ vows.describe('Models').addBatch({
       assert.isNull(m);
     }
 
-  }  
+  }
+  
+}).addBatch({
+
+  'Model Validation': {
+    
+    'When field not required, null is valid': function() {
+      
+      var err1 = app.testModel.validateProperties({
+        intval: null,
+        intval_req: 99
+      });
+      
+      var err2 = app.testModel.validateProperties({
+        intval: undefined,
+        intval_req: null
+      });
+
+      assert.isNull(err1);
+      
+      assert.equal(err2.toString(), "Error: TestModel: Unable to validate 'intval_req': null");
+
+    }
+    
+  }
   
 }).addBatch({
   
