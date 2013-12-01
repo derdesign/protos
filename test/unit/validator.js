@@ -393,6 +393,31 @@ vows.describe('lib/validator.js').addBatch({
       assert.equal(e.toString(), 'Error: Expecting function');
     }
     
+    try {
+      validator.context('', function() {});
+    } catch(e) {
+      assert.instanceOf(e, Error);
+      assert.equal(e.toString(), 'Error: Expecting context');
+    }
+    
+  },
+  
+  'Properly sets multiple contexts': function() {
+    
+    var instance, validator = app.validator();
+    
+    validator.context('foo bar baz', function() {
+      instance = this;
+    });
+    
+    var foo = validator.context('foo');
+    var bar = validator.context('bar');
+    var baz = validator.context('baz');
+    
+    assert.strictEqual(foo, instance);
+    assert.strictEqual(bar, instance);
+    assert.strictEqual(baz, instance);
+    
   }
   
 }).export(module);
