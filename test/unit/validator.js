@@ -237,6 +237,12 @@ vows.describe('lib/validator.js').addBatch({
         count: 57.2 // Gets added 2 on the post filter
       });
       
+      var valid4 = validator.getValid({});
+      
+      // Should return an empty object if no fields passed. If there are required fields, 
+      // it should just continue the validation instead of returning the validation error.
+      assert.deepEqual(valid4, {});
+      
     }
     
   },
