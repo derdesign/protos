@@ -226,7 +226,8 @@ var commands = {
       if (fs.existsSync(pidfile)) {
         // Sends an INT signal so 'exit' events are fired by process
         // This will ensure the application has a clean exit
-        var cmd = util.format('pkill -2 -F %s', pidfile);
+        var pids = fs.readFileSync(pidfile, 'utf8').split(/\n+/).join(' ');
+        var cmd = util.format('kill -2 %s', pids);
         cp.exec(cmd, function(err, stdout, stderr) {
           if (err) {
             console.log(err);
