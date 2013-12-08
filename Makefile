@@ -36,6 +36,7 @@ deps-clean:
 		@rm -Rf ./node_modules
 
 lint:
+		@./tools/lint bin/protos
 		@ls -F | egrep / | egrep -v "(node_modules|test|docs|build|doctmp|resources)" | NODE_ENV=lintall xargs -n 1 ./tools/lint
 		@echo
 

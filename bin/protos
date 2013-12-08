@@ -14,7 +14,7 @@ var _ = require('underscore'),
     Utility = require('../lib/utility.js'),
     CommandLine = require('../lib/command.js');
 
-var protos, origPath;
+var origPath;
 var protosPath = pathModule.resolve(__dirname, '../');
 
 var commands = {
@@ -179,9 +179,107 @@ var commands = {
     }
   },
   
+  start: {
+    switches: ['watch'],
+    single: ['pidfile', 'port', 'env'],
+    args: 99,
+    noargs: true,
+    sharedHelp: {
+      server: ['watch', 'pidfile', 'port', 'env']
+    },
+    run: function(data) {
+      data.fork = true;
+      data.logpath = 'stdout.log';
+      data.env = data.env || 'production';
+      commands.server.run.call(this, data);
+    }
+  },
+  
+  stop: {
+    switches: [],
+    single: ['pidfile'],
+    args: 99,
+    noargs: true,
+    sharedHelp: {
+      server: ['pidfile']
+    },
+    run: function(data) {
+      
+      var len = data.args.length;
+      
+      if (len > 1) {
+        this.printHelp();
+        process.exit();
+      } else if (len == 1) {
+        var p = data.args.pop();
+        if (fs.existsSync(p)) {
+          process.chdir(p);
+        } else {
+          console.exit("Directory not found: " + p);
+        }
+      }
+      
+      validateApp.call(this, data, false);
+      
+      var pidfile = data.pidfile || 'pid';
+      
+      if (fs.existsSync(pidfile)) {
+        // Sends an INT signal so 'exit' events are fired by process
+        // This will ensure the application has a clean exit
+        var cmd = util.format('pkill -2 -F %s', pidfile);
+        cp.exec(cmd, function(err, stdout, stderr) {
+          if (err) {
+            console.log(err);
+          } else if (stderr || stdout) {
+            console.log(stderr || stdout);
+          }
+        });
+      } else {
+        console.exit(util.format("Application could not be stopped (no '%s' pidfile found)", pidfile));
+      }
+      
+    }
+  },
+  
+  status: {
+    single: ['pidfile'],
+    args: 99,
+    noargs: true,
+    sharedHelp: {
+      server: ['pidfile']
+    },
+    run: function(data) {
+      
+      var len = data.args.length;
+      
+      if (len > 1) {
+        this.printHelp();
+        process.exit();
+      } else if (len == 1) {
+        var p = data.args.pop();
+        if (fs.existsSync(p)) {
+          process.chdir(p);
+        } else {
+          console.exit("Directory not found: " + p);
+        }
+      }
+      
+      validateApp.call(this, data, false);
+      
+      var pidfile = data.pidfile || 'pid';
+      
+      if (fs.existsSync(pidfile)) {
+        console.exit(util.format("Application seems to be running (found pidfile: '%s')", pidfile));
+      } else {
+        console.exit(util.format("Application doesn't seem to be be running (no '%s' pidfile found)", pidfile));
+      }
+      
+    }
+  },
+  
   server: {
-    switches: ['fork'],
-    single: ['logpath', 'port', 'env'],
+    switches: ['fork', 'watch'],
+    single: ['pidfile', 'logpath', 'port', 'env'],
     args: 99,
     noargs: true,
     help: {
@@ -189,46 +287,37 @@ var commands = {
       port: "Port to use for the HTTP Server",
       env: "Environment to use when running server",
       logpath: "File to save output when forking a new process",
+      pidfile: "The pidfile created by the application",
+      watch: "When forking, watch contents of stdout file"
     },
     run: function(data) {
 
       if (data.env) process.env.NODE_ENV = data.env;
-
-      var cwd = process.cwd();
       
       var len = data.args.length;
       
-      if (len <= 1) {
-        if (len === 1) {
-          var p = data.args.pop();
-          if (fs.existsSync(p)) {
-            process.chdir(p);
-          } else {
-            console.exit("File not found: " + p);
-          }
+      if (len > 1) {
+        this.printHelp();
+        process.exit();
+      } else if (len == 1) {
+        var p = data.args.pop();
+        if (fs.existsSync(p)) {
+          process.chdir(p);
         } else {
-          var isApp = validateApp.call(this, data, true);
-          if (!isApp) {
-            this.printHelp();
-            process.exit();
-          }
+          console.exit("Directory not found: " + p);
         }
-        
-        var files = listFiles('.');
-        
-        if (files.indexOf('boot.js') >= 0) {
-          var path = process.cwd();
-          process.chdir(cwd);
-          startServer.call(this, path, data, process.exit);
-        } else if (len === 1) {
-          console.exit(util.format("No application found on %s/", p));
-        } else {
-          this.printHelp();
-        }
-      } else {
-        if (!data.port) console.exit("--port is required when running multiple servers");
       }
       
+      validateApp.call(this, data, false);
+      
+      var pidfile = data.pidfile || 'pid';
+      
+      if (fs.existsSync(pidfile)) {
+        console.exit(util.format("Application seems to be running (found pidfile: '%s')", pidfile));
+      } else {
+        startServer.call(this, process.cwd(), data);
+      }
+
     }
   },
   
@@ -593,8 +682,7 @@ module.exports = {\n\
         createHelper(app, helper);
       });
        
-    },
-    validate: validateApp
+    }
   }
 
 }
@@ -770,7 +858,8 @@ module.exports = %s;";
 function createController(app, name) {
   
   name = name.toLowerCase().replace(/(-|_)?controller$/,'');
-  controller = inflect.camelize(name) + 'Controller';
+  
+  var controller = inflect.camelize(name) + 'Controller';
 
   if (controller === 'MainController') return; // That's a no-no
   
@@ -886,7 +975,8 @@ function createView(app, controller, view, partial) {
 function createHelper(app, name) {
 
   name = name.toLowerCase().replace(/(-|_)?helper$/,'');
-  helper = inflect.camelize(name) + 'Helper';
+  
+  var helper = inflect.camelize(name) + 'Helper';
 
   // console.exit([name, helper]);
 
@@ -929,7 +1019,6 @@ function listFiles(path, regex) {
   }
 }
 
-
 function validateApp(data, noexit, callback) {
   var inApp = listFiles(process.cwd()).indexOf('boot.js') >= 0;
   if (!inApp) {
@@ -954,22 +1043,61 @@ function validateApp(data, noexit, callback) {
   }
 }
 
-
-function startServer(path, data, callback) {
+function startServer(path, data) {
   var bootFile = path + '/boot.js';
-  var logPath = data.logpath;
+  var cmd, logPath = data.logpath;
   if (data.port) process.env.PORT_OVERRIDE = data.port;
   if (data.fork) {
     if (!logPath) console.exit("--fork has to be used with --logpath");
-    var cmd = util.format("nohup node %s >> %s 2>&1", bootFile, logPath);
-    cp.exec(cmd, {env: process.env});
-    if (data.args.length <= 1) {
-      console.log("Saving all output to " + logPath);
-      process.exit(); // Only exit on single app
+    if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+    cmd = util.format("nohup node %s > %s 2>&1", bootFile, logPath);
+    cmd = cp.exec(cmd, {env: process.env});
+    if (data.watch) {
+      var readline = require('readline');
+      var chokidar = require('chokidar');
+      var retries = 10;
+      var interval = setInterval(function() {
+        if (--retries < 0) {
+          clearInterval(interval);
+        } else if (fs.existsSync(logPath)) {
+          clearInterval(interval);
+          var buf = '';
+          var readCallback = function(err, data) {
+            if (data) {
+              process.stdout.write(data.slice(buf.length));
+              buf = data;
+            }
+          }
+          var watcher = chokidar.watch(logPath, {interval: 100});
+          watcher.on('change', function() {
+            fs.readFile(logPath, 'utf8', readCallback);
+          });
+          var rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+          });
+          var terminate = function() {
+            watcher.close();
+            process.exit();
+          }
+          rl.on('SIGINT', function() {
+            // Catches SIGINT before it's processed by the process
+            // and exits accordingly. This allows using CTLR-C to exit
+            // and the application will still run in background
+            terminate();
+          });
+          rl.question('', function(answer) {
+            // This allows pressing ENTER to exit the watch state
+            terminate();
+          });
+        }
+      }, 1000);
+    } else {
+      process.exit();
     }
   } else {
-    var cmd = cp.spawn('node', [bootFile], {env: process.env});
     var log = function(data) { console.log(data.toString('utf8').trimRight()); }
+    cmd = cp.spawn('node', [bootFile], {env: process.env});
     cmd.stdout.on('data', log);
     cmd.stderr.on('data', log);
   }
@@ -1138,9 +1266,9 @@ var cli = new CommandLine(commands);
 cli.help.before = "\n\
 Usage: protos [ACTION] [OPTIONS] [ARGUMENTS]\n\n\
 Actions: \n\
-         create install server config controller handler helper model\n\
-         view partial layout static restricted api hook include\n\
-         inspector link lint validate \n\n\
+         create install server start stop status config controller\n\
+         handler helper model view partial layout static restricted\n\
+         api hook include inspector link lint validate \n\n\
 Options:\n";
 
 cli.help.after = "\n\
