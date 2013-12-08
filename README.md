@@ -4,7 +4,7 @@
 Protos is a Web Application Framework for Node.js. Runs on UNIX Systems such as **Linux**, **FreeBSD** & **OSX**.
 
 
-## Usage
+## Installation
 
 Install:
 
@@ -13,6 +13,9 @@ Install:
 Install (globally):
   
     sudo npm install -g protos
+
+
+## Usage
 
 Create a project:
 
@@ -25,10 +28,18 @@ Create a minimal project:
 Start server:
     
     node boot.js
+    
+Deploy application:
 
-Start server within project's path:
+    protos start
+    
+Stop deployed application:
 
-    protos server
+    protos stop
+    
+Deployed application status:
+
+    protos status
 
 Start production server on port 8000:
 
@@ -64,6 +75,7 @@ Command Line Help:
 - File-based Event Handlers
 - File-based Extensions
 - Code Generation
+- Deployment commands
 
 
 ## Middleware
