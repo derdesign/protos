@@ -82,6 +82,7 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       
       // Blocks access to minify sources
       multi.curl('-i /target.css');
+      multi.curl('-i /assets/target.css');
       multi.curl('-i /target.js');
       
       multi.exec(function(err, results) {
@@ -146,9 +147,11 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
     
     "Blocks access to minify sources": function(results) {
       var r1 = results[8],
-          r2 = results[9];
+          r2 = results[9],
+          r3 = results[10];
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
     },
     
     "Does not compile ignored files": function() {

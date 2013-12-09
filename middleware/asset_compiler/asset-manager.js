@@ -17,8 +17,8 @@ if (config.compile.length === 0) return;
 
 var assets = {},
     extRegex = new RegExp('\\.(' + config.compile.join('|') + ')$');
-    
-// Prevent access to raw source files
+
+// Prevent access to raw source files and compiled files
 if (! config.assetSourceAccess) {
   app.on('static_file_request', function(req, res, path) {
     if (extRegex.test(path) || ignores.indexOf(path) >= 0) {
@@ -28,14 +28,21 @@ if (! config.assetSourceAccess) {
   });
 }
 
+// console.log(config);
+
 // Get ignores
 var target, arr, ignores = [];
 
 for (target in config.minify) {
   arr = config.minify[target];
   if (!Array.isArray(arr)) arr = [arr];
-  for (var i=0; i < arr.length; i++) {
-    ignores.push(app.fullPath('public/' + arr[i]));
+  for (var ext,file,i=0; i < arr.length; i++) {
+    file = arr[i];
+    ext = getExt(file);
+    ignores.push(app.fullPath('public/' + file));
+    if (extRegex.test(file)) {
+      ignores.push(app.fullPath('public/' + file.replace(extRegex, '.' + config.compileExts[ext])));
+    }
   }
 }
 
@@ -150,4 +157,8 @@ function compileSrc(file, compiler, ext) {
       app.emit('compile', relPath, err, code);
     }
   });
+}
+
+function getExt(file) {
+  return file.slice(file.lastIndexOf('.')+1).trim().toLowerCase();
 }
