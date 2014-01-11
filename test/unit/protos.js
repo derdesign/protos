@@ -1,3 +1,4 @@
+/*jshint evil:true */
 
 var app = require('../fixtures/bootstrap'),
     vows = require('vows'),

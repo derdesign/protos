@@ -272,7 +272,7 @@ vows.describe('Response Misc').addBatch({
     },
     
     "Properly parses arguments and sends responses": function(results) {
-      var r0 = results[0];
+      var r0 = results[0],
           r1 = results[1],
           r2 = results[2],
           r3 = results[3],

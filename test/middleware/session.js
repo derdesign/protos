@@ -164,7 +164,7 @@ vows.describe('Session (middleware)').addBatch({
       sess = app.session.config.sessCookie;
       shash = app.session.config.hashCookie;
       
-      var sessRegex = new RegExp(sess + '\=(.+)\;');
+      var sessRegex = new RegExp(sess + '=(.+);');
       
       // Response should include session cookies
       multi.curl('-i /session');
@@ -173,7 +173,7 @@ vows.describe('Session (middleware)').addBatch({
         var matches = results[0].match(sessRegex);
         
         if (matches) {
-          guestCookie = matches[1];
+          var guestCookie = matches[1];
           storage.getHash(guestSessId, function(err, data) {
             results.push(err || data);
             storage.delete(guestSessId, function(err, data) {
@@ -348,7 +348,7 @@ vows.describe('Session (middleware)').addBatch({
           
           results[2].split(/\r\n/).forEach(function(line) {
             
-            var re = new RegExp(util.format('Set-Cookie: %s\=([^;]+);', sess));
+            var re = new RegExp(util.format('Set-Cookie: %s=([^;]+);', sess));
             
             matches = line.match(re);
             

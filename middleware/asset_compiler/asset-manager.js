@@ -48,12 +48,19 @@ for (target in config.minify) {
 
 // console.exit(ignores);
 
+var sassPartial = /\/?_[^\/]+\.scss$/i;
+
 // Scan for files to compile
 fileModule.walkSync(app.fullPath(app.paths.public), function(dirPath, dirs, files) {
   for (var matches, path, ext, file, i=0; i < files.length; i++) {
     file = files[i].trim();
     path = dirPath.trim() + '/' + file;
-    if (ignores.indexOf(path) >= 0) continue;
+    if (ignores.indexOf(path) >= 0) {
+      continue;
+    } else if (sassPartial.test(path)) {
+      ignores.push(path);
+      continue;
+    }
     matches = path.match(extRegex);
     if (matches) {
       ext = matches[1];

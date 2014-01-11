@@ -34,7 +34,7 @@ vows.describe('View Rendering').addBatch({
       var err = data[0], buf = data[1], headers = data[2];
       assert.strictEqual(buf, "This is a raw message");
       assert.strictEqual(headers['content-type'], 'text/plain;charset=utf-8');
-      assert.strictEqual(headers['status'], '200 OK');
+      assert.strictEqual(headers.status, '200 OK');
     }
     
   }

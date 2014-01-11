@@ -81,7 +81,7 @@ Command Line Help:
 ## Middleware
 
 - Static File Server
-- Asset Compiler and Minifier: **LESS**, **CoffeeScript**, **Stylus**
+- Asset Compiler and Minifier: **LESS**, **Stylus**, **Sass**, **CoffeeScript**
 - Image Processing: **GraphicsMagick**, **ImageMagick**
 - Logger with Transports: **File**, **JSON**, **MongoDB**, **Redis**
 - Amazon Web Services

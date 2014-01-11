@@ -1,11 +1,18 @@
 
 /* Asset compilers */
 
-var less = protos.requireDependency('less', 'Asset Compiler Middleware', 'asset_compiler'),
-    stylus = protos.requireDependency('stylus', 'Asset Compiler Middleware', 'asset_compiler'),
-    nib = protos.requireDependency('nib', 'Asset Compiler Middleware', 'asset_compiler'),
-    coffee = protos.requireDependency('coffee-script', 'Asset Compiler Middleware', 'asset_compiler'),
-    pathModule = require('path');
+var mw = {
+  name: 'asset_compiler',
+  desc: 'Asset Compiler Middleware',
+}
+
+var less = protos.requireDependency('less', mw.desc, mw.name);
+var sass = protos.requireDependency('node-sass', mw.desc, mw.name);
+var stylus = protos.requireDependency('stylus', mw.desc, mw.name);
+var nib = protos.requireDependency('nib', mw.desc, mw.name);
+var coffee = protos.requireDependency('coffee-script', mw.desc, mw.name);
+
+var pathModule = require('path');
 
 // Asset compilers
 module.exports = {
@@ -17,6 +24,17 @@ module.exports = {
     }, callback);
   },
   
+  scss: function(source, file, callback) {
+    sass.render({
+      data: source,
+      error: callback,
+      success: function(css) {
+        callback(null, css);
+      },
+      includePaths: [pathModule.dirname(file)]
+    });
+  },
+
   styl: function(source, file, callback) {
     stylus(source)
       .set('filename', file)

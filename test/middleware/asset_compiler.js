@@ -9,7 +9,7 @@ var app = require('../fixtures/bootstrap'),
     
 var multi = new Multi(app);
 
-var compiledLess, compiledStylus, compiledCoffee, assetCompilerMinifyComplete;
+var compiledLess, compiledScss, compiledStylus, compiledCoffee, assetCompilerMinifyComplete;
 
 vows.describe('Asset Compiler (middleware)').addBatch({
   
@@ -59,17 +59,23 @@ vows.describe('Asset Compiler (middleware)').addBatch({
 
       // Get pre-compiled files for comparison
       compiledLess = fs.readFileSync(app.fullPath('../compiled-assets/less.txt'), 'utf8');
+      compiledScss = fs.readFileSync(app.fullPath('../compiled-assets/scss.txt'), 'utf8');
       compiledStylus = fs.readFileSync(app.fullPath('../compiled-assets/stylus.txt'), 'utf8');
       compiledCoffee = fs.readFileSync(app.fullPath('../compiled-assets/coffee.txt'), 'utf8');
      
       // Forbids access to asset sources
       multi.curl('-i /assets/less.less');
+      multi.curl('-i /assets/scss.scss');
+      multi.curl('-i /assets/_partial.scss');
       multi.curl('-i /assets/stylus.styl');
       multi.curl('-i /assets/coffee.coffee');
       
       // Successfully compiles LESS assets
       multi.curl('/assets/less.css');
       
+      // Successfully compiles SCSS assets
+      multi.curl('/assets/scss.css');
+
       // Successfully compiles Stylus assets
       multi.curl('/assets/stylus.css');
       
@@ -97,30 +103,39 @@ vows.describe('Asset Compiler (middleware)').addBatch({
     "Forbids access to asset sources": function(results) {
       var r1 = results[0],
           r2 = results[1],
-          r3 = results[2];
+          r3 = results[2],
+          r4 = results[3],
+          r5 = results[4];
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r4.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r5.indexOf('HTTP/1.1 404 Not Found') >= 0);
     },
     
     "Successfully compiles LESS assets": function(results) {
-      var r = results[3];
+      var r = results[5];
       assert.equal(r, compiledLess);
     },
     
+    "Successfully compiles SCSS assets": function(results) {
+      var r = results[6];
+      assert.equal(r, compiledScss);
+    },
+    
     "Successfully compiles Stylus assets": function(results) {
-      var r = results[4];
+      var r = results[7];
       assert.equal(r, compiledStylus);
     },
     
     "Successfully compiles CoffeeScript assets": function(results) {
-      var r = results[5];
+      var r = results[8];
       assert.equal(r, compiledCoffee);
     },
     
     "Successfully minifies supported assets": function(results) {
-      var r1 = results[6],
-          r2 = results[7];
+      var r1 = results[9],
+          r2 = results[10];
           
       // console.exit(r1);
           
@@ -146,9 +161,9 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
     },
     
     "Blocks access to minify sources": function(results) {
-      var r1 = results[8],
-          r2 = results[9],
-          r3 = results[10];
+      var r1 = results[11],
+          r2 = results[12],
+          r3 = results[13];
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);

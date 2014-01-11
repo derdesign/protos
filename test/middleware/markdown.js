@@ -22,7 +22,7 @@ vows.describe('Markdown (middleware)').addBatch({
       return app.markdown.parse(source, {
         sanitize: true,
         sanitizeURIPolicy: function(url) {
-          return /(google|twitter)/.test(url) ? url : null;
+          return (/(google|twitter)/).test(url) ? url : null;
         }
       });
 

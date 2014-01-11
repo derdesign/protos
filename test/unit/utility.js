@@ -157,7 +157,7 @@ vows.describe('lib/utility.js').addBatch({
     },
     
     'Creates regexes properly': function(regexes) {
-      var regexes = regexes.map(function(ob) { return ob.toString(); });
+      regexes = regexes.map(function(ob) { return ob.toString(); });
       assert.strictEqual(regexes[0], '/^(.+)\\.css$/');
       assert.strictEqual(regexes[1], '/^(.+)\\.(css|js)$/');
       assert.strictEqual(regexes[2], '/^hello/[xyz][a-b]{1}[aeiou]{1,3}(.+)\\.(css|js)$/');

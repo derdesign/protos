@@ -65,13 +65,14 @@ function AssetCompiler(config, middleware) {
   config = protos.configExtend({
     watchOn: ['development', 'debug'],
     watchInterval: app.config.watchInterval || 100,
-    compile: ['less', 'styl', 'coffee'],
+    compile: ['less', 'scss', 'styl', 'coffee'],
     assetSourceAccess: false,
     compilers: require('./compilers.js'),
     compileExts: {
       coffee: 'js',
       styl: 'css',
       less: 'css',
+      scss: 'css'
     },
     ignore: [],
     minify: {},

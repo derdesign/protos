@@ -24,7 +24,7 @@ vows.describe('lib/validator.js').addBatch({
       .add({first: /^John Doe$/, last: 'alpha_spaces'}, function(val) { return "cb:error -> " + val;})
       .add({email: 'email'}, "The email is invalid: %s") 
       .add([{msg: 'alpha'}])  // array arg test for [add]
-      .addOptional({some: function(val) { return /^[a-z]$/.test(val); }})
+      .addOptional({some: function(val) { return (/^[a-z]$/).test(val); }})
       .addOptional([{count: 'integer'}, "Not an integer value"]); // array arg test for [addOptional]
       
       return validator;
