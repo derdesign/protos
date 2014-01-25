@@ -509,10 +509,10 @@ PostgreSQL.prototype.__modelMethods = {
     
     // Set single if ID is specified in query
     if (o.id) single = true;
-      
+    
     // Prepare custom query
-    var condition, key, value,
-        keys = [], values = [];
+    var condition, key, value;
+    var keys = [], values = [];
     
     for (key in o) {
       keys.push(key);
@@ -600,6 +600,25 @@ PostgreSQL.prototype.__modelMethods = {
       // Remove entry from database
       this.driver.deleteById({
         id: id,
+        table: this.context
+      }, function(err, results) {
+        callback.call(self, err);
+      });
+      
+    } else if (id && typeof id == 'object') {
+      
+      var o = id;
+      var keys = _.keys(o);
+      var values = _.values(o);
+      var condition = [];
+      
+      for (var i=0,len=keys.length; i < len; i++) {
+        condition.push(util.format('%s=$%d', keys[i], (i+1)));
+      }
+      
+      this.driver.deleteWhere({
+        condition: condition.join(' AND '),
+        params: values,
         table: this.context
       }, function(err, results) {
         callback.call(self, err);

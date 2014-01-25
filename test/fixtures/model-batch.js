@@ -262,7 +262,7 @@ function ModelBatch() {
           var promise = new EventEmitter();
 
           // integer
-          multi.delete(2);
+          multi.delete({id: 2});
 
           // array
           multi.delete([1, 2]);

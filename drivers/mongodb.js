@@ -604,12 +604,23 @@ MongoDB.prototype.__modelMethods = {
 
   delete: function(id, callback) {
     var self = this;
-
+    
     if (typeof id == 'number' || typeof id == 'string' || id instanceof Array || id instanceof ObjectID) {
 
       this.driver.deleteById({
         collection: this.context,
         _id: id
+      }, function(err) {
+        callback.call(self, err);
+      });
+      
+    } else if (id && typeof id == 'object') {
+      
+      var o = id;
+      
+      this.driver.deleteWhere({
+        collection: this.context,
+        condition: o
       }, function(err) {
         callback.call(self, err);
       });

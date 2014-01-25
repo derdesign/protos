@@ -497,28 +497,19 @@ SQLite.prototype.__modelMethods = {
     // Set single if ID is specified in query
     if (o.id) single = true;
       
-    // Prepare custom query
-    var condition, key, value,
-        keys = [], values = [];
-    
-    for (key in o) {
-      keys.push(key);
-      values.push(o[key]);
-    }
-    
+    var keys = _.keys(o);
+      
     // Prevent empty args
     if (keys.length === 0) {
       callback.call(self, new Error(util.format("%s: Empty arguments", this.className)));
       return;
-    } else {
-      condition = keys.join('=? AND ') + '=?';
     }
     
     // Get model data & return generated model (if found)
     this.driver.queryWhere({
-      condition: condition,
+      condition: keys.join('=? AND ') + '=?',
       columns: fields || undefined,
-      params: values,
+      params: _.values(o),
       table: this.context,
       appendSql: "ORDER BY id DESC"
     }, function(err, results) {
@@ -577,7 +568,7 @@ SQLite.prototype.__modelMethods = {
   /* Model API delete */
   
   delete: function(id, callback) {
-
+    
     var self = this;
     
     if (typeof id == 'number' || id instanceof Array) {
@@ -585,6 +576,18 @@ SQLite.prototype.__modelMethods = {
       // Remove entry from database
       this.driver.deleteById({
         id: id,
+        table: this.context
+      }, function(err, results) {
+        callback.call(self, err);
+      });
+
+    } else if (id && typeof id == 'object') {
+      
+      var o = id;
+      
+      this.driver.deleteWhere({
+        condition: _.keys(o).join('=? AND ') + '=?',
+        params: _.values(o),
         table: this.context
       }, function(err, results) {
         callback.call(self, err);
