@@ -1,6 +1,7 @@
 
 var app =require('../fixtures/bootstrap'),
     vows = require('vows'),
+    util = require('util'),
     assert = require('assert');
 
 vows.describe('lib/helper.js').addBatch({
@@ -15,16 +16,18 @@ vows.describe('lib/helper.js').addBatch({
   
   'Helper::sanitize': function() {
     
-    var str = 'This is a <script type="text/javascript"></script> <a href="http://google.com">Google</a>.';
+    var str = 'This is a <script type="text/javascript"></script> <a href="http://google.com/webfonts/index.html">Google</a>.';
     
     var badLink = 'Hey <a href="http://example.com">you!</a>';
     
-    var urlPolicy = function(url) {
-      if (url.indexOf('http://google.com') === 0) return url; // Only allow urls from google.com
+    var urlPolicy = function(parsed) {
+      if (parsed.domain_ === 'google.com') {
+        return util.format('%s://%s%s', parsed.scheme_, parsed.domain_, parsed.path_);
+      }
     }
     
     assert.equal(app.mainHelper.sanitize(str), 'This is a  <a>Google</a>.');
-    assert.equal(app.mainHelper.sanitize(str, urlPolicy), 'This is a  <a href="http://google.com">Google</a>.');
+    assert.equal(app.mainHelper.sanitize(str, urlPolicy), 'This is a  <a href="http://google.com/webfonts/index.html">Google</a>.');
     assert.equal(app.mainHelper.sanitize(badLink, urlPolicy), 'Hey <a>you!</a>');
 
   },

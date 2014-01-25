@@ -15,21 +15,21 @@
     "node": "0.10.x"
   },
   "dependencies": {
-    "underscore": "1.5.1",
+    "underscore": "1.5.2",
     "underscore.string": "2.3.3",
-    "node-inspector": "0.4.0",
+    "node-inspector": "0.7.0-2",
     "shortcode-parser": "0.0.1",
-    "handlebars": "1.0.12",
-    "node-uuid": "1.4.0",
-    "sanitizer": "0.0.15",
-    "jshint": "2.1.9",
-    "chokidar": "0.6.2",
-    "request": "2.25.0",
-    "moment": "2.1.0",
+    "handlebars": "1.3.0",
+    "node-uuid": "1.4.1",
+    "sanitizer": "0.1.1",
+    "jshint": "2.4.2",
+    "chokidar": "0.8.1",
+    "request": "2.33.0",
+    "moment": "2.5.1",
     "multi": "0.1.3",
-    "mime": "1.2.10",
+    "mime": "1.2.11",
     "file": "0.2.1",
-    "qs": "0.6.5"
+    "qs": "0.6.6"
   },
   "devDependencies": {
     "vows": "0.7.0"

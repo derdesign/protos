@@ -104,7 +104,7 @@ vows.describe('View Shortcodes').addBatch({
 \n\
 &lt;strong&gt;Hello World! &#91;Brackets&#93; and &#123;Braces&#125; are escaped!!!.&lt;/strong&gt;\n\
 \n\
-&LT;DIV CLASS&#61;&#34;VALID&#34; ID&#61;&#34;BLAH&#34;&GT;\n\
+&LT;DIV CLASS=&#34;VALID&#34; ID=&#34;BLAH&#34;&GT;\n\
   &LT;P&GT;HELLO WORLD!&LT;/P&GT;\n\
   \n\
 &LT;/DIV&GT;';
