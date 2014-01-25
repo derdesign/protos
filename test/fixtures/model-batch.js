@@ -183,7 +183,7 @@ function ModelBatch() {
             [ { id: 1, username: 'user'+process.pid, password: 'pass1' }, { id: 2, username: 'user2', password: 'pass2' }],
             null,
             [],
-            [],
+            null,
             [ { id: 5, username: 'foo2', password: 'bar' }, // Gets items ordered by ID and in DESC order
               { id: 4, username: 'foo1', password: 'bar' },
               { id: 3, username: 'foo', password: 'bar' } ]

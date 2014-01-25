@@ -449,7 +449,6 @@ MySQL.prototype.__modelMethods = {
       
       // If `o` is number: Convert to object
       o = {id: o};
-      single = true;
 
     } else if (util.isArray(o)) {
       
@@ -478,6 +477,9 @@ MySQL.prototype.__modelMethods = {
       return callback.call(self, new Error(util.format("%s: Wrong value for `o` argument", this.className)), null);
       
     }
+    
+    // Set single if ID is specified in query
+    if (o.id) single = true;
       
     // Prepare custom query
     var condition, key, value,

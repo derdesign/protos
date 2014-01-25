@@ -530,6 +530,12 @@ MongoDB.prototype.__modelMethods = {
 
     }
     
+    // Convert `id` to `_id`
+    convertMongoID(o);
+    
+    // Set single if ID is specified in query
+    if (o._id) single = true; 
+    
     this.driver.queryWhere({
       collection: this.context,
       condition: o,
