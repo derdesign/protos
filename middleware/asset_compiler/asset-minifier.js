@@ -8,8 +8,10 @@ var app = protos.app,
     config = app.asset_compiler,
     Multi = require('multi');
     
-var cleancss = protos.requireDependency('clean-css', 'Asset Compiler', 'asset_compiler');
+var CleanCSS = protos.requireDependency('clean-css', 'Asset Compiler', 'asset_compiler');
 var uglifyjs = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_compiler');
+
+var cleancss = new CleanCSS(config.cleanCSSOpts);
 
 var minifyTargets = Object.keys(config.minify);
 
@@ -43,7 +45,7 @@ function minification() {
         var ext = getExt(target);
         target = app.fullPath('public/' + target);
         if (ext == 'css') {
-          var source = cleancss.process(compiled.join('\n'));
+          var source = cleancss.minify(compiled.join('\n'));
           fs.writeFileSync(target, source, 'utf8');
           app.debug("Asset Compiler: Minified CSS: " + app.relPath(target));
         } else if (ext == 'js') {

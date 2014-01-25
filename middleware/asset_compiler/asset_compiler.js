@@ -81,6 +81,12 @@ function AssetCompiler(config, middleware) {
       squeeze: true,
       liftVariables: false,
       strictSemicolons: false
+    },
+    cleanCSSOpts: {
+      keepSpecialComments: 0,
+      keepBreaks: false,
+      benchmark: false,
+      noAdvanced: false
     }
   }, config);
   

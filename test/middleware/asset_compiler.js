@@ -137,25 +137,25 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       var r1 = results[9],
           r2 = results[10];
           
-      // console.exit(r1);
+      // console.exit(r2);
           
-      var expected1 = '#metadata{content:"css";background:url(target.css)}#features #toc-sidebar{display:none!important}\
-#toc-sidebar{overflow-y:scroll;box-shadow:5px 0 40px rgba(255,255,255,.8);position:fixed;top:0;left:0;height:100%;background:\
-#f2f2f2 repeat}#toc-sidebar>:first-child{margin:50px 0 100px 20px;padding:0}#toc-sidebar ul{width:250px}#toc-sidebar ul \
-li{list-style:none}#toc-sidebar ul li a{font-size:12px;color:#222}#toc-sidebar ul li.section{margin-top:.5em}#toc-sidebar ul \
-li.section a{font-weight:700}#toc-sidebar ul li.sub{margin-left:0}#metadata{content:"less";background:url(assets/assets/target\
-.less)}#yelow #short{color:#fea}#yelow #long{color:#fea}#yelow #rgba{color:rgba(255,238,170,.1)}#yelow #argb{color:#1affeeaa}\
-.body{background1:url("data:image/png:asdfasdf");background2:url(\'data:image/png:asdfasdf\');background3:url(data:image/png:\
-asdfasdf);background4:url(http://hello.com/style.css);background5:url(http://hello.com/style.css);background6:url(http://hello\
-.com/style.css);background7:url(dir/images/test.jpg);background8:url(dir/images/test.jpg);background9:url(dir/images/test.jpg)}';
+      var expected1 = '#features #toc-sidebar{display:none!important}#toc-sidebar{overflow-y:scroll;box-shadow:5px 0 40px \
+rgba(255,255,255,.8);position:fixed;top:0;left:0;height:100%;background:#f2f2f2 repeat}#toc-sidebar>:first-child{margin:50px 0 100px 20px;\
+padding:0}#toc-sidebar ul{width:250px}#toc-sidebar ul li{list-style:none}#toc-sidebar ul li a{font-size:12px;color:#222}\
+#toc-sidebar ul li.section{margin-top:.5em}#toc-sidebar ul li.section a{font-weight:700}#toc-sidebar ul li.sub{margin-left:0}\
+#metadata{content:"less";background:url(assets/assets/target.less)}#yelow #long,#yelow #short{color:#fea}#yelow \
+#rgba{color:rgba(255,238,170,.1)}#yelow #argb{color:#1affeeaa}.body{background1:url("data:image/png:asdfasdf");\
+background2:url(\'data:image/png:asdfasdf\');background3:url(data:image/png:asdfasdf);background4:url(http://hello.com/style.css);\
+background5:url(http://hello.com/style.css);background6:url(http://hello.com/style.css);background7:url(dir/images/test.jpg);\
+background8:url(dir/images/test.jpg);background9:url(dir/images/test.jpg)}';
 
-      var expected2 = 'var metadata=["js","target.js"];!function(){var e,t,r,a,n,s,o,u,i=Array.prototype.slice;n=42,s=!0,s&&\
-(n=-42),u=function(e){return e*e},t=[1,2,3,4,5],r={root:Math.sqrt,square:u,cube:function(e){return e*u(e)}},o=function(){var \
-e,t;return t=arguments[0],e=2<=arguments.length?i.call(arguments,1):[],print(t,e)},"undefined"!=typeof elvis&&null!==elvis&&\
-alert("I knew it!"),e=function(){var e,n,s;for(s=[],e=0,n=t.length;n>e;e++)a=t[e],s.push(r.cube(a));return s}()}.call(this),\
-function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","fa","so"],a={Jagger:"Rock",Elvis:"Roll"},e=[1,\
-0,1,0,0,1,1,1,0],t={brother:{name:"Max",age:11},sister:{name:"Ida",age:9}}}.call(this);';
-      
+      var expected2 = 'var metadata=["js","target.js"];(function(){var e,t,r,a,n,s,o,u,i=Array.prototype.slice;n=42,s=!0,s&&\
+(n=-42),u=function(e){return e*e},t=[1,2,3,4,5],r={root:Math.sqrt,square:u,cube:function(e){return e*u(e)}},o=function()\
+{var e,t;return t=arguments[0],e=2<=arguments.length?i.call(arguments,1):[],print(t,e)},"undefined"!=typeof elvis&&null!==elvis\
+&&alert("I knew it!"),e=function(){var e,n,s;for(s=[],e=0,n=t.length;n>e;e++)a=t[e],s.push(r.cube(a));return s}()}).call(this),\
+function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","fa","so"],a={Jagger:"Rock",Elvis:"Roll"},e=\
+[1,0,1,0,0,1,1,1,0],t={brother:{name:"Max",age:11},sister:{name:"Ida",age:9}}}.call(this);';
+
       assert.equal(r1, expected1);
       assert.equal(r2, expected2);
     },
