@@ -59,6 +59,15 @@ vows.describe('lib/application.js').addBatch({
     'Inherits from EventEmitter': function() {
       assert.instanceOf(app, EventEmitter);
     },
+    
+    'Properly sets data': function() {
+      var expected = {
+        alpha: { alpha: true },
+        beta: { beta: true }
+      }
+      assert.deepEqual(app.data(), expected);
+      app.__data = {}; // Reset data for further tests
+    },
 
     'Initializes models': function() {
       assert.instanceOf(app.models.users, protos.lib.model);

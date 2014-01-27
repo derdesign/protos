@@ -16,6 +16,8 @@ app.on('after_reload', function(spec) {
   after = spec;
 });
 
+var __data;
+
 var testHook = app.fullPath('hook/test_hook.js');
 var testHookBuf = fs.readFileSync(testHook, 'utf8');
 var otherHook = app.fullPath('hook/other_hook.js');
@@ -24,6 +26,10 @@ var otherHookDisabled = app.fullPath('other_hook.js');
 vows.describe('Hot Code Loading').addBatch({
   
   'Modifying runtime before reload...': function() {
+    
+    // data
+    __data = app.__data;
+    app.__data = {};
     
     // hooks
     assert.isUndefined(app.TEST_HOOK);
@@ -80,6 +86,8 @@ vows.describe('Hot Code Loading').addBatch({
     
     fs.renameSync(otherHook, otherHookDisabled);
     
+    assert.deepEqual(app.__data, {});
+    
     app.reload({
       all: true
     });
@@ -89,6 +97,10 @@ vows.describe('Hot Code Loading').addBatch({
 }).addBatch({
   
   'Verifying runtime after reload...': function() {
+    
+    // Data
+    assert.deepEqual(app.data(), { alpha: { alpha: true }, beta: { beta: true } });
+    app.__data = __data; // Restore previous data
     
     // Restore hook files
     fs.writeFileSync(testHook, testHookBuf, 'utf8');
@@ -135,6 +147,7 @@ vows.describe('Hot Code Loading').addBatch({
  "The reload events are emitted with spec": function() {
    
    var spec = {
+     data: true,
      hooks: true,
      controllers: true, 
      api: true,

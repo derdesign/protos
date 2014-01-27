@@ -52,7 +52,7 @@ var commands = {
       
             if (matches) {
         
-              console.log(util.format('\nFound %d Errors:', matches.length));
+              console.log('\nFound %d Errors:', matches.length);
         
               matches.forEach(function(match, i) {
           
@@ -69,7 +69,7 @@ var commands = {
                 err = colorize(err, '1');
                 code = colorize(code, '0;31');
           
-                console.log(util.format('\n%d. %s\n%s', (i+1), err, code));
+                console.log('\n%d. %s\n%s', (i+1), err, code);
           
               });
         
@@ -377,6 +377,30 @@ var commands = {
     }
   },
   
+  data: {
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      var json = /\.json$/;
+      fs.mkdir('data', function(err) {
+        if (!err || err.code === 'EEXIST') {
+          data.args = data.args.forEach(function(file) {
+            if (!json.test(file)) file += '.json';
+            file = util.format('data/%s', file);
+            if (fs.existsSync(file)) {
+              console.log("» Skipping %s: file exists", file);
+            } else {
+              fs.writeFileSync(file, '{}', 'utf8');
+              console.log('Created %s', file);
+            }
+          });
+        } else {
+          throw err;
+        }
+      });
+    }
+  },
+  
   controller: {
     args: 99,
     validate: validateApp,
@@ -592,11 +616,11 @@ module.exports = {\n\
             view.push(partial || false);
             return view;
           } else {
-            console.log(util.format("Invalid view: %s", view.join('/')));
+            console.log("Invalid view: %s", view.join('/'));
             console.exit(util.format("Controller does not exist: %s", controller));
           }
         } else {
-          console.log(util.format("Invalid view: %s", view.join('')));
+          console.log("Invalid view: %s", view.join(''));
           console.exit(util.format("The views should be specified as {controller}/{viewname}{.ext}"));
         }
       });
@@ -845,13 +869,13 @@ module.exports = %s;";
   var file = util.format('%s/app/models/%s.js', app, name);
   
   if (fs.existsSync(file)) {
-    console.log(util.format("» Skipping %s: file exists", file));
+    console.log("» Skipping %s: file exists", file);
     return;
   }
   
   fs.writeFileSync(file, tpl, 'utf-8');
   
-  console.log(util.format("» Created %s/app/models/%s.js", app, name));
+  console.log("» Created %s/app/models/%s.js", app, name);
   
 }
 
@@ -890,7 +914,7 @@ module.exports = %s;";
 
   fs.writeFileSync(file, tpl, 'utf-8');
 
-  console.log(util.format("» Created %s", file));
+  console.log("» Created %s", file);
   
   viewsBatch.push([app, name, 'index']);
   
@@ -958,7 +982,7 @@ function createView(app, controller, view, partial) {
   }
   
   if (fs.existsSync(file)) {
-    console.log(util.format("» Skipping %s: file exists", file));
+    console.log("» Skipping %s: file exists", file);
     return;
   }
 
@@ -969,7 +993,7 @@ function createView(app, controller, view, partial) {
   
   fs.writeFileSync(file, tpl, 'utf-8');
 
-  console.log(util.format("» Created %s", file));
+  console.log("» Created %s", file);
   
 }
 
@@ -1001,7 +1025,7 @@ module.exports = %s;";
 
   fs.writeFileSync(file, tpl, 'utf-8');
 
-  console.log(util.format("» Created %s", file));
+  console.log("» Created %s", file);
 
 }
 
@@ -1120,7 +1144,7 @@ function createJsFilesWithTemplate(target, data, template) {
   filenames.forEach(function(file) {
     var path = process.cwd() + '/' + target + '/' + file;
     if (fs.existsSync(path)) {
-      console.log(util.format('» Skipping %s%s: file exists', target, file));
+      console.log('» Skipping %s%s: file exists', target, file);
     } else {
       var fileWithoutExtension = file.replace(/\.js$/, '');
       var camelCase = inflect.camelize(fileWithoutExtension.toLowerCase());
@@ -1139,7 +1163,7 @@ function createJsFilesWithTemplate(target, data, template) {
         }
       }
       fs.writeFileSync(path, template(locals), 'utf8');
-      console.log(util.format('» Created %s/%s%s', app, target, file));
+      console.log('» Created %s/%s%s', app, target, file);
     }
   });
 }
@@ -1178,10 +1202,10 @@ function recursivelyCreateFiles(target, data, ext, callback) {
   files.forEach(function(f) {
     f = f.slice(1,-1);
     if (fs.existsSync(f)) {
-      console.log(util.format('» Skipping %s%s: file exists', app, f.replace(cwd, '')));
+      console.log('» Skipping %s%s: file exists', app, f.replace(cwd, ''));
     } else {
       out.push(f);
-      console.log(util.format('» Created %s%s', app, f.replace(cwd, '')));
+      console.log('» Created %s%s', app, f.replace(cwd, ''));
     }
   });
   
@@ -1245,6 +1269,7 @@ var cli = new CommandLine(commands);
   handler     [controller]/[name1,name2] ...
   helper      [name] ...
   model       [name] ...
+  data        [name] ...
 
   view        [controller]/[name1,name2] ... [options]
   partial     [controller]/[name1,name2] ... [options]
@@ -1269,7 +1294,7 @@ Usage: protos [ACTION] [OPTIONS] [ARGUMENTS]\n\n\
 Actions: \n\
          create install server start stop status config controller\n\
          handler helper model view partial layout static restricted\n\
-         api hook include inspector link lint validate \n\n\
+         api hook data include inspector link lint validate \n\n\
 Options:\n";
 
 cli.help.after = "\n\

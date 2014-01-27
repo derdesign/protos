@@ -9,6 +9,8 @@ var fs = require('fs'),
     util = require('util'),
     Multi = require('multi'),
     EventEmitter = require('events').EventEmitter;
+    
+var NOOP = function() {}
 
 var cwd = process.cwd(),
     tmp = pathModule.resolve('./test/fixtures/tmp');
@@ -289,6 +291,44 @@ this.validation = {\n\n  }\n\n  this.properties = {\n\n  }\n\n}\n\nPostsModel.me
       
       // Api files export methods by default
       assert.equal(bufs['config/aws.js'], '\n/* config/aws.js */\n\nmodule.exports = {\n\n}');
+    }
+
+  }
+  
+}).addBatch({
+  
+  'protos data': {
+    
+    topic: function() {
+      var promise = new EventEmitter();
+      
+      fs.mkdirSync('data/');
+      fs.writeFileSync('data/test.json', '', 'utf8');
+      fs.writeFileSync('data/three.json', '', 'utf8');
+      
+      protos.command('data test one.json two three.json');
+      
+      protos.exec(function(err, results) {
+        if (!err) {
+          fs.unlink('data/test.json', NOOP);
+          fs.unlink('data/three.json', NOOP);
+          results.push({
+            one: fs.readFileSync('data/one.json', 'utf8'),
+            two: fs.readFileSync('data/two.json', 'utf8'),
+          });
+        }
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+    },
+    
+    'Properly creates files in data/': function(results) {
+      var r1 = results[0];
+      var buf = results[1];
+      assert.equal(r1, '» Skipping data/test.json: file exists\nCreated data/one.json\nCreated data/two.json\n» Skipping data/three.json: file exists');
+      assert.equal(buf.one, '{}');
+      assert.equal(buf.two, '{}');
     }
 
   }
