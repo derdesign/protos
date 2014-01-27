@@ -142,10 +142,17 @@ fileModule.walkSync(app.fullPath(app.paths.public), function(dirPath, dirs, file
 var filtered = {};
 
 for (var key in assets) { 
-  var relPaths = assets[key].map(function(f) { return app.relPath(f, 'public'); });
+  var relPaths = assets[key].map(function(f) {
+    return app.relPath(f, 'public');
+  });
   filtered[key] = protos.util.excludeWithPattern(relPaths, config.ignore);
-  if (filtered[key].length === 0) delete filtered[key];
-  else filtered[key] = filtered[key].map(function(f) { return app.fullPath('public/' + f); });
+  if (filtered[key].length === 0) {
+    delete filtered[key];
+  } else {
+    filtered[key] = filtered[key].map(function(f) {
+      return app.fullPath(app.paths.public + f);
+    });
+  }
 }
 
 assets = filtered;
