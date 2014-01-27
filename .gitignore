@@ -8,6 +8,8 @@
 /skeleton/log/*.log
 /skeleton/public/test
 /test/fixtures/tmp
+/test/fixtures/*skeleton/public/concat1.js
+/test/fixtures/*skeleton/public/concat2.js
 /test/fixtures/*skeleton/public/*-style.css
 /test/fixtures/*skeleton/public/min.js
 /test/fixtures/*skeleton/public/assets/*.js

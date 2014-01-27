@@ -12,6 +12,7 @@
     
   » Configuration options:
 
+    {object} concat: Assets to be concatenated. {target: [sources]}
     {object} minify: Assets to be minified. {target: [sources]}
     {array} watchOn: Array containing environments in which the assets will be automatically compiled on change
     {integer} watchInterval: Watch polling interval
@@ -75,6 +76,7 @@ function AssetCompiler(config, middleware) {
       scss: 'css'
     },
     ignore: [],
+    concat: {},
     minify: {},
     uglifyOpts: {
       mangle: true,

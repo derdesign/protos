@@ -1,6 +1,8 @@
 
 /* Asset manager */
 
+var _ = require('underscore');
+
 var app = protos.app,
     fs = require('fs'),
     util = require('util'),
@@ -8,6 +10,72 @@ var app = protos.app,
     fileModule = require('file'),
     pathModule = require('path'),
     config = app.asset_compiler;
+
+var ignores = [];
+
+app.once('init', function() {
+  // Remove any duplicate entries in ignores array to improve performance
+  // and avoid unnecessary lookups
+  ignores = _.unique(ignores);
+});
+
+var truthy = function(val) {
+  return val; 
+}
+
+// Set ignores to be unique on startup
+
+// Concatenation
+
+if (config.concat) {
+  
+  var Multi = require('multi');
+  
+  var concat = config.concat;
+  var concatFiles = Object.keys(concat);
+  var concatCount = 0;
+  
+  concatFiles.forEach(function(target, index) {
+    
+    var files = concat[target];
+    var multi = new Multi(fs, {interrupt: false});
+    
+    for (var file,i=0,len=files.length; i < len; i++) {
+      file = app.fullPath(app.paths.public + files[i]);
+      multi.readFile(file, 'utf8');
+      ignores.push(file); // Prevent source files from being accessed
+    }
+    
+    multi.exec(function(errors, results) {
+      
+      if (errors) {
+        
+        throw errors.filter(truthy);
+        
+      } else {
+        
+        var buf = results.filter(truthy).join('\n\n');
+        
+        fs.writeFile(app.fullPath(app.paths.public + target), buf, 'utf8', function(err) {
+          if (err) {
+            throw err;
+          } else {
+            app.debug(util.format('Asset Manager: Concatenated %s', target));
+            if (++concatCount === concatFiles.length) {
+              app.emit('asset_compiler_concat_complete');
+            }
+          }
+        });
+        
+      }
+      
+    });
+    
+  });
+  
+}
+
+// ===========================================================
 
 // Handle compile_all event
 app.on('compile_all', compileAll);
@@ -28,10 +96,8 @@ if (! config.assetSourceAccess) {
   });
 }
 
-// console.log(config);
-
 // Get ignores
-var target, arr, ignores = [];
+var target, arr;
 
 for (target in config.minify) {
   arr = config.minify[target];

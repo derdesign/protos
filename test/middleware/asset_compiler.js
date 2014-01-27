@@ -7,9 +7,16 @@ var app = require('../fixtures/bootstrap'),
     Multi = require('multi'),
     EventEmitter = require('events').EventEmitter;
     
+var TEST = -1;
+    
 var multi = new Multi(app);
 
-var compiledLess, compiledScss, compiledStylus, compiledCoffee, assetCompilerMinifyComplete;
+var compiledLess,
+    compiledScss,
+    compiledStylus,
+    compiledCoffee,
+    assetCompilerMinifyComplete,
+    assetCompilerConcatComplete;
 
 vows.describe('Asset Compiler (middleware)').addBatch({
   
@@ -41,6 +48,11 @@ vows.describe('Asset Compiler (middleware)').addBatch({
         assetCompilerMinifyComplete = true;
       });
       
+      // Asset compiler concat complete event
+      app.on('asset_compiler_concat_complete', function() {
+        assetCompilerConcatComplete = true;
+      });
+      
       // Load dependencies
       if (!app.supports.static_server) app.use('static_server');
       
@@ -48,6 +60,10 @@ vows.describe('Asset Compiler (middleware)').addBatch({
         
         app.use('asset_compiler', {
           watchOn: [],
+          concat: {
+            'concat1.js': ['concat/one.js', 'concat/two.js', 'concat/three.js'],
+            'concat2.js': ['concat/three.js', 'concat/one.js']
+          },
           minify: {
             'min.css': ['target.css', 'assets/target.less'],
             'min.js': ['target.js', 'assets/target.coffee']
@@ -91,21 +107,28 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       multi.curl('-i /assets/target.css');
       multi.curl('-i /target.js');
       
+      // Properly concatenates assets
+      multi.curl('/concat1.js');
+      multi.curl('/concat2.js');
+      
+      // Blocks access to minify sources
+      multi.curl('-i /concat/one.js');
+      multi.curl('-i /concat/two.js');
+      multi.curl('-i /concat/three.js');
+      
       multi.exec(function(err, results) {
-        
         promise.emit('success', err || results);
-        
       });
       
       return promise;
     },
     
     "Forbids access to asset sources": function(results) {
-      var r1 = results[0],
-          r2 = results[1],
-          r3 = results[2],
-          r4 = results[3],
-          r5 = results[4];
+      var r1 = results[++TEST],
+          r2 = results[++TEST],
+          r3 = results[++TEST],
+          r4 = results[++TEST],
+          r5 = results[++TEST];
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
@@ -114,28 +137,28 @@ vows.describe('Asset Compiler (middleware)').addBatch({
     },
     
     "Successfully compiles LESS assets": function(results) {
-      var r = results[5];
+      var r = results[++TEST];
       assert.equal(r, compiledLess);
     },
     
     "Successfully compiles SCSS assets": function(results) {
-      var r = results[6];
+      var r = results[++TEST];
       assert.equal(r, compiledScss);
     },
     
     "Successfully compiles Stylus assets": function(results) {
-      var r = results[7];
+      var r = results[++TEST];
       assert.equal(r, compiledStylus);
     },
     
     "Successfully compiles CoffeeScript assets": function(results) {
-      var r = results[8];
+      var r = results[++TEST];
       assert.equal(r, compiledCoffee);
     },
     
     "Successfully minifies supported assets": function(results) {
-      var r1 = results[9],
-          r2 = results[10];
+      var r1 = results[++TEST],
+          r2 = results[++TEST];
           
       // console.exit(r2);
           
@@ -161,9 +184,25 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
     },
     
     "Blocks access to minify sources": function(results) {
-      var r1 = results[11],
-          r2 = results[12],
-          r3 = results[13];
+      var r1 = results[++TEST],
+          r2 = results[++TEST],
+          r3 = results[++TEST];
+      assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
+    },
+    
+    "Successfully concatenates assets": function(results) {
+      var r1 = results[++TEST];
+      var r2 = results[++TEST];
+      assert.equal(r1, '/* This is one.js */\n\nvar one = true;\n\n/* This is two.js */\n\nvar two = true;\n\n/* This is three.js */\n\nvar three = true;');
+      assert.equal(r2, '/* This is three.js */\n\nvar three = true;\n\n/* This is one.js */\n\nvar one = true;');
+    },
+    
+    "Blocks access to concatenated sources": function(results) {
+      var r1 = results[++TEST],
+          r2 = results[++TEST],
+          r3 = results[++TEST];
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
@@ -188,6 +227,10 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
     },
     
     "Emits asset_compiler_minify_complete": function() {
+      assert.isTrue(assetCompilerMinifyComplete);
+    },
+    
+    "Emits asset_compiler_concat_complete": function() {
       assert.isTrue(assetCompilerMinifyComplete);
     }
     
