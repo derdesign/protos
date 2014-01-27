@@ -330,7 +330,8 @@ vows.describe('lib/application.js').addBatch({
   'Application::fullPath': {
 
     'Returns the full path of an application resource': function() {
-      assert.equal(app.fullPath('views/main'), app.path + '/views/main');
+      assert.equal(app.fullPath('views/main'), app.path + '/views/main');     // Original behavior
+      assert.equal(app.fullPath('hello/world/'), app.path + '/hello/world/'); // Preserves ending slash
     }
 
   },
