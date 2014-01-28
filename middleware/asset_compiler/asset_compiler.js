@@ -76,6 +76,7 @@ function AssetCompiler(config, middleware) {
       scss: 'css'
     },
     ignore: [],
+    sourceMaps: [],
     concat: {},
     minify: {},
     lessOpts: {},
@@ -110,6 +111,9 @@ function AssetCompiler(config, middleware) {
   
   // Run Assets minifier
   require('./asset-minifier.js');
+  
+  // Run Source Maps
+  require('./source-maps.js');
   
 }
 
