@@ -68,7 +68,7 @@ function AssetCompiler(config, middleware) {
     watchInterval: app.config.watchInterval || 100,
     compile: ['less', 'scss', 'styl', 'coffee'],
     assetSourceAccess: false,
-    compilers: require('./compilers.js'),
+    compilers: {},
     compileExts: {
       coffee: 'js',
       styl: 'css',
@@ -78,11 +78,14 @@ function AssetCompiler(config, middleware) {
     ignore: [],
     concat: {},
     minify: {},
+    lessOpts: {},
+    stylusOpts: {},
+    sassOpts: {},
+    coffeeOpts: config.coffeeOpts || null, // Use provided config, or use null for defaults
     uglifyOpts: {
       mangle: true,
-      squeeze: true,
-      liftVariables: false,
-      strictSemicolons: false
+      fromString: true,
+      warnings: false
     },
     cleanCSSOpts: {
       keepSpecialComments: 0,
@@ -95,6 +98,13 @@ function AssetCompiler(config, middleware) {
   // Expose config into app config
   app[middleware] = config;
   
+  // Getting compilers after config is set, to be able to read it
+  var compilers = require('./compilers.js');
+  
+  // Extend compilers with user provided ones
+  protos.extend(compilers, config.compilers);
+  config.compilers = compilers;
+
   // Run Assets manager
   require('./asset-manager.js');
   

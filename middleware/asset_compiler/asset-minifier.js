@@ -7,9 +7,11 @@ var app = protos.app,
     util = require('util'),
     config = app.asset_compiler,
     Multi = require('multi');
-    
+
+var _ = require('underscore');
+
 var CleanCSS = protos.requireDependency('clean-css', 'Asset Compiler', 'asset_compiler');
-var uglifyjs = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_compiler');
+var UglifyJS = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_compiler');
 
 var cleancss = new CleanCSS(config.cleanCSSOpts);
 
@@ -87,17 +89,7 @@ function resolvePaths(source, file, target) {
 }
 
 function minifyJS(code) {
-  var ast, compressor, stream;
-  ast = uglifyjs.parse(code, {});
-  compressor = uglifyjs.Compressor({warnings: false});
-  ast.figure_out_scope();
-  ast = ast.transform(compressor);
-  ast.figure_out_scope();
-  ast.compute_char_frequency();
-  ast.mangle_names();
-  stream = uglifyjs.OutputStream();
-  ast.print(stream);
-  return stream.toString();
+  return UglifyJS.minify(code, config.uglifyOpts).code;
 }
 
 function getExt(file) {
