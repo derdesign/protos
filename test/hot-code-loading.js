@@ -96,11 +96,38 @@ vows.describe('Hot Code Loading').addBatch({
 
 }).addBatch({
   
+  "The reload events are emitted with spec": function() {
+   
+    var spec = {
+      data: true,
+      hooks: true,
+      controllers: true, 
+      api: true,
+      exts: true,
+      helpers: true,
+      models: true,
+      partials: true, 
+      includes: true, 
+      all: true, 
+      views: true, 
+      handlers: true
+    };
+
+    assert.deepEqual(before, spec);
+    assert.deepEqual(after, spec);
+
+  },
+  
   'Verifying runtime after reload...': function() {
     
-    // Data
-    assert.deepEqual(app.data(), { alpha: { alpha: true }, beta: { beta: true } });
-    app.__data = __data; // Restore previous data
+    // Data reloading
+    var alphaBuf = fs.readFileSync(app.fullPath('data/alpha.json'), 'utf8');              // Get original contents of alpha
+    assert.deepEqual(app.data(), { alpha: { alpha: true }, beta: { beta: true } });       // Compare with actual data
+    fs.writeFileSync(app.fullPath('data/alpha.json'), '{\n  "alpha": false\n}', 'utf8');  // Modify alpha file
+    app.reload({data: true});                                                             // Reload data
+    assert.deepEqual(app.data(), { alpha: { alpha: false }, beta: { beta: true } });      // Ensure updated data is read
+    fs.writeFileSync(app.fullPath('data/alpha.json'), alphaBuf, 'utf8');                  // Restore alpha file
+    app.__data = __data;                                                                  // Restore previous data
     
     // Restore hook files
     fs.writeFileSync(testHook, testHookBuf, 'utf8');
@@ -142,28 +169,6 @@ vows.describe('Hot Code Loading').addBatch({
     // api
     assert.isFunction(app.api.methodOne);
     
-  },
-  
- "The reload events are emitted with spec": function() {
-   
-   var spec = {
-     data: true,
-     hooks: true,
-     controllers: true, 
-     api: true,
-     exts: true,
-     helpers: true,
-     models: true,
-     partials: true, 
-     includes: true, 
-     all: true, 
-     views: true, 
-     handlers: true
-   };
-
-   assert.deepEqual(before, spec);
-   assert.deepEqual(after, spec);
-
- }
+  }
   
 }).export(module);
