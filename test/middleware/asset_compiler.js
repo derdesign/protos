@@ -18,11 +18,17 @@ var compiledLess,
     assetCompilerMinifyComplete,
     assetCompilerConcatComplete;
     
-var lessOpts, sassOpts, stylusOpts, coffeeOpts;
+var lessOpts, sassOpts, stylusOpts, coffeeOpts,
+    lessCode, sassCode, stylusCode, coffeeCode;
 
 app.addFilter('less_options', function(options, file) {
   lessOpts = [options, file];
   return options;
+});
+
+app.addFilter('compiled_less', function(source, file, options) {
+  lessCode = [source, file, options];
+  return source;
 });
 
 app.addFilter('sass_options', function(options, file) {
@@ -30,14 +36,29 @@ app.addFilter('sass_options', function(options, file) {
   return options;
 });
 
+app.addFilter('compiled_sass', function(source, file, options) {
+  sassCode = [source, file, options];
+  return source;
+});
+
 app.addFilter('stylus_options', function(options, file) {
   stylusOpts = [options, file];
   return options;
 });
 
+app.addFilter('compiled_stylus', function(source, file, options) {
+  stylusCode = [source, file, options];
+  return source;
+});
+
 app.addFilter('coffee_options', function(options, file) {
   coffeeOpts = [options, file];
   return options;
+});
+
+app.addFilter('compiled_coffee', function(source, file, options) {
+  coffeeCode = [source, file, options];
+  return source;
 });
 
 vows.describe('Asset Compiler (middleware)').addBatch({
@@ -248,7 +269,9 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
       assert.equal(compiled2, '/* Import using <updir> */\n#layout {\n  width: 500px;\n}\n');
     },
     
-    "Properly emits compiler option filters": function() {
+    "Properly applies compiler option filters": function() {
+      
+      // Args, options, file
       
       // Less
       assert.isObject(lessOpts[0]);
@@ -266,6 +289,32 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
       assert.isNull(coffeeOpts[0]);
       assert.isString(coffeeOpts[1]);
 
+    },
+    
+    "Properly applies compiled source filters": function() {
+      
+      // Args: source, file, options
+      
+      // Less
+      assert.isString(lessCode[0]);
+      assert.isString(lessCode[1]);
+      assert.isObject(lessCode[2]);
+      
+      // Sass
+      assert.isString(sassCode[0]);
+      assert.isString(sassCode[1]);
+      assert.isObject(sassCode[2]);
+      
+      // Stylus
+      assert.isString(stylusCode[0]);
+      assert.isString(stylusCode[1]);
+      assert.isObject(stylusCode[2]);
+      
+      // Coffee
+      assert.isString(coffeeCode[0]);
+      assert.isString(coffeeCode[1]);
+      assert.isNull(coffeeCode[2]);
+      
     },
     
     "Emits asset_compiler_minify_complete": function() {

@@ -35,7 +35,10 @@ module.exports = {
       paths: [pathModule.dirname(file)]
     });
     options = app.applyFilters('less_options', options, file);
-    less.render(source, options, callback);
+    less.render(source, options, function(err, out) {
+      if (!err) out = app.applyFilters('compiled_less', out, file, options);
+      callback(err, out);
+    });
   },
 
   scss: function(source, file, callback) {
@@ -44,6 +47,7 @@ module.exports = {
       data: source,
       error: callback,
       success: function(css) {
+        css = app.applyFilters('compiled_sass', css, file, options);
         callback(null, css);
       },
       includePaths: [pathModule.dirname(file)]
@@ -59,13 +63,20 @@ module.exports = {
       .set('filename', file)
       .use(nib())
       .import('nib')
-      .render(callback);
+      .render(function(err, out) {
+        if (!err) out = app.applyFilters('compiled_stylus', out, file, options);
+        callback(err, out)
+      });
   },
   
   coffee: function(source, file, callback) {
-    var options = config.coffeeOpts ? _.extend({}, config.cofeeOpts) : null;
+    var out, options = config.coffeeOpts ? _.extend({}, config.coffeeOpts) : null;
+    if (options) options = _.extend(options, {filename: file});
     options = app.applyFilters('coffee_options', options, file);
-    callback(null, coffee.compile(source, options));
+    out = coffee.compile(source, options);
+    out = app.applyFilters('compiled_coffee', out, file, options);
+    out = (out instanceof Object) ? out.js : out; // CoffeeScript outputs object when sourceMaps are enabled
+    callback(null, out);
   }
-  
+
 }
