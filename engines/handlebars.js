@@ -38,7 +38,7 @@ Handlebars.prototype.render = function(data) {
   if (func === null) {
     var fn = handlebars.compile(data);
     func = function(data) {
-      return fn(data, context).toString(); // Ensure a string is returned (could be SafeString instance)
+      return (fn(data, context) || '').toString(); // Ensure a string is returned (could be SafeString instance)
     }
     this.cacheFunction(func, arguments);
   }
