@@ -17,6 +17,28 @@ var compiledLess,
     compiledCoffee,
     assetCompilerMinifyComplete,
     assetCompilerConcatComplete;
+    
+var lessOpts, sassOpts, stylusOpts, coffeeOpts;
+
+app.addFilter('less_options', function(options, file) {
+  lessOpts = [options, file];
+  return options;
+});
+
+app.addFilter('sass_options', function(options, file) {
+  sassOpts = [options, file];
+  return options;
+});
+
+app.addFilter('stylus_options', function(options, file) {
+  stylusOpts = [options, file];
+  return options;
+});
+
+app.addFilter('coffee_options', function(options, file) {
+  coffeeOpts = [options, file];
+  return options;
+});
 
 vows.describe('Asset Compiler (middleware)').addBatch({
   
@@ -224,6 +246,26 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
       var compiled2 = fs.readFileSync(app.fullPath('public/css/subdir/stylus-test.css')).toString('utf8');
       assert.equal(compiled1, '#layout {\n  width: 500px;\n}\n/* Coming from stylus-style.styl */\nbody {\n  background: #f2f2f2;\n}\n');
       assert.equal(compiled2, '/* Import using <updir> */\n#layout {\n  width: 500px;\n}\n');
+    },
+    
+    "Properly emits compiler option filters": function() {
+      
+      // Less
+      assert.isObject(lessOpts[0]);
+      assert.isString(lessOpts[1]);
+      
+      // Sass
+      assert.isObject(sassOpts[0]);
+      assert.isString(sassOpts[1]);
+      
+      // Stylus
+      assert.isObject(stylusOpts[0]);
+      assert.isString(stylusOpts[1]);
+      
+      // Coffee
+      assert.isNull(coffeeOpts[0]);
+      assert.isString(coffeeOpts[1]);
+
     },
     
     "Emits asset_compiler_minify_complete": function() {

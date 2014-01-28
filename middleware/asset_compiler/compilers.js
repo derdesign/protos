@@ -9,7 +9,7 @@ var mw = {
 }
 
 var _ = require('underscore');
-var config = config = app.asset_compiler;
+var config = app.asset_compiler;
 
 var less = protos.requireDependency('less', mw.desc, mw.name);
 var sass = protos.requireDependency('node-sass', mw.desc, mw.name);
@@ -19,39 +19,53 @@ var coffee = protos.requireDependency('coffee-script', mw.desc, mw.name);
 
 var pathModule = require('path');
 
+// Note: 
+// The .extend() calls below first override an empty object with the 
+// original config options. Then, such new object is overridden with
+// the options for each particular file to be compiled. This is to
+// ensure the configuration does not override file-specific configs.
+
 // Asset compilers
 module.exports = {
   
   less: function(source, file, callback) {
-    less.render(source, _.extend({ // Using underscore's extend instead of protos.extend for performance
+    var options = _.extend({}, config.lessOpts);
+    options = _.extend(options, {
       filename: pathModule.basename(file),
       paths: [pathModule.dirname(file)]
-    }, config.lessOpts), callback);
+    });
+    options = app.applyFilters('less_options', options, file);
+    less.render(source, options, callback);
   },
 
   scss: function(source, file, callback) {
-    sass.render(_.extend({
+    var options = _.extend({}, config.sassOpts);
+    options = _.extend(options, {
       data: source,
       error: callback,
       success: function(css) {
         callback(null, css);
       },
       includePaths: [pathModule.dirname(file)]
-    }, config.sassOpts));
+    });
+    options = app.applyFilters('sass_options', options, file);
+    sass.render(options);
   },
 
   styl: function(source, file, callback) {
-    stylus(source, config.stylusOpts)
+    var options = _.extend({}, config.stylusOpts);
+    options = app.applyFilters('stylus_options', options, file);
+    stylus(source, options)
       .set('filename', file)
       .use(nib())
       .import('nib')
-      .render(callback)
-    ;
+      .render(callback);
   },
   
   coffee: function(source, file, callback) {
-    // console.exit(coffee);
-    callback(null, coffee.compile(source, config.coffeeOpts));
+    var options = config.coffeeOpts ? _.extend({}, config.cofeeOpts) : null;
+    options = app.applyFilters('coffee_options', options, file);
+    callback(null, coffee.compile(source, options));
   }
   
 }
