@@ -64,7 +64,7 @@ if (config.sourceMaps.length) {
     app.addFilter('compiled_coffee', function(out, file) {
       if (out instanceof Object) {
         file = file.replace(app.paths.public, '');
-        var map = out.v3SourceMap.replace(/"sources": \[\n    ""/, util.format('"sources": \[\n    "%s"', file));
+        var map = out.v3SourceMap.replace(/"sources": \[\n    ""/, util.format('"sources": [\n    "%s"', file));
         out = util.format('%s\n//@ sourceMappingURL=data:application/json,%s', out.js, encodeURIComponent(map));
       }
       return out;
