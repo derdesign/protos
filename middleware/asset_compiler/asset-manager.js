@@ -105,9 +105,9 @@ for (target in config.minify) {
   for (var ext,file,i=0; i < arr.length; i++) {
     file = arr[i];
     ext = getExt(file);
-    ignores.push(app.fullPath('public/' + file));
+    ignores.push(app.fullPath(app.paths.public + file));
     if (extRegex.test(file)) {
-      ignores.push(app.fullPath('public/' + file.replace(extRegex, '.' + config.compileExts[ext])));
+      ignores.push(app.fullPath(app.paths.public + file.replace(extRegex, '.' + config.compileExts[ext])));
     }
   }
 }

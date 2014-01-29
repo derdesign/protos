@@ -252,19 +252,19 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
     },
     
     "Does not compile ignored files": function() {
-      assert.isFalse(fs.existsSync(app.fullPath('public/ignore.css')));
+      assert.isFalse(fs.existsSync(app.fullPath(app.paths.public + 'ignore.css')));
     },
     
     "LESS @import works as expected": function() {
-      var compiled1 = fs.readFileSync(app.fullPath('public/less-style.css')).toString('utf8');
-      var compiled2 = fs.readFileSync(app.fullPath('public/css/subdir/less-test.css')).toString('utf8');
+      var compiled1 = fs.readFileSync(app.fullPath(app.paths.public + 'less-style.css')).toString('utf8');
+      var compiled2 = fs.readFileSync(app.fullPath(app.paths.public + 'css/subdir/less-test.css')).toString('utf8');
       assert.equal(compiled1, '/* Coming from less-layout.less */\n#layout {\n  width: 500px;\n}\n/* Coming from less-style.less */\nbody {\n  background: #f2f2f2;\n}\n');
       assert.equal(compiled2, '/* Import using <updir> */\n/* Coming from less-layout.less */\n#layout {\n  width: 500px;\n}\n');
     },
     
     "Stylus @import works as expected": function() {
-      var compiled1 = fs.readFileSync(app.fullPath('public/stylus-style.css')).toString('utf8');
-      var compiled2 = fs.readFileSync(app.fullPath('public/css/subdir/stylus-test.css')).toString('utf8');
+      var compiled1 = fs.readFileSync(app.fullPath(app.paths.public + 'stylus-style.css')).toString('utf8');
+      var compiled2 = fs.readFileSync(app.fullPath(app.paths.public + 'css/subdir/stylus-test.css')).toString('utf8');
       assert.equal(compiled1, '#layout {\n  width: 500px;\n}\n/* Coming from stylus-style.styl */\nbody {\n  background: #f2f2f2;\n}\n');
       assert.equal(compiled2, '/* Import using <updir> */\n#layout {\n  width: 500px;\n}\n');
     },

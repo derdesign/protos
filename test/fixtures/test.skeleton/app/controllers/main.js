@@ -76,7 +76,7 @@ function MainController(app) {
   /* File Download */
   
   get('/download', function(req, res) {
-    res.download(app.fullPath('/public/robots.txt'), req.queryData.file);
+    res.download(app.fullPath(app.paths.public + 'robots.txt'), req.queryData.file);
   });
   
   /* JSON Response */

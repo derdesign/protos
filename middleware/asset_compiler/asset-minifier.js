@@ -19,7 +19,7 @@ var minifyTargets = Object.keys(config.minify);
 
 var compiler = new Multi({
   getSource: function(f, target, callback) {
-    var file = app.fullPath('public/' + f);
+    var file = app.fullPath(app.paths.public + f);
     var ext = getExt(file);
     var source = fs.readFileSync(file, 'utf8').toString();
     source = app.applyFilters('asset_compiler_minify_source', source, ext, f);
@@ -45,7 +45,7 @@ function minification() {
       if (err) throw err;
       else {
         var ext = getExt(target);
-        target = app.fullPath('public/' + target);
+        target = app.fullPath(app.paths.public + target);
         if (ext == 'css') {
           var source = cleancss.minify(compiled.join('\n'));
           fs.writeFileSync(target, source, 'utf8');
