@@ -14,7 +14,7 @@ vows.describe('View Rendering').addBatch({
       
       var promise = new EventEmitter();
 
-      var msgTemplate = app.fullPath('app/views/__restricted/msg.mustache');
+      var msgTemplate = app.fullPath('app/views/'+ app.paths.restricted +'/msg.mustache');
       
       fs.renameSync(msgTemplate, msgTemplate + '1');
       

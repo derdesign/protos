@@ -48,10 +48,10 @@ vows.describe('View Rendering').addBatch({
     },
 
     'Returns valid paths for #restricted views': function(res) {
-      assert.strictEqual(res.getViewPath('#404'), vPath('__restricted/404.mustache'));
-      assert.strictEqual(res.getViewPath('#404.hbs'), vPath('__restricted/404.hbs'));
-      assert.strictEqual(res.getViewPath('#dir/view'), vPath('__restricted/dir/view.mustache'));
-      assert.strictEqual(res.getViewPath('#dir/view.hbs'), vPath('__restricted/dir/view.hbs'));
+      assert.strictEqual(res.getViewPath('#404'), vPath(app.paths.restricted + '404.mustache'));
+      assert.strictEqual(res.getViewPath('#404.hbs'), vPath(app.paths.restricted + '404.hbs'));
+      assert.strictEqual(res.getViewPath('#dir/view'), vPath(app.paths.restricted + 'dir/view.mustache'));
+      assert.strictEqual(res.getViewPath('#dir/view.hbs'), vPath(app.paths.restricted + 'dir/view.hbs'));
     },
 
     'Returns valid paths relative to views/': function(res) {
@@ -61,8 +61,8 @@ vows.describe('View Rendering').addBatch({
     },
 
     'Returns valid paths for static views': function(res) {
-      assert.strictEqual(res.getViewPath('/static'), vPath('__static/static.hbs'));
-      assert.strictEqual(res.getViewPath('/static.mustache'), vPath('__static/static.mustache'));
+      assert.strictEqual(res.getViewPath('/static'), vPath(app.paths.static + 'static.hbs'));
+      assert.strictEqual(res.getViewPath('/static.mustache'), vPath(app.paths.static + 'static.mustache'));
     }
 
   }
