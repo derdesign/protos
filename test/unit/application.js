@@ -166,6 +166,7 @@ vows.describe('lib/application.js').addBatch({
         'language',
         'encoding',
         'rawViews',
+        'staticViews',
         'shortcodeFilter',
         'pageTitle',
         'headers',

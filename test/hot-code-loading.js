@@ -104,6 +104,7 @@ vows.describe('Hot Code Loading').addBatch({
       controllers: true, 
       api: true,
       exts: true,
+      static: true,
       helpers: true,
       models: true,
       partials: true, 

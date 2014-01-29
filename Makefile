@@ -14,6 +14,7 @@ integration = ./test/integration/*.js
 middleware = ./test/middleware/*.js
 commandline = ./test/command.js
 hotCodeLoading = ./test/hot-code-loading.js
+viewRenderingAlt= ./test/view-rendering-alt.js
 
 # Make commands
 
@@ -43,8 +44,13 @@ lint:
 test:
 		@echo "\nAvailable Test Commands: tests  test-unit  test-sto test-drv test-eng test-int test-mid\n"
 
-tests:
-		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${hotCodeLoading} ${commandline}
+tests: 	tests-core tests-alt
+
+tests-core: 
+		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${hotCodeLoading} 
+	
+tests-alt:
+		@${vows} ${vowsOpts} ${viewRenderingAlt} ${commandline}
 
 test-unit:
 		@${vows} ${vowsOpts} ${unit}

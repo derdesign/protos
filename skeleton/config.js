@@ -37,7 +37,12 @@ module.exports = {
   },
 
   viewExtensions: {
-    html: 'ejs'
+    html: 'handlebars'
+  },
+  
+  staticViews: {
+    defaultExtension: false,
+    setEncoding: /^(html|xhtml|css|js|json|xml|rss|atom|txt|csv|markdown)$/
   }
 
 }

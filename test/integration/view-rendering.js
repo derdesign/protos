@@ -113,21 +113,21 @@ vows.describe('View Rendering').addBatch({
       
       'Application::notFound works properly': function(results) {
         var res = results[0], buf = res[1].trim(), hdr = res[0].headers;
-        assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
+        assert.isTrue(buf.indexOf('<!doctype html>') === -1);
         assert.equal(buf, '<p>HTTP/404: Page not Found</p>');
         assert.equal(hdr.status, '404 Not Found');
       },
 
       'Application::serverError works properly': function(results) {
         var res = results[1], buf = res[1].trim(), hdr = res[0].headers;
-        assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
+        assert.isTrue(buf.indexOf('<!doctype html>') === -1);
         assert.equal(buf, '<p>HTTP/500: Internal Server Error</p>');
         assert.equal(hdr.status, '500 Internal Server Error');
       },
 
       'Application::httpMessage works properly': function(results) {
         var res = results[2], buf = res[1].trim(), hdr = res[0].headers;
-        assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
+        assert.isTrue(buf.indexOf('<!doctype html>') === -1);
         assert.equal(buf, '<p>{RAW MESSAGE}</p>');
         assert.equal(hdr.status, '200 OK');
       }
@@ -161,7 +161,7 @@ vows.describe('View Rendering').addBatch({
 
     'Application::notFound works properly': function(results) {
       var res = results[0], buf = res[1].trim(), hdr = res[0].headers;
-      assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
+      assert.isTrue(buf.indexOf('<!doctype html>') === -1);
       assert.isTrue(buf.indexOf('<p>HTTP/404: Page not Found</p>') >= 0);
       assert.equal(hdr.status, '404 Not Found');
     },
@@ -175,7 +175,7 @@ vows.describe('View Rendering').addBatch({
 
     'Application::httpMessage works properly': function(results) {
       var res = results[2], buf = res[1].trim(), hdr = res[0].headers;
-      assert.isTrue(buf.indexOf('<!DOCTYPE html>') === -1);
+      assert.isTrue(buf.indexOf('<!doctype html>') === -1);
       assert.isTrue(buf.indexOf('<p>{RAW MESSAGE}</p>') >= 0);
       assert.equal(hdr.status, '200 OK');
     }
