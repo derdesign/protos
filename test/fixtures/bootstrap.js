@@ -60,6 +60,10 @@ var protos = Protos.bootstrap(testSkeleton, {
       server: {
         port: 8000
       },
+      envData: {
+        development: 'deploy.json',
+        travis: 'deploy.json'
+      },
       events: {
         components: function(protos) {
           // Load framework components

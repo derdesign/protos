@@ -29,12 +29,15 @@ vows.describe('lib/protos.js').addBatch({
       assert.equal(protos.path, protos.constructor.path + '/test/fixtures/test-protos');
     },
     
-    'Reads deployment file': function() {
-      assert.deepEqual(protos.deploy, {
-        ALPHA: 1,
-        BETA: 2,
-        GAMMA: [3]
-      });
+    'Properly reads and sets env data': function() {
+      var env = app.require('deploy.json');
+      assert.strictEqual(protos.env(), env);
+      assert.strictEqual(protos.env('ALPHA'), env.ALPHA);
+      assert.strictEqual(protos.env('BETA'), env.BETA);
+      assert.strictEqual(protos.env('GAMMA'), env.GAMMA);
+      assert.equal(protos.env('ALPHA'), 1);
+      assert.equal(protos.env('BETA'), 2);
+      assert.deepEqual(protos.env('GAMMA'), [3]);
     },
     
     'Inherits from EventEmitter': function() {
