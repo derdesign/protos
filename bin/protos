@@ -708,6 +708,56 @@ module.exports = {\n\
       });
        
     }
+  },
+  
+  env: {
+    args: 1,
+    single: ['src'],
+    validate: validateApp,
+    help: {
+      src: "JSON file to use for environment data"
+    },
+    run: function(data) {
+      
+      var cwd = process.cwd();
+      var relFile = data.src || 'development.json';
+      var file = util.format('%s/%s', cwd, relFile);
+      
+      if (fs.existsSync(file)) {
+        
+        try {
+          var envData = require(file);
+        } catch(e) {
+          console.log("\nUnable to parse JSON\n");
+          process.exit();
+        }
+        
+        var prop = data.args[0];
+        var out = prop.trim().split('.').reduce(function(prev, current) {
+          return prev ? prev[current] : undefined;
+        }, Object.create(envData));
+        
+        if (typeof out == 'string' || typeof out == 'number' || out instanceof String) {
+          console.log(out);
+          process.exit();
+        } if (out instanceof Array) {
+          out = out.join(',');
+        } else if (out === null) {
+          out = 'null';
+        } else {
+          out = JSON.stringify(out)
+        }
+        
+        console.log(out);
+        
+      } else {
+        
+        console.log("File does not exist: %s", relFile);
+          
+      }
+      
+    }
+
   }
 
 }
@@ -1294,7 +1344,7 @@ Usage: protos [ACTION] [OPTIONS] [ARGUMENTS]\n\n\
 Actions: \n\
          create install server start stop status config controller\n\
          handler helper model view partial layout static restricted\n\
-         api hook data include inspector link lint validate \n\n\
+         api hook data include inspector link lint validate env\n\n\
 Options:\n";
 
 cli.help.after = "\n\
