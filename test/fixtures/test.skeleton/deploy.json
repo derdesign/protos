@@ -1,5 +1,10 @@
 {
   "ALPHA": 1,
   "BETA": 2,
-  "GAMMA": [3]
+  "GAMMA": [3],
+  "SOME": {
+    "OTHER": {
+      "VALUE": "abcd"
+    }
+  }
 }

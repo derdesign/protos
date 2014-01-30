@@ -30,11 +30,34 @@ vows.describe('lib/protos.js').addBatch({
     },
     
     'Properly reads and sets env data': function() {
+      
       assert.deepEqual(protos.env(), {
         ALPHA: 1,
         BETA: 2,
-        GAMMA: [3]
+        GAMMA: [ 3 ],
+        SOME: {
+          OTHER: {
+            VALUE: 'abcd'
+          }
+        }
       });
+      
+      assert.equal(protos.env('ALPHA'), 1);
+      assert.equal(protos.env('BETA'), 2);
+      assert.deepEqual(protos.env('GAMMA'), [3]);
+      
+      assert.deepEqual(protos.env('SOME'), {
+        OTHER: {
+          VALUE: 'abcd'
+        }
+      });
+      
+      assert.deepEqual(protos.env('SOME.OTHER'), {
+        VALUE: 'abcd'
+      });
+      
+      assert.equal(protos.env('SOME.OTHER.VALUE'), 'abcd');
+      
     },
     
     'Inherits from EventEmitter': function() {
