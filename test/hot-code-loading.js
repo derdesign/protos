@@ -23,6 +23,10 @@ var testHookBuf = fs.readFileSync(testHook, 'utf8');
 var otherHook = app.fullPath('hook/other_hook.js');
 var otherHookDisabled = app.fullPath('other_hook.js');
 
+var envFile = app.fullPath('deploy.json');
+var envFile1 = app.fullPath('deploy1.json');
+var envFileTmp = app.fullPath('deploy1.json.tmp');
+
 vows.describe('Hot Code Loading').addBatch({
   
   'Modifying runtime before reload...': function() {
@@ -86,6 +90,9 @@ vows.describe('Hot Code Loading').addBatch({
     
     fs.renameSync(otherHook, otherHookDisabled);
     
+    fs.renameSync(envFile, envFileTmp);
+    fs.renameSync(envFile1, envFile);
+    
     assert.deepEqual(app.__data, {});
     
     app.reload({
@@ -99,6 +106,7 @@ vows.describe('Hot Code Loading').addBatch({
   "The reload events are emitted with spec": function() {
    
     var spec = {
+      env: true,
       data: true,
       hooks: true,
       controllers: true, 
@@ -120,6 +128,12 @@ vows.describe('Hot Code Loading').addBatch({
   },
   
   'Verifying runtime after reload...': function() {
+    
+    // Env data should have changed
+    assert.deepEqual({TESTING: true}, protos.env());
+    fs.renameSync(envFile, envFile1);
+    fs.renameSync(envFileTmp, envFile);
+    app.reload({env: true});
     
     // Data reloading
     var alphaBuf = fs.readFileSync(app.fullPath('data/alpha.json'), 'utf8');              // Get original contents of alpha
