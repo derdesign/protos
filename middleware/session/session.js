@@ -22,6 +22,7 @@
 
 var app = protos.app;
 var slice = Array.prototype.slice;
+var moment = require('moment');
 
 var _ = require('underscore');
 var util = require('util');
@@ -38,20 +39,29 @@ function Session(config, middleware) {
   app[middleware] = this; // Attach to application singleton
 
   // Middleware configuration defaults
-  this.config = _.extend({
+  this.config = config = _.extend({
     guestSessions: false,
-    regenInterval: 5 * 60,
-    permanentExpires: 30 * 24 * 3600,
-    defaultExpires: 24*3600,
-    temporaryExpires: 24*3600,
-    guestExpires: 7 * 24 * 3600,
+    regenInterval: "5 minutes",
+    permanentExpires: "1 month",
+    defaultExpires: "1 day",
+    temporaryExpires: "24 hours",
+    guestExpires: "1 week",
     typecastVars: [],
     autoTypecast: true,
     sessCookie: "_sess",
     hashCookie: "_shash",
     salt: null
   }, config);
-    
+  
+  // Parse time
+  var timeOpts = ['regenInterval', 'permanentExpires', 'defaultExpires', 'temporaryExpires', 'guestExpires'];
+  
+  for (var key in config) {
+    if (timeOpts.indexOf(key) >= 0 && typeof config[key] == 'string') {
+      config[key] = time(config[key]);
+    }
+  }
+  
   if (typeof config.salt != 'string') throw new Error("Session: you must specify a salt");
 
   switch (typeof config.storage) {
@@ -488,6 +498,11 @@ Session.prototype.typecast = function(data) {
     if (data[key] != null) data[key] = protos.util.typecast(data[key]);
   }
   return data;
+}
+
+function time(str) {
+  str = str.split(/\s+/);
+  return moment.duration(parseInt(str[0], 10), str[1]).asSeconds();
 }
 
 module.exports = Session;

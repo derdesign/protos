@@ -7,6 +7,29 @@ app.logging = false;
 
 vows.describe('Session (middleware) » Unit Tests').addBatch({
   
+  'Session::config': {
+    
+    'Properly parses time duration strings': function() {
+    
+      assert.deepEqual(app.session.config, {
+        guestSessions: false,
+        regenInterval: 300,
+        permanentExpires: 2592000,
+        defaultExpires: 86400,
+        temporaryExpires: 86400,
+        guestExpires: 604800,
+        typecastVars: [ 'vInt', 'vFloat', 'vNull', 'vBool' ],
+        autoTypecast: true,
+        sessCookie: '_sess',
+        hashCookie: '_shash',
+        salt: 'abc1234',
+        storage: 'redis'
+      });
+
+    }
+    
+  },
+  
   'Session::createHash': {
     
     'Returns valid {sessId} for guest sessions': function() {
