@@ -57,7 +57,7 @@ function partialHelper() {
   var args = slice.call(arguments, 0);
   var options = args.pop();
   var params = options.hash;
-  var partial = args[0];
+  var partial = args[0] && args[0].replace(/\-+/g, '_'); // Allow dashes in partial names
   if (partial && partial in partials) { // Make sure we are always using the updated partials object
     if (this.locals !== this) {
       // Avoid cyclic __proto__ value by checking if

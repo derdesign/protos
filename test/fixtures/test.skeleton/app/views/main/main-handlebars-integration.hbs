@@ -31,17 +31,17 @@
 {{/each}}
 # Partial running with partials helper + locals argument
 {{#each posts}}
-{{partial "handlebars_test" ../locals}}
+{{partial "handlebars-test" ../locals}}{{! Using dash instead of underscores }}
 {{handlebars_test ../locals}}
 {{/each}}
 # Partial running with partials helper + locals parameter
 {{#each posts}}
-{{partial "handlebars_test" locals=../locals}}
+{{partial "handlebars_test" locals=../locals}}{{! Using dash instead of underscores }}
 {{handlebars_test locals=../locals}}
 {{/each}}
 # Partial running with partials helper + parameters
 {{#each posts}}
-{{partial "handlebars_test" alpha=1 beta=2 gamma=3}}
+{{partial "handlebars_test" alpha=1 beta=2 gamma=3}}{{! Using dash instead of underscores }}
 {{handlebars_test alpha=1 beta=2 gamma=3}}
 {{/each}}
 # Partial running with partials helper + parameters + local argument
