@@ -408,6 +408,14 @@ vows.describe('lib/validator.js').addBatch({
     
   },
   
+  'Running context(func) runs with instance': function() {
+    var instance, validator = app.validator();
+    validator.context(function() {
+      instance = this;
+    });
+    assert.strictEqual(instance, validator);
+  },
+  
   'Properly sets multiple contexts': function() {
     
     var instance, validator = app.validator();
