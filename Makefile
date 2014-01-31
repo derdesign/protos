@@ -44,13 +44,13 @@ lint:
 test:
 		@echo "\nAvailable Test Commands: tests  test-unit  test-sto test-drv test-eng test-int test-mid\n"
 
-tests: 	tests-core tests-alt
+tests: 	tests-alt tests-core
 
 tests-core: 
-		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${hotCodeLoading} 
+		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${hotCodeLoading} ${commandline}
 	
 tests-alt:
-		@${vows} ${vowsOpts} ${viewRenderingAlt} ${commandline}
+		@${vows} ${vowsOpts} ${viewRenderingAlt}
 
 test-unit:
 		@${vows} ${vowsOpts} ${unit}
