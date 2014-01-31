@@ -7,9 +7,9 @@ function MainController(app) {
   /* Handler Tests */
   
   app.handlerTests.main = {
-    'test.js': this.handler('test.js'),
-    'test-dir/another.js': this.handler('test-dir/another.js'),
-    'blog:some/handler/dir/file.js': this.handler('blog:some/handler/dir/file.js')
+    'test.js': this.handler('test'), // without extension
+    'test-dir/another.js': handler('test-dir/another.js'), // without this
+    'blog:some/handler/dir/file.js': this.handler('blog:some/handler/dir/file')
   }
   
   get('/', function(req, res) {

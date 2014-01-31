@@ -2,7 +2,7 @@
 function FilterController() {
   
   // Filter #1: block bad-route-1
-  this.filter(function(req, res, promise) {
+  filter(function(req, res, promise) { // Using filter without this
     if (req.url == '/filter/bad-route-1') {
       res.sendHeaders();
       res.end('{BAD ROUTE 1}');

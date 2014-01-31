@@ -7,7 +7,7 @@ function TestController(app) {
   /* Controller Handlers */
   
   app.handlerTests.test = {
-    'handler.js': this.handler('handler.js')
+    'handler.js': this.handler('handler')
   }
 
   /* Dynamic routes, covering all route methods */
