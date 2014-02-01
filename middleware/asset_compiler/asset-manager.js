@@ -11,11 +11,12 @@ var app = protos.app,
     pathModule = require('path'),
     config = app.asset_compiler;
 
+var assetUtil = require('./asset-util.js');
+
 var ignores = [];
 
 app.once('init', function() {
-  // Remove any duplicate entries in ignores array to improve performance
-  // and avoid unnecessary lookups
+  // Remove any duplicate entries in ignores array to improve performance and avoid unnecessary lookups
   ignores = _.unique(ignores);
 });
 
@@ -38,12 +39,17 @@ if (config.concat) {
   concatFiles.forEach(function(target, index) {
     
     var files = concat[target];
-    var multi = new Multi(fs, {interrupt: false});
+    var multi = new Multi(assetUtil, {interrupt: false});
     
-    for (var file,i=0,len=files.length; i < len; i++) {
-      file = app.fullPath(app.paths.public + files[i]);
-      multi.readFile(file, 'utf8');
-      ignores.push(file); // Prevent source files from being accessed
+    for (var cfile,file,ext,i=0,len=files.length; i < len; i++) {
+      file = files[i];
+      ext = pathModule.extname(file).slice(1);
+      multi.getSource(file, target, 'concat');
+      ignores.push(app.fullPath(app.paths.public + file)); // Prevent source files from being accessed
+      if (ext in config.compileExts) {
+        cfile = file.replace(new RegExp(util.format('\\.%s$', ext)), '.' + config.compileExts[ext]);
+        ignores.push(app.fullPath(app.paths.public + cfile));
+      }
     }
     
     multi.exec(function(errors, results) {
@@ -74,7 +80,7 @@ if (config.concat) {
   });
   
 }
-
+  
 // ===========================================================
 
 // Handle compile_all event

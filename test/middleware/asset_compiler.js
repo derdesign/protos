@@ -104,10 +104,11 @@ vows.describe('Asset Compiler (middleware)').addBatch({
         app.use('asset_compiler', {
           watchOn: [],
           concat: {
-            'concat1.js': ['concat/one.js', 'concat/two.js', 'concat/three.js'],
-            'concat2.js': ['concat/three.js', 'concat/one.js']
+            'concat.js': ['concat/two.coffee', 'concat/one.js', 'concat/three.js', 'concat/four.coffee'],
+            'resolve-concat.css': ['assets/resolve-this/resolve-this.less']
           },
           minify: {
+            'resolve-this.css': ['assets/resolve-this/resolve-this.less'],
             'min.css': ['target.css', 'assets/target.less'],
             'min.js': ['target.js', 'assets/target.coffee']
           },
@@ -151,13 +152,16 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       multi.curl('-i /target.js');
       
       // Properly concatenates assets
-      multi.curl('/concat1.js');
-      multi.curl('/concat2.js');
+      multi.curl('/concat.js');
+      multi.curl('/resolve-concat.css');
       
-      // Blocks access to minify sources
+      // Blocks access to concatenated sources
       multi.curl('-i /concat/one.js');
       multi.curl('-i /concat/two.js');
+      multi.curl('-i /concat/two.coffee');
       multi.curl('-i /concat/three.js');
+      multi.curl('-i /concat/four.js');
+      multi.curl('-i /concat/four.coffee');
       
       multi.exec(function(err, results) {
         promise.emit('success', err || results);
@@ -226,6 +230,21 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
       assert.equal(r2, expected2);
     },
     
+    "Minification properly resolves CSS relative paths": function() {
+      
+      var resolveThis = fs.readFileSync(app.fullPath('public/resolve-this.css'), 'utf8');
+      
+      // Notice how the URL is image.png, instead of ../../image.png 
+      
+      var expected = '#metadata{content:"less";background:url(assets/resolve-this/assets/resolve-this/resolve-this.less)}#resolve-\
+this{background1:url(image.png);background2:url(image.png);background3:url(image.png);background5:url(http://path-to-image.png);\
+background6:url(http://path-to-image.png);background7:url(http://path-to-image.png);background8:url(data:application/png,abcdefgh);\
+background9:url(\'data:application/png,abcdefgh\');background10:url("data:application/png,abcdefgh")}';
+
+      assert.equal(resolveThis, expected);
+      
+    },
+    
     "Blocks access to minify sources": function(results) {
       var r1 = results[++TEST],
           r2 = results[++TEST],
@@ -236,19 +255,50 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
     },
     
     "Successfully concatenates assets": function(results) {
+      
       var r1 = results[++TEST];
-      var r2 = results[++TEST];
-      assert.equal(r1, '/* This is one.js */\n\nvar one = true;\n\n/* This is two.js */\n\nvar two = true;\n\n/* This is three.js */\n\nvar three = true;');
-      assert.equal(r2, '/* This is three.js */\n\nvar three = true;\n\n/* This is one.js */\n\nvar one = true;');
+      
+      var expected = '\n/*\n  This is two.coffee\n */\n\n(function() {\n  var bitlist, kids, singers, song;\n\n  song = ["do", "re", \
+"mi", "fa", "so"];\n\n  singers = {\n    Jagger: "Rock",\n    Elvis: "Roll"\n  };\n\n  bitlist = [1, 0, 1, 0, 0, 1, 1, 1, 0];\n\n  \
+kids = {\n    brother: {\n      name: "Max",\n      age: 11\n    },\n    sister: {\n      name: "Ida",\n      age: 9\n    }\n  };\n\n})\
+.call(this);\n\n\n/* This is one.js */\n\nvar one = true;\n\n/* This is three.js */\n\nvar three = true;\n\n\n/*\n  This is \
+four.coffee\n */\n\n(function() {\n  var courses, dish, food, foods, i, _i, _j, _k, _len, _len1, _len2, _ref;\n\n  _ref = \
+[\'toast\', \'cheese\', \'wine\'];\n  for (_i = 0, _len = _ref.length; _i < _len; _i++) {\n    food = _ref[_i];\n    \
+eat(food);\n  }\n\n  courses = [\'greens\', \'caviar\', \'truffles\', \'roast\', \'cake\'];\n\n  for (i = _j = 0, \
+_len1 = courses.length; _j < _len1; i = ++_j) {\n    dish = courses[i];\n    menu(i + 1, dish);\n  }\n\n  foods = \
+[\'broccoli\', \'spinach\', \'chocolate\'];\n\n  for (_k = 0, _len2 = foods.length; _k < _len2; _k++) {\n    \
+food = foods[_k];\n    if (food !== \'chocolate\') {\n      eat(food);\n    }\n  }\n\n}).call(this);\n';
+
+      assert.equal(r1, expected);
+
+    },
+    
+    "Concatenation properly resolves CSS relative paths": function(results) {
+      
+      var r1 = results[++TEST];
+      
+      var expected = '#resolve-this {\n  background1: url("image.png");\n  background2: url("image.png");\n  background3: url("image.png");\n  \
+background5: url(http://path-to-image.png);\n  background6: url(\'http://path-to-image.png\');\n  background7: url("http://path-to-image.png");\n  \
+background8: url(data:application/png,abcdefgh);\n  background9: url(\'data:application/png,abcdefgh\');\n  background10: url("data:application/png,\
+abcdefgh");\n}\n';
+
+      assert.equal(r1, expected);
+
     },
     
     "Blocks access to concatenated sources": function(results) {
       var r1 = results[++TEST],
           r2 = results[++TEST],
-          r3 = results[++TEST];
+          r3 = results[++TEST],
+          r4 = results[++TEST],
+          r5 = results[++TEST],
+          r6 = results[++TEST];
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r4.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r5.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r6.indexOf('HTTP/1.1 404 Not Found') >= 0);
     },
     
     "Does not compile ignored files": function() {

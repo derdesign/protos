@@ -1,0 +1,19 @@
+
+// This tests the asset minifier path normalization
+
+#resolve-this {
+  
+  // Should process these paths
+  background1: url(../../image.png);
+  background2: url('../../image.png');
+  background3: url("../../image.png");
+  
+  // Should ignore http and data uris
+  background5: url(http://path-to-image.png);
+  background6: url('http://path-to-image.png');
+  background7: url("http://path-to-image.png");
+  background8: url(data:application/png,abcdefgh);
+  background9: url('data:application/png,abcdefgh');
+  background10: url("data:application/png,abcdefgh");
+
+}
