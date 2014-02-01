@@ -17,6 +17,7 @@
     {array} watchOn: Array containing environments in which the assets will be automatically compiled on change
     {integer} watchInterval: Watch polling interval
     {array} compile: Extensions to compile and/or watch.
+    {array} ignore: Files to ignore by the static server
     {object} compileExts: Object containing the target extensions of compiled assets. Contains {ext: outExt}
     {object} compilers: Object containing the functions that compile the target extensions.
     {boolean} assetSourceAccess: If set to true, will enable access to the asset sources (disabled by default)
@@ -54,7 +55,12 @@
 
 var app = protos.app;
 
+var fs = require('fs');
+var util = require('util');
+
 function AssetCompiler(config, middleware) {
+  
+  var self = this;
   
   // Check for dependencies
   
@@ -63,7 +69,7 @@ function AssetCompiler(config, middleware) {
   }
   
   // Extend configuration
-  config = protos.configExtend({
+  config = this.config = protos.configExtend({
     watchOn: ['development', 'debug'],
     watchInterval: app.config.watchInterval || 100,
     compile: ['less', 'scss', 'styl', 'coffee'],
@@ -97,9 +103,9 @@ function AssetCompiler(config, middleware) {
   }, config);
   
   // Expose config into app config
-  app[middleware] = config;
+  app[middleware] = this;
   
-  // Getting compilers after config is set, to be able to read it
+  // Getting compilers (depend on config)
   var compilers = require('./compilers.js');
   
   // Extend compilers with user provided ones
@@ -115,6 +121,15 @@ function AssetCompiler(config, middleware) {
   // Run Source Maps
   require('./source-maps.js');
   
+  // Minify & Concat event
+  app.on('asset_compiler_minify_concat', function() {
+    app.emit('asset_compiler_minify', config.minify);
+    app.emit('asset_compiler_concat', config.concat);
+  });
+  
+  // Run Minify & Concat
+  app.emit('asset_compiler_minify_concat');
+
 }
 
 module.exports = AssetCompiler;

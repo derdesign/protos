@@ -5,7 +5,7 @@ var app = protos.app;
 var util = require('util');
 var pathModule = require('path');
 
-var config = app.asset_compiler;
+var config = app.asset_compiler.config;
 
 if (config.sourceMaps.length) {
   

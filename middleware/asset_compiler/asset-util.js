@@ -6,7 +6,7 @@ var fs = require('fs');
 var path = require('path');
 var util = require('util');
 
-var config = app.asset_compiler;
+var config = app.asset_compiler.config;
 
 function getExt(file) {
   return file.slice(file.lastIndexOf('.')+1).trim().toLowerCase();
@@ -49,6 +49,16 @@ module.exports = {
       config.compilers[ext](source, file, callback);
     } else {
       callback(null, source);
+    }
+  },
+  
+  logErr: function(err) {
+    if (err) {
+      if (app.supports.logger) {
+        app.errorLog(err)
+      } else {
+        app.log(err);
+      }
     }
   }
   

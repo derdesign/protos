@@ -301,10 +301,6 @@ abcdefgh");\n}\n';
       assert.isTrue(r6.indexOf('HTTP/1.1 404 Not Found') >= 0);
     },
     
-    "Does not compile ignored files": function() {
-      assert.isFalse(fs.existsSync(app.fullPath(app.paths.public + 'ignore.css')));
-    },
-    
     "LESS @import works as expected": function() {
       var compiled1 = fs.readFileSync(app.fullPath(app.paths.public + 'less-style.css')).toString('utf8');
       var compiled2 = fs.readFileSync(app.fullPath(app.paths.public + 'css/subdir/less-test.css')).toString('utf8');

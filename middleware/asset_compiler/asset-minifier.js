@@ -5,9 +5,15 @@ var app = protos.app,
     fs = require('fs'),
     path = require('path'),
     util = require('util'),
-    config = app.asset_compiler,
     Multi = require('multi');
-    
+
+
+//////////////////////////////////////////
+// PREPARATION
+//////////////////////////////////////////
+
+var config = app.asset_compiler.config;
+ 
 var _ = require('underscore');
 
 var assetUtil = require('./asset-util.js');
@@ -17,17 +23,33 @@ var UglifyJS = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_co
 
 var cleancss = new CleanCSS(config.cleanCSSOpts);
 
-var minifyTargets = Object.keys(config.minify);
 
-var compiler = new Multi(assetUtil);
+//////////////////////////////////////////
+// EVENTS
+//////////////////////////////////////////
 
-// Recursive minification
-function minification() {
-  var sources, target = minifyTargets.shift();
+app.on('asset_compiler_minify', function(minifyConfig) {
+  if (!minifyConfig) minifyConfig = config.minify;
+  var compiler = new Multi(assetUtil);
+  var minifyTargets = Object.keys(minifyConfig);
+  minification(minifyConfig, minifyTargets, compiler);
+});
+
+
+//////////////////////////////////////////
+// FUNCTIONS
+//////////////////////////////////////////
+
+
+function minification(minifyConfig, minifyTargets, compiler) {
+  // NOTE: The minifyTargets array is used to handle recursion state,
+  // therefore it is passed as an argument, otherwise it would be
+  // reset each time the function is called, due to its recursion.
+  var source, sources, target = minifyTargets.shift();
   if (target) {
-    sources = config.minify[target];
+    sources = minifyConfig[target];
     if (!Array.isArray(sources)) sources = [sources];
-    sources.forEach(function(item, i) {
+    sources.forEach(function(item) {
       compiler.getSource(item, target, 'minify');
     });
     compiler.exec(function(err, compiled) {
@@ -35,21 +57,25 @@ function minification() {
       else {
         var ext = assetUtil.getExt(target);
         target = app.fullPath(app.paths.public + target);
-        if (ext == 'css') {
-          var source = cleancss.minify(compiled.join('\n'));
-          fs.writeFileSync(target, source, 'utf8');
-          app.debug("Asset Compiler: Minified CSS: " + app.relPath(target));
-        } else if (ext == 'js') {
-          var outSrc = minifyJS(compiled.join('\n'));
-          fs.writeFileSync(target, outSrc, 'utf8');
-          app.debug("Asset Compiler: Minified JavaScript: " + app.relPath(target));
-        } else {
-          throw new Error("Asset Compiler: Extension not supported: " + target);
+        switch (ext) {
+          case 'css':
+            source = cleancss.minify(compiled.join('\n'));
+            fs.writeFileSync(target, source, 'utf8');
+            app.debug("Asset Compiler: Minified CSS: " + app.relPath(target));
+            break;
+          case 'js':
+            source = minifyJS(compiled.join('\n'));
+            fs.writeFileSync(target, source, 'utf8');
+            app.debug("Asset Compiler: Minified JavaScript: " + app.relPath(target));
+            break;
+          default:
+            throw new Error("Asset Compiler: Extension not supported: " + target);
         }
-        minification();
+        minification(minifyConfig, minifyTargets, compiler);
       }
     });
   } else {
+    app.asset_compiler.config.minify = minifyConfig; // Set new config once minification is done
     app.emit('asset_compiler_minify_complete');
   }
 }
@@ -57,6 +83,3 @@ function minification() {
 function minifyJS(code) {
   return UglifyJS.minify(code, config.uglifyOpts).code;
 }
-
-// Run
-minification();

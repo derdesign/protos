@@ -9,85 +9,26 @@ var app = protos.app,
     chokidar = require('chokidar'),
     fileModule = require('file'),
     pathModule = require('path'),
-    config = app.asset_compiler;
+    Multi = require('multi'),
+    config = app.asset_compiler.config;
+    
+//////////////////////////////////////////
+// PREPARATION
+//////////////////////////////////////////
 
 var assetUtil = require('./asset-util.js');
 
-var ignores = [];
+var ignores = config.ignore.map(function(file) {
+  return app.fullPath(app.paths.public + file);
+});
 
 app.once('init', function() {
-  // Remove any duplicate entries in ignores array to improve performance and avoid unnecessary lookups
-  ignores = _.unique(ignores);
+  ignores = _.unique(ignores); // Improve performance by removing duplicate entries
 });
 
 var truthy = function(val) {
   return val; 
 }
-
-// Set ignores to be unique on startup
-
-// Concatenation
-
-if (config.concat) {
-  
-  var Multi = require('multi');
-  
-  var concat = config.concat;
-  var concatFiles = Object.keys(concat);
-  var concatCount = 0;
-  
-  concatFiles.forEach(function(target, index) {
-    
-    var files = concat[target];
-    var multi = new Multi(assetUtil, {interrupt: false});
-    
-    for (var cfile,file,ext,i=0,len=files.length; i < len; i++) {
-      file = files[i];
-      ext = pathModule.extname(file).slice(1);
-      multi.getSource(file, target, 'concat');
-      ignores.push(app.fullPath(app.paths.public + file)); // Prevent source files from being accessed
-      if (ext in config.compileExts) {
-        cfile = file.replace(new RegExp(util.format('\\.%s$', ext)), '.' + config.compileExts[ext]);
-        ignores.push(app.fullPath(app.paths.public + cfile));
-      }
-    }
-    
-    multi.exec(function(errors, results) {
-      
-      if (errors) {
-        
-        throw errors.filter(truthy);
-        
-      } else {
-        
-        var buf = results.filter(truthy).join('\n\n');
-        
-        fs.writeFile(app.fullPath(app.paths.public + target), buf, 'utf8', function(err) {
-          if (err) {
-            throw err;
-          } else {
-            app.debug(util.format('Asset Manager: Concatenated %s', target));
-            if (++concatCount === concatFiles.length) {
-              app.emit('asset_compiler_concat_complete');
-            }
-          }
-        });
-        
-      }
-      
-    });
-    
-  });
-  
-}
-  
-// ===========================================================
-
-// Handle compile_all event
-app.on('compile_all', compileAll);
-    
-// Do nothing if no compilation is required
-if (config.compile.length === 0) return;
 
 var assets = {},
     extRegex = new RegExp('\\.(' + config.compile.join('|') + ')$');
@@ -142,34 +83,6 @@ fileModule.walkSync(app.fullPath(app.paths.public), function(dirPath, dirs, file
   }
 });
 
-// Exclude assets ignored in config
-// ignore: ['bootstrap/deny.(less|styl)', 'blueprint/(deny|forbid).less']
-
-var filtered = {};
-
-for (var key in assets) { 
-  var relPaths = assets[key].map(function(f) {
-    return app.relPath(f, 'public');
-  });
-  filtered[key] = protos.util.excludeWithPattern(relPaths, config.ignore);
-  if (filtered[key].length === 0) {
-    delete filtered[key];
-  } else {
-    filtered[key] = filtered[key].map(function(f) {
-      return app.fullPath(app.paths.public + f);
-    });
-  }
-}
-
-assets = filtered;
-
-// Cleanup ignores, only leave compiled sources that are not 
-// allowed, since they're being minified. Asset sources are
-// normally blocked. This improves performance on array index lookup.
-ignores = ignores.filter(function(item) {
-  return !extRegex.test(item);
-});
-
 var watch = (config.watchOn.indexOf(protos.environment) >= 0);
 var assetExts = Object.keys(assets);
     
@@ -202,8 +115,68 @@ if (watch) {
 
 }
 
+
+//////////////////////////////////////////
+// EVENTS
+//////////////////////////////////////////
+
+
+// Compile all assets on demand
+app.on('asset_compiler_compile_all', compileAll);
+
+app.on('asset_compiler_concat', function(concatConfig) {
+  if (!concatConfig) concatConfig = config.concat;
+  var compiler = new Multi(assetUtil);
+  var concatTargets = Object.keys(concatConfig);
+  concatenation(concatConfig, concatTargets, compiler);
+});
+
+
+//////////////////////////////////////////
+// FUNCTIONS
+//////////////////////////////////////////
+
+
+function concatenation(concatConfig, concatTargets, compiler) {
+  var sources, target = concatTargets.shift();
+  if (target) {
+    sources = concatConfig[target];
+    if (!Array.isArray(sources)) sources = [sources];
+    sources.forEach(function(item) {
+      var file = app.fullPath(app.paths.public + item);
+      var ext = assetUtil.getExt(file);
+      ignores.push(file);
+      if (ext in config.compileExts) {
+        var cfile = file.replace(new RegExp(util.format('\\.%s$', ext)), '.' + config.compileExts[ext]);
+        ignores.push(cfile);
+      }
+      compiler.getSource(item, target, 'concat');
+    });
+    compiler.exec(function(err, compiled) {
+      if (err) {
+        throw err;
+      } else {
+        var ext = assetUtil.getExt(target);
+        switch (ext) {
+          case 'css':
+          case 'js':
+            var source = compiled.join('\n\n');
+            target = app.fullPath(app.paths.public + target);
+            fs.writeFileSync(target, source, 'utf8');
+            break;
+          default:
+            throw new Error("Asset Compiler: Extension not supported: " + target);
+        }
+        concatenation(concatConfig, concatTargets, compiler);
+      }
+    });
+  } else {
+    app.asset_compiler.config.concat = concatConfig; // Set new config once concatenation is done
+    app.emit('asset_compiler_concat_complete');
+  }
+}
+
 function watchCompile(file) {
-  
   var matches, path = pathModule.dirname(file);
   if (ignores.indexOf(path) === -1 && (matches = file.match(extRegex))) {
     // Only compile if path is not being ignored

@@ -9,7 +9,7 @@ var mw = {
 }
 
 var _ = require('underscore');
-var config = app.asset_compiler;
+var config = app.asset_compiler.config;
 
 var less = protos.requireDependency('less', mw.desc, mw.name);
 var sass = protos.requireDependency('node-sass', mw.desc, mw.name);
