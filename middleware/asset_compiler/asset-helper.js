@@ -58,17 +58,6 @@ app.on('asset_compiler_reload_assets', function() {
   // Prepare things before reload
   app.emit('before_asset_compiler_reload_assets');
   
-  var configFile = app.fullPath('config/asset_compiler.js');
-  
-  if (app.config.asset_compiler && fs.existsSync(configFile)) {
-    // If using a specific config in config/, reload it.
-    // The config.ignore setting is used in realtime, so it can't be directly replaced
-    // When reloading, make sure previously computed ignores are present in new config.
-    var newConfig = protos.require(configFile, true); // Reload config bypassing cache
-    newConfig.ignore = newConfig.ignore.concat(config.ignore); // Append old ignores to new ignores
-    instance.config = newConfig; // Set new config
-  }
-  
   // NOTE: The complete events must be bound before the events that emit them are fired
   
   app.once('asset_compiler_compile_all_complete', done); // After compilation is complete, increment counter
