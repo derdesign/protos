@@ -26,10 +26,13 @@ vows.describe('lib/application.js').addBatch({
   'Integrity Checks': {
     
     'Sets environment': function() {
-      app.environment = null; // Make sure it can't be overridden
-      assert.isTrue(app.environment !== null);
-      delete app.environment; // Make sure it can't be deleted
-      assert.isTrue(/^(debug|development|travis)$/.test(app.environment));
+      var o = Object.getOwnPropertyDescriptor(app, 'environment');
+      assert.deepEqual(o, {
+        value: protos.environment,
+        writable: false,
+        enumerable: true,
+        configurable: false
+      });
     },
     
     'Sets domain': function() {

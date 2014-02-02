@@ -138,9 +138,16 @@ vows.describe('lib/protos.js').addBatch({
       
       // Test values as if it were the production environment
       out.production.shouldBeNumber = protos.production(99, 'BAD VALUE');
+      out.production.shouldBeNumber = app.production(99, 'BAD VALUE');
+      
       out.production.shouldBeNull = protos.production(null, 'BAD VALUE');
+      out.production.shouldBeNull = app.production(null, 'BAD VALUE');
+      
       out.production.shouldBeFalse = protos.production(false, 'BAD VALUE');
+      out.production.shouldBeFalse = app.production(false, 'BAD VALUE');
+      
       out.production.shouldBeTrue = protos.production();
+      out.production.shouldBeTrue = app.production();
       
       // Restore protos.production
       protos.production = method;
@@ -173,7 +180,7 @@ vows.describe('lib/protos.js').addBatch({
       assert.deepEqual(results, expected);
       assert.isFunction(protos.production);
       assert.isFunction(app.production);
-      assert.strictEqual(protos.production, app.production);
+
     }
     
   }
