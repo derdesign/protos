@@ -111,6 +111,9 @@ function AssetCompiler(config, middleware) {
   // Extend compilers with user provided ones
   protos.extend(compilers, config.compilers);
   config.compilers = compilers;
+  
+  // Setup asset helper
+  require('./asset-helper.js');
 
   // Run Assets manager
   require('./asset-manager.js');

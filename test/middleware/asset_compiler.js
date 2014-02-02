@@ -61,6 +61,8 @@ app.addFilter('compiled_coffee', function(source, file, options) {
   return source;
 });
 
+var assetTestsAfter, assetFiles = {};
+
 vows.describe('Asset Compiler (middleware)').addBatch({
   
   '': {
@@ -111,8 +113,7 @@ vows.describe('Asset Compiler (middleware)').addBatch({
             'resolve-this.css': ['assets/resolve-this/resolve-this.less'],
             'min.css': ['target.css', 'assets/target.less'],
             'min.js': ['target.js', 'assets/target.coffee']
-          },
-          ignore: ['ignore.styl']
+          }
         });
         
       }
@@ -123,6 +124,17 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       compiledStylus = fs.readFileSync(app.fullPath('../compiled-assets/stylus.txt'), 'utf8');
       compiledCoffee = fs.readFileSync(app.fullPath('../compiled-assets/coffee.txt'), 'utf8');
      
+      // Properly handles assets helper
+     
+      var file1 = 'css/less-layout.css';
+      var file2 = 'css/stylus-layout.css';
+      
+      assetFiles[file1] = app.mainHelper.asset(null, {src: file1});
+      assetFiles[file2] = app.mainHelper.asset(null, {src: file2});
+      
+      multi.curl(util.format('-i %s', assetFiles[file1]));
+      multi.curl(util.format('-i %s', assetFiles[file2]));
+      
       // Forbids access to asset sources
       multi.curl('-i /assets/less.less');
       multi.curl('-i /assets/scss.scss');
@@ -164,10 +176,53 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       multi.curl('-i /concat/four.coffee');
       
       multi.exec(function(err, results) {
-        promise.emit('success', err || results);
+        
+        app.reload({assets: true});
+      
+        multi.curl(util.format('-i %s', assetFiles[file1])); // 404
+        multi.curl(util.format('-i %s', assetFiles[file2])); // 404
+        
+        multi.exec(function(_, newResults) {
+          assetTestsAfter = newResults;
+          promise.emit('success', err || results);
+        });
+        
       });
       
       return promise;
+    },
+    
+    "Properly configures asset routes with asset helper": function(results) {
+      
+      var assetUtil = protos.require('middleware/asset_compiler/asset-util.js');
+      
+      var r1 = results[++TEST],
+          r2 = results[++TEST];
+          
+      var r3 = assetTestsAfter[0],
+          r4 = assetTestsAfter[1];
+
+      for (var file in assetFiles) {
+        var expected = assetFiles[file];
+        var mtime = fs.statSync(app.fullPath(app.paths.public + file)).mtime;
+        var hash = app.applyFilters('static_file_mtime_hash', mtime);
+        var ext = assetUtil.getExt(file);
+        file = file.replace(/\.css$/, '');
+        file = util.format('/%s-%s.%s', file, hash, ext);
+        assert.equal(file, expected);
+      }
+
+      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r1.indexOf('Content-Type: text/css') >= 0);
+      assert.isTrue(r1.indexOf('Coming from less-layout.less') >= 0);
+      
+      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r2.indexOf('Content-Type: text/css') >= 0);
+      assert.isTrue(r2.indexOf('Coming from stylus-layout.styl') >= 0);
+      
+      assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r4.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      
     },
     
     "Forbids access to asset sources": function(results) {

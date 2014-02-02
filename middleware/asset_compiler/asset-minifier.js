@@ -32,6 +32,9 @@ app.on('asset_compiler_minify', function(minifyConfig) {
   if (!minifyConfig) minifyConfig = config.minify;
   var compiler = new Multi(assetUtil);
   var minifyTargets = Object.keys(minifyConfig);
+  for (var target in minifyConfig) {
+    assetUtil.ignoreFiles(minifyConfig[target]);
+  }
   minification(minifyConfig, minifyTargets, compiler);
 });
 
@@ -75,7 +78,7 @@ function minification(minifyConfig, minifyTargets, compiler) {
       }
     });
   } else {
-    app.asset_compiler.config.minify = minifyConfig; // Set new config once minification is done
+    config.minify = minifyConfig; // Set new config once minification is done
     app.emit('asset_compiler_minify_complete');
   }
 }

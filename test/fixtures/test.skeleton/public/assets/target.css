@@ -1,1 +1,23 @@
-/* This file should be ignored by the asset compiler */
+#yelow #short {
+  color: #fea;
+}
+#yelow #long {
+  color: #ffeeaa;
+}
+#yelow #rgba {
+  color: rgba(255, 238, 170, 0.1);
+}
+#yelow #argb {
+  color: #1affeeaa;
+}
+.body {
+  background1: url("data:image/png:asdfasdf");
+  background2: url('data:image/png:asdfasdf');
+  background3: url(data:image/png:asdfasdf);
+  background4: url("http://hello.com/style.css");
+  background5: url('http://hello.com/style.css');
+  background6: url(http://hello.com/style.css);
+  background7: url("../dir/images/test.jpg");
+  background8: url('../dir/images/test.jpg');
+  background9: url(../dir/images/test.jpg);
+}

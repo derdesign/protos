@@ -40,10 +40,15 @@ Application.prototype._isStaticFileRequest = function(req, res) {
  */
 
 var multiSlashes = /\/+/g;
+var startSlash = protos.regex.startSlash;
 
 Application.prototype._serveStaticFile = function(path, req, res) {
 
   path = path.replace(multiSlashes, '/').trim();
+  
+  var relPath = app.relPath(path, app.paths.public);
+  
+  path = app.applyFilters('static_file_path', path, relPath);
   
   req.__handled = true;
   
@@ -151,7 +156,7 @@ Application.prototype._serveStaticFile = function(path, req, res) {
         stream = fs.createReadStream.apply(null, streamArgs);
 
         stream.on('error', function(err) {
-          app.serverError(res, ["Unable to read " + app.relPath(path) + ": " + err.toString()]);
+          app.serverError(res, ["Unable to read " + relPath + ": " + err.toString()]);
         });
 
         stream.on('open', function() {

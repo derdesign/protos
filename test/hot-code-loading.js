@@ -106,6 +106,7 @@ vows.describe('Hot Code Loading').addBatch({
   "The reload events are emitted with spec": function() {
    
     var spec = {
+      assets: false,
       env: true,
       data: true,
       hooks: true,

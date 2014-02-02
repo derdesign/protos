@@ -5,6 +5,7 @@ var app = protos.app;
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
+var _ = require('underscore');
 
 var config = app.asset_compiler.config;
 
@@ -37,7 +38,31 @@ function resolveCSSPaths(source, file, target) {
 
 module.exports = {
   
+  EXT_REGEX: new RegExp('\\.(' + config.compile.join('|') + ')$'),
+  
   getExt: getExt,
+  
+  compiledFile: function(file) {
+    if (this.EXT_REGEX.test(file)) {
+      var ext = this.getExt(file);
+      var base = file.replace(this.EXT_REGEX, '');
+      return util.format('%s.%s', base, config.compileExts[ext]);
+    } else {
+      return file;
+    }
+  },
+  
+  ignoreFiles: function(files) {
+    for (var file,i=0,len=files.length; i < len; i++) {
+      file = app.fullPath(app.paths.public + files[i]);
+      if (this.EXT_REGEX.test(file)) {
+        config.ignore.push(this.compiledFile(file));
+      } else {
+        config.ignore.push(file);
+      }
+    }
+    config.ignore = _.unique(config.ignore);
+  },
   
   getSource: function(f, target, action, callback) {
     var file = app.fullPath(app.paths.public + f);
