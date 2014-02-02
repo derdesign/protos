@@ -16,7 +16,8 @@ var compiledLess,
     compiledStylus,
     compiledCoffee,
     assetCompilerMinifyComplete,
-    assetCompilerConcatComplete;
+    assetCompilerConcatComplete,
+    assetCompilerCompileAllComplete;
     
 var lessOpts, sassOpts, stylusOpts, coffeeOpts,
     lessCode, sassCode, stylusCode, coffeeCode;
@@ -61,6 +62,10 @@ app.addFilter('compiled_coffee', function(source, file, options) {
   return source;
 });
 
+app.on('static_file_request', function(req, res) {
+  res.setHeader('X-Requested-File', req.url);
+});
+
 var assetTestsAfter, assetFiles = {};
 
 vows.describe('Asset Compiler (middleware)').addBatch({
@@ -89,13 +94,21 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       });
       
       // Asset compiler minify complete event
-      app.on('asset_compiler_minify_complete', function() {
+      app.once('asset_compiler_minify_complete', function() {
         assetCompilerMinifyComplete = true;
+        runTestsWhenReady();
       });
       
       // Asset compiler concat complete event
-      app.on('asset_compiler_concat_complete', function() {
+      app.once('asset_compiler_concat_complete', function() {
         assetCompilerConcatComplete = true;
+        runTestsWhenReady();
+      });
+      
+      // Asset compiler compile all complete
+      app.once('asset_compiler_compile_all_complete', function() {
+        assetCompilerCompileAllComplete = true;
+        runTestsWhenReady();
       });
       
       // Load dependencies
@@ -105,6 +118,8 @@ vows.describe('Asset Compiler (middleware)').addBatch({
         
         app.use('asset_compiler', {
           watchOn: [],
+          assetHash: true,
+          assetHashAlgorith: 'md5',
           concat: {
             'concat.js': ['concat/two.coffee', 'concat/one.js', 'concat/three.js', 'concat/four.coffee'],
             'resolve-concat.css': ['assets/resolve-this/resolve-this.less']
@@ -129,13 +144,13 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       var file1 = 'css/less-layout.css';
       var file2 = 'css/stylus-layout.css';
       
-      assetFiles[file1] = app.mainHelper.asset(null, {src: file1});
-      assetFiles[file2] = app.mainHelper.asset(null, {src: file2});
+      assetFiles[file1] = app.asset_compiler.assetHelper(null, {src: file1});
+      assetFiles[file2] = app.asset_compiler.assetHelper(null, {src: file2});
       
       multi.curl(util.format('-i %s', assetFiles[file1]));
       multi.curl(util.format('-i %s', assetFiles[file2]));
       
-      // Forbids access to asset sources
+      // Blocks access to asset sources
       multi.curl('-i /assets/less.less');
       multi.curl('-i /assets/scss.scss');
       multi.curl('-i /assets/_partial.scss');
@@ -175,24 +190,36 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       multi.curl('-i /concat/four.js');
       multi.curl('-i /concat/four.coffee');
       
-      multi.exec(function(err, results) {
+      function runTestsWhenReady() {
+
+        if (assetCompilerMinifyComplete && assetCompilerConcatComplete && assetCompilerCompileAllComplete) {
+          
+          multi.exec(function(err, results) {
+
+            app.once('after_asset_compiler_reload_assets', function() {
+          
+              multi.curl(util.format('-i %s', assetFiles[file1])); // 404
+              multi.curl(util.format('-i %s', assetFiles[file2])); // 404
         
-        app.reload({assets: true});
-      
-        multi.curl(util.format('-i %s', assetFiles[file1])); // 404
-        multi.curl(util.format('-i %s', assetFiles[file2])); // 404
+              multi.exec(function(_, newResults) {
+                assetTestsAfter = newResults;
+                promise.emit('success', err || results);
+              });
+
+            });
+
+            app.reload({assets: true});
+              
+          });
+          
+        }
         
-        multi.exec(function(_, newResults) {
-          assetTestsAfter = newResults;
-          promise.emit('success', err || results);
-        });
-        
-      });
-      
+      }
+
       return promise;
     },
     
-    "Properly configures asset routes with asset helper": function(results) {
+    "Asset helper provides expected results": function(results) {
       
       var assetUtil = protos.require('middleware/asset_compiler/asset-util.js');
       
@@ -201,7 +228,7 @@ vows.describe('Asset Compiler (middleware)').addBatch({
           
       var r3 = assetTestsAfter[0],
           r4 = assetTestsAfter[1];
-
+    
       for (var file in assetFiles) {
         var expected = assetFiles[file];
         var mtime = fs.statSync(app.fullPath(app.paths.public + file)).mtime;
@@ -211,7 +238,7 @@ vows.describe('Asset Compiler (middleware)').addBatch({
         file = util.format('/%s-%s.%s', file, hash, ext);
         assert.equal(file, expected);
       }
-
+    
       assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
       assert.isTrue(r1.indexOf('Content-Type: text/css') >= 0);
       assert.isTrue(r1.indexOf('Coming from less-layout.less') >= 0);
@@ -262,8 +289,6 @@ vows.describe('Asset Compiler (middleware)').addBatch({
       var r1 = results[++TEST],
           r2 = results[++TEST];
           
-      // console.exit(r2);
-          
       var expected1 = '#features #toc-sidebar{display:none!important}#toc-sidebar{overflow-y:scroll;box-shadow:5px 0 40px \
 rgba(255,255,255,.8);position:fixed;top:0;left:0;height:100%;background:#f2f2f2 repeat}#toc-sidebar>:first-child{margin:50px 0 100px 20px;\
 padding:0}#toc-sidebar ul{width:250px}#toc-sidebar ul li{list-style:none}#toc-sidebar ul li a{font-size:12px;color:#222}\
@@ -301,12 +326,15 @@ background9:url(\'data:application/png,abcdefgh\');background10:url("data:applic
     },
     
     "Blocks access to minify sources": function(results) {
+      
       var r1 = results[++TEST],
           r2 = results[++TEST],
           r3 = results[++TEST];
+
       assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 404 Not Found') >= 0);
       assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
+
     },
     
     "Successfully concatenates assets": function(results) {

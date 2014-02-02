@@ -12,7 +12,7 @@ var app = protos.app,
 // PREPARATION
 //////////////////////////////////////////
 
-var config = app.asset_compiler.config;
+var instance = app.asset_compiler;
  
 var _ = require('underscore');
 
@@ -21,7 +21,7 @@ var assetUtil = require('./asset-util.js');
 var CleanCSS = protos.requireDependency('clean-css', 'Asset Compiler', 'asset_compiler');
 var UglifyJS = protos.requireDependency('uglify-js', 'Asset Compiler', 'asset_compiler');
 
-var cleancss = new CleanCSS(config.cleanCSSOpts);
+var cleancss = new CleanCSS(instance.config.cleanCSSOpts);
 
 
 //////////////////////////////////////////
@@ -29,7 +29,7 @@ var cleancss = new CleanCSS(config.cleanCSSOpts);
 //////////////////////////////////////////
 
 app.on('asset_compiler_minify', function(minifyConfig) {
-  if (!minifyConfig) minifyConfig = config.minify;
+  if (!minifyConfig) minifyConfig = instance.config.minify;
   var compiler = new Multi(assetUtil);
   var minifyTargets = Object.keys(minifyConfig);
   for (var target in minifyConfig) {
@@ -63,12 +63,12 @@ function minification(minifyConfig, minifyTargets, compiler) {
         switch (ext) {
           case 'css':
             source = cleancss.minify(compiled.join('\n'));
-            fs.writeFileSync(target, source, 'utf8');
+            instance.writeFile(target, source);
             app.debug("Asset Compiler: Minified CSS: " + app.relPath(target));
             break;
           case 'js':
             source = minifyJS(compiled.join('\n'));
-            fs.writeFileSync(target, source, 'utf8');
+            instance.writeFile(target, source);
             app.debug("Asset Compiler: Minified JavaScript: " + app.relPath(target));
             break;
           default:
@@ -78,11 +78,11 @@ function minification(minifyConfig, minifyTargets, compiler) {
       }
     });
   } else {
-    config.minify = minifyConfig; // Set new config once minification is done
-    app.emit('asset_compiler_minify_complete');
+    instance.config.minify = minifyConfig; // Set new config once minification is done
+    app.emit('asset_compiler_minify_complete'); // Runs even without targets to minify
   }
 }
 
 function minifyJS(code) {
-  return UglifyJS.minify(code, config.uglifyOpts).code;
+  return UglifyJS.minify(code, instance.config.uglifyOpts).code;
 }

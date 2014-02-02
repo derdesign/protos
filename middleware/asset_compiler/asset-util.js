@@ -7,7 +7,11 @@ var path = require('path');
 var util = require('util');
 var _ = require('underscore');
 
-var config = app.asset_compiler.config;
+var instance = app.asset_compiler;
+
+var EXT_REGEX = getExtRegex();
+
+app.on('after_asset_compiler_reload_assets', getExtRegex);
 
 function getExt(file) {
   return file.slice(file.lastIndexOf('.')+1).trim().toLowerCase();
@@ -36,9 +40,13 @@ function resolveCSSPaths(source, file, target) {
   return source;
 }
 
+function getExtRegex() {
+  return new RegExp('\\.(' + instance.config.compile.join('|') + ')$');
+}
+
 module.exports = {
-  
-  EXT_REGEX: new RegExp('\\.(' + config.compile.join('|') + ')$'),
+
+  EXT_REGEX: EXT_REGEX,
   
   getExt: getExt,
   
@@ -46,7 +54,7 @@ module.exports = {
     if (this.EXT_REGEX.test(file)) {
       var ext = this.getExt(file);
       var base = file.replace(this.EXT_REGEX, '');
-      return util.format('%s.%s', base, config.compileExts[ext]);
+      return util.format('%s.%s', base, instance.config.compileExts[ext]);
     } else {
       return file;
     }
@@ -56,12 +64,12 @@ module.exports = {
     for (var file,i=0,len=files.length; i < len; i++) {
       file = app.fullPath(app.paths.public + files[i]);
       if (this.EXT_REGEX.test(file)) {
-        config.ignore.push(this.compiledFile(file));
+        instance.config.ignore.push(this.compiledFile(file));
       } else {
-        config.ignore.push(file);
+        instance.config.ignore.push(file);
       }
     }
-    config.ignore = _.unique(config.ignore);
+    instance.config.ignore = _.unique(instance.config.ignore);
   },
   
   getSource: function(f, target, action, callback) {
@@ -70,8 +78,8 @@ module.exports = {
     var source = fs.readFileSync(file, 'utf8').toString();
     if (action == 'minify') source = app.applyFilters('asset_compiler_minify_source', source, ext, f);
     if (path.extname(target).slice(1) === 'css') source = resolveCSSPaths(source, f, target);
-    if (ext in config.compilers) {
-      config.compilers[ext](source, file, callback);
+    if (ext in instance.config.compilers) {
+      instance.config.compilers[ext](source, file, callback);
     } else {
       callback(null, source);
     }

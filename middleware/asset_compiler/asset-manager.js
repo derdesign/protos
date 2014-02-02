@@ -8,17 +8,17 @@ var app = protos.app,
     fileModule = require('file'),
     pathModule = require('path'),
     Multi = require('multi');
-
+    
     
 //////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////
 
-var config = app.asset_compiler.config;
+var instance = app.asset_compiler;
 
 var assetUtil = require('./asset-util.js');
 
-config.ignore = config.ignore.map(function(file) {
+instance.config.ignore = instance.config.ignore.map(function(file) {
   return app.fullPath(app.paths.public + file);
 });
 
@@ -26,26 +26,13 @@ var truthy = function(val) {
   return val; 
 }
 
-var assets = {};
-
 var sassPartial = /\/?_[^\/]+\.scss$/i;
 
-// Scan for files to compile
-fileModule.walkSync(app.fullPath(app.paths.public), function(dirPath, dirs, files) {
-  for (var matches, path, ext, file, i=0; i < files.length; i++) {
-    file = files[i].trim();
-    path = dirPath.trim() + '/' + file;
-    matches = path.match(assetUtil.EXT_REGEX);
-    if (matches) {
-      ext = matches[1];
-      if (! assets[ext]) assets[ext] = [];
-      assets[ext].push(path);
-    }
-  }
-});
+var assets, assetExts, compileCounter = 0;
 
-var watch = (config.watchOn.indexOf(protos.environment) >= 0);
-var assetExts = Object.keys(assets);
+scanForFiles();
+
+var watch = (instance.config.watchOn.indexOf(protos.environment) >= 0);
 
 if (watch) {
   
@@ -53,14 +40,14 @@ if (watch) {
   
   app.debug('Asset Manager: Watching files in ' + app.paths.public);
   
-  var watcher = chokidar.watch(app.paths.public, {interval: config.watchInterval});
+  var watcher = chokidar.watch(app.paths.public, {interval: instance.config.watchInterval});
   
   watcher.on('add', watchCompile);
   watcher.on('change', watchCompile);
   
   watcher.on('unlink', function(file) {
     var matches, path = pathModule.dirname(file);
-    if (config.ignore.indexOf(path) === -1 && (matches = file.match(assetUtil.EXT_REGEX))) {
+    if (instance.config.ignore.indexOf(path) === -1 && (matches = file.match(assetUtil.EXT_REGEX))) {
       app.log(util.format("Asset Manager: Stopped watching '%s' (unlinked)", app.relPath(file)));
     }
   });
@@ -70,7 +57,7 @@ if (watch) {
   });
   
 } else {
-
+  
   // Loop over each file and compile
   compileAll();
 
@@ -81,12 +68,12 @@ if (watch) {
 // EVENTS
 //////////////////////////////////////////
 
-
-// Compile all assets on demand
 app.on('asset_compiler_compile_all', compileAll);
 
+app.on('asset_compiler_scan_files', scanForFiles);
+
 app.on('asset_compiler_concat', function(concatConfig) {
-  if (!concatConfig) concatConfig = config.concat;
+  if (!concatConfig) concatConfig = instance.config.concat;
   var compiler = new Multi(assetUtil);
   var concatTargets = Object.keys(concatConfig);
   for (var target in concatConfig) {
@@ -99,7 +86,6 @@ app.on('asset_compiler_concat', function(concatConfig) {
 //////////////////////////////////////////
 // FUNCTIONS
 //////////////////////////////////////////
-
 
 function concatenation(concatConfig, concatTargets, compiler) {
   var sources, target = concatTargets.shift();
@@ -121,7 +107,7 @@ function concatenation(concatConfig, concatTargets, compiler) {
           case 'js':
             var source = compiled.join('\n\n');
             target = app.fullPath(app.paths.public + target);
-            fs.writeFileSync(target, source, 'utf8');
+            instance.writeFile(target, source);
             break;
           default:
             throw new Error("Asset Compiler: Extension not supported: " + target);
@@ -130,53 +116,83 @@ function concatenation(concatConfig, concatTargets, compiler) {
       }
     });
   } else {
-    app.asset_compiler.config.concat = concatConfig; // Set new config once concatenation is done
-    app.emit('asset_compiler_concat_complete');
+    instance.config.concat = concatConfig; // Set new config once concatenation is done
+    app.emit('asset_compiler_concat_complete'); // Runs even without targets to concat
   }
 }
 
 function watchCompile(file) {
   var matches, path = pathModule.dirname(file);
-  if (config.ignore.indexOf(path) === -1 && (matches = file.match(assetUtil.EXT_REGEX))) {
+  if (instance.config.ignore.indexOf(path) === -1 && (matches = file.match(assetUtil.EXT_REGEX))) {
     // Only compile if path is not being ignored
     var ext = matches[1];
-    var compiler = config.compilers[ext];
+    var compiler = instance.config.compilers[ext];
     compileSrc(file, compiler, ext);
   }
 }
 
-function compileAll() {
-  for (var compiler, files, ext, i=0; i < assetExts.length; i++) {
-    ext = assetExts[i];
-    compiler = config.compilers[ext];
-    files = assets[ext];
-    for (var src, file, outSrc, outFile, j=0; j < files.length; j++) {
-      compileSrc(files[j], compiler, ext);
+function scanForFiles() {
+  assets = {}; // Reset again when running
+  fileModule.walkSync(app.fullPath(app.paths.public), function(dirPath, dirs, files) {
+    for (var matches, path, ext, file, i=0; i < files.length; i++) {
+      file = files[i].trim();
+      path = dirPath.trim() + '/' + file;
+      matches = path.match(assetUtil.EXT_REGEX);
+      if (matches) {
+        ext = matches[1];
+        if (! assets[ext]) assets[ext] = [];
+        assets[ext].push(path);
+      }
     }
+  });
+  assetExts = Object.keys(assets); // Sets asset extensions
+}
+
+
+function compilationDone() {
+  if (--compileCounter === 0) {
+    app.emit('asset_compiler_compile_all_complete');
   }
 }
 
-function compileSrc(file, compiler, ext) {
+function compileAll() {
+  
+  // NOTE: Using for loops is very messy due to the fact that
+  // one has to keep track of multiple loop variables,
+  // Using forEach to iterate instead.
+  
+  assetExts.forEach(function(ext) {
+    compileCounter += assets[ext].length;
+  });
+  
+  assetExts.forEach(function(ext) {
+    var compiler = instance.config.compilers[ext];
+    var files = assets[ext];
+    for (var i=0,len=files.length; i < len; i++) {
+      compileSrc(files[i], compiler, ext, compilationDone);
+    }
+  });
+  
+}
+
+function compileSrc(file, compiler, ext, done) {
   var src, outFile, relPath;
   src = fs.readFileSync(file, 'utf8');
   compiler(src, file, function(err, code) {
     if (err) {
-      if (err.constructor.name) {
+      if (err instanceof Error) {
         err = new Error(util.inspect(err));
         err.stack = '';
       }
-      app.log(err);
+      assetUtil.logErr(err);
     }
-    outFile = file.replace(assetUtil.EXT_REGEX, '.' + config.compileExts[ext]);
+    outFile = file.replace(assetUtil.EXT_REGEX, '.' + instance.config.compileExts[ext]);
     relPath = app.relPath(outFile);
-    fs.writeFileSync(outFile, code, 'utf8');
+    instance.writeFile(outFile, code);
+    if (done instanceof Function) done();
     app.debug('Asset Manager: Compiled %s (%s)', relPath, ext);
     if (app.environment != 'production') {
       app.emit('compile', relPath, err, code);
     }
   });
-}
-
-function getExt(file) {
-  return file.slice(file.lastIndexOf('.')+1).trim().toLowerCase();
 }

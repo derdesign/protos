@@ -69,11 +69,14 @@ function AssetCompiler(config, middleware) {
   }
   
   // Extend configuration
-  config = this.config = protos.configExtend({
+  this.config = protos.configExtend({
+    ignore: [], // Positioned first for fast lookups
     watchOn: ['development', 'debug'],
     watchInterval: app.config.watchInterval || 100,
     compile: ['less', 'scss', 'styl', 'coffee'],
     assetSourceAccess: false,
+    assetHash: false,
+    assetHashAlgorithm: 'sha1',
     compilers: {},
     compileExts: {
       coffee: 'js',
@@ -81,7 +84,6 @@ function AssetCompiler(config, middleware) {
       less: 'css',
       scss: 'css'
     },
-    ignore: [],
     sourceMaps: [],
     concat: {},
     minify: {},
@@ -109,8 +111,8 @@ function AssetCompiler(config, middleware) {
   var compilers = require('./compilers.js');
   
   // Extend compilers with user provided ones
-  protos.extend(compilers, config.compilers);
-  config.compilers = compilers;
+  protos.extend(compilers, this.config.compilers);
+  this.config.compilers = compilers;
   
   // Setup asset helper
   require('./asset-helper.js');
@@ -126,12 +128,37 @@ function AssetCompiler(config, middleware) {
   
   // Minify & Concat event
   app.on('asset_compiler_minify_concat', function() {
-    app.emit('asset_compiler_minify', config.minify);
-    app.emit('asset_compiler_concat', config.concat);
+    // NOTE: Using self.config ensures a new config is used
+    // in case it is reloaded during runtime.
+    app.emit('asset_compiler_minify', self.config.minify);
+    app.emit('asset_compiler_concat', self.config.concat);
   });
   
   // Run Minify & Concat
   app.emit('asset_compiler_minify_concat');
+
+}
+
+AssetCompiler.prototype.writeFile = function(target, source) {
+  
+  var exists, canWrite = ( this.config.watchOn.indexOf(app.environment) >= 0 ) // If Watching enabled -or-
+  || ( (exists=fs.existsSync(target)) === false ) // File does not exist -or-
+  || ( exists && fs.readFileSync(target, 'utf8') !== source ); // File exists -and- Source changed
+  
+  if (canWrite) {
+    
+    // All the checks above are performed to make sure that the file is not written to disk
+    // if its source is the same or if it exists. This is of crucial importance because otherwise the file's
+    // modification times would change, which in turn would make the asset hashes change,
+    // which is something we definitely don't want (if all mtimes change, all will be re-downloaded).
+
+    // If file watching is enabled in the environment, then the file is always written.
+    
+    // If the file does not exist, it will be always written as well.
+
+    fs.writeFileSync(target, source, 'utf8');
+    
+  }
 
 }
 
