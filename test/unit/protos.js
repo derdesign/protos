@@ -31,7 +31,7 @@ vows.describe('lib/protos.js').addBatch({
     
     'Properly reads and sets env data': function() {
       
-      assert.deepEqual(protos.env(), {
+      var DATA = {
         ALPHA: 1,
         BETA: 2,
         GAMMA: [ 3 ],
@@ -40,23 +40,28 @@ vows.describe('lib/protos.js').addBatch({
             VALUE: 'abcd'
           }
         }
-      });
+      }
       
-      assert.equal(protos.env('ALPHA'), 1);
-      assert.equal(protos.env('BETA'), 2);
-      assert.deepEqual(protos.env('GAMMA'), [3]);
+      assert.deepEqual(protos.env(), DATA);
+      assert.deepEqual(app.env(), DATA);
       
-      assert.deepEqual(protos.env('SOME'), {
-        OTHER: {
-          VALUE: 'abcd'
-        }
-      });
+      assert.equal(protos.env('ALPHA'), DATA.ALPHA);
+      assert.equal(app.env('ALPHA'), DATA.ALPHA);
       
-      assert.deepEqual(protos.env('SOME.OTHER'), {
-        VALUE: 'abcd'
-      });
+      assert.equal(protos.env('BETA'), DATA.BETA);
+      assert.equal(app.env('BETA'), DATA.BETA);
       
-      assert.equal(protos.env('SOME.OTHER.VALUE'), 'abcd');
+      assert.deepEqual(protos.env('GAMMA'), DATA.GAMMA);
+      assert.deepEqual(app.env('GAMMA'), DATA.GAMMA);
+      
+      assert.deepEqual(protos.env('SOME'), DATA.SOME);
+      assert.deepEqual(app.env('SOME'), DATA.SOME);
+      
+      assert.deepEqual(protos.env('SOME.OTHER'), DATA.SOME.OTHER);
+      assert.deepEqual(app.env('SOME.OTHER'), DATA.SOME.OTHER);
+      
+      assert.equal(protos.env('SOME.OTHER.VALUE'), DATA.SOME.OTHER.VALUE);
+      assert.equal(app.env('SOME.OTHER.VALUE'), DATA.SOME.OTHER.VALUE);
       
     },
     
