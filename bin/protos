@@ -484,6 +484,18 @@ module.exports = function() {\n\
     }
   },
   
+  template: {
+    single: ['ext'],
+    args: 99,
+    validate: validateApp,
+    run: function(data) {
+      // Remove readme file
+      var readme = 'app/templates/readme.md';
+      if (fs.existsSync(readme)) fs.unlinkSync(readme);
+      recursivelyCreateFiles('templates', data);
+    }
+  },
+  
   restricted: {
     single: ['ext'],
     args: 99,
@@ -595,7 +607,7 @@ module.exports = {\n\
     single: ['ext'],
     args: 99,
     help: {
-      ext: 'Extension to use for generated views'
+      ext: 'Extension to use for generated views and templates'
     },
     validate: validateApp,
     run: function(data, partial, path) {
@@ -771,16 +783,16 @@ function createApplication(data) {
   var path = process.cwd() + '/' + app;
   var masterPath = pathModule.resolve(__dirname, '../');
   
-  var cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/log/*.log %s/public/*.css %s/public/*.js", 
-    masterPath, app, app, app, app);
+  var cmd = util.format("cp -Rf %s/skeleton %s; rm -Rf %s/log/*.log", 
+    masterPath, app, app);
 
   if (!data.skeleton) {
     
-    ['api', 'config', 'ext', 'hook', 'include', 'lib', 'log', 'priv', 'script', 'upload', 'test'].forEach(function(dir) {
+    ['api', 'config', 'ext', 'hook', 'include', 'vendor', 'log', 'priv', 'script', 'upload', 'test'].forEach(function(dir) {
       cmd += util.format(" %s/%s", app, dir);
     });
     
-    ['handlers', 'helpers', 'models'].forEach(function(dir) {
+    ['handlers', 'helpers', 'models', 'templates'].forEach(function(dir) {
       cmd += util.format(" %s/app/%s", app, dir);
     });
     
@@ -1342,9 +1354,9 @@ var cli = new CommandLine(commands);
 cli.help.before = "\n\
 Usage: protos [ACTION] [OPTIONS] [ARGUMENTS]\n\n\
 Actions: \n\
-         create install server start stop status config controller\n\
-         handler helper model view partial layout static restricted\n\
-         api hook data include inspector link lint validate env\n\n\
+         create install server start stop status config controller env\n\
+         handler helper model view partial layout static template restricted\n\
+         api hook data include inspector link lint validate\n\n\
 Options:\n";
 
 cli.help.after = "\n\

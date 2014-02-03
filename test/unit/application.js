@@ -806,7 +806,69 @@ vows.describe('lib/application.js').addBatch({
      },
      
    }
+   
+}).addBatch({
+  
+  'Application::renderTemplate': {
+    
+    topic: function() {
 
+      var args = {
+        alpha: 1,
+        beta: 2,
+        gamma: 3
+      }
+
+      return {
+        
+        state: app.templates,
+        
+        sample: app.renderTemplate('sample-template', args),
+        sample_ext: app.renderTemplate('sample-template.hbs', args),
+        sample_slash_start: app.renderTemplate('/sample-template', args),
+        sample_slash_end: app.renderTemplate('sample-template/', args),
+        sample_slash_both: app.renderTemplate('/sample-template/', args),
+        
+        howdy: app.renderTemplate('test/howdy'),
+        three: app.renderTemplate('one/two/three'),
+        three_multiple_slashes: app.renderTemplate('//one//two//three//'),
+        
+        sample_expected: '\
+\n\nMy Application\n\n\n&lt;p&gt;&lt;a&gt;Hello World!&lt;/a&gt;&lt;/p&gt;\n\n\n&lt;p&gt;\
+&lt;/p&gt;\n\n\nalpha: 1\nbeta: 2\ngamma: 3\n\n\nglobalVarOne: 105\n\n\nProtos Class: Protos'
+
+      }
+      
+    },
+    
+    "Properly sets internal state": function(data) {
+      var state = data.state;
+      var stateKeys = Object.keys(state).sort();
+      assert.deepEqual(stateKeys, ['sample-template', 'one/two/three', 'test/howdy' ].sort());
+      stateKeys.forEach(function(tpl) {
+        var fun = state[tpl];
+        assert.isFunction(fun);
+        assert.strictEqual(fun.engine, app.enginesByExtension[fun.ext]);
+      });
+    },
+    
+    "Passes all view tests": function(data) {
+      var expected = data.sample_expected;
+      assert.equal(data.sample, expected);
+      assert.equal(data.sample_ext, '');
+      assert.equal(data.sample_slash_start, expected);
+      assert.equal(data.sample_slash_end, expected);
+      assert.equal(data.sample_slash_both, expected);
+    },
+    
+    "Properly renders templates within directories": function(data) {
+      assert.equal(data.howdy, 'This is the howdy template');
+      assert.equal(data.three, 'This is template three');
+      assert.equal(data.three_multiple_slashes, 'This is template three');
+    }
+    
+  }
+  
 }).addBatch({
   
   'Application::onReady': {

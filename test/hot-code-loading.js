@@ -16,7 +16,7 @@ app.on('after_reload', function(spec) {
   after = spec;
 });
 
-var __data;
+var __data, __templates;
 
 var testHook = app.fullPath('hook/test_hook.js');
 var testHookBuf = fs.readFileSync(testHook, 'utf8');
@@ -30,6 +30,10 @@ var envFileTmp = app.fullPath('deploy1.json.tmp');
 vows.describe('Hot Code Loading').addBatch({
   
   'Modifying runtime before reload...': function() {
+    
+    // templates
+    __templates = app.templates;
+    app.templates = {};
     
     // data
     __data = app.__data;
@@ -95,6 +99,8 @@ vows.describe('Hot Code Loading').addBatch({
     
     assert.deepEqual(app.__data, {});
     
+    assert.deepEqual(app.templates, {})
+    
     app.reload({
       all: true
     });
@@ -117,6 +123,7 @@ vows.describe('Hot Code Loading').addBatch({
       helpers: true,
       models: true,
       partials: true, 
+      templates: true,
       includes: true, 
       all: true, 
       views: true, 
@@ -130,6 +137,13 @@ vows.describe('Hot Code Loading').addBatch({
   
   'Verifying runtime after reload...': function() {
     
+    // Templates should have changed
+    assert.deepEqual(Object.keys(app.templates).sort(), ['sample-template', 'one/two/three', 'test/howdy'].sort());
+    for (var tpl in app.templates) {
+      assert.instanceOf(app.templates[tpl].engine, protos.lib.engine); // Make sure functions come from engines
+    }
+    app.templates = __templates; // Restore previous templates
+
     // Env data should have changed
     assert.deepEqual({TESTING: true}, protos.env());
     fs.renameSync(envFile, envFile1);

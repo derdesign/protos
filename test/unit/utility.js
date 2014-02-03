@@ -255,4 +255,36 @@ vows.describe('lib/utility.js').addBatch({
     
   }
 
+}).addBatch({
+  
+  'Utility::walkDir': {
+    
+    topic: function() {
+      var path = protos.constructor.path + '/test/fixtures/compiled-assets';
+      var regex = /(coffee|scss)\.txt$/;
+      return {
+        path: path,
+        all: protos.util.walkDir(path),
+        filtered: protos.util.walkDir(path, regex)
+      }
+    },
+    
+    'Successfully lists files in directory': function(data) {
+      var files = data.all;
+      assert.equal(files.length, 4);
+      assert.equal(files[0], data.path + '/coffee.txt');
+      assert.equal(files[1], data.path + '/less.txt');
+      assert.equal(files[2], data.path + '/scss.txt');
+      assert.equal(files[3], data.path + '/stylus.txt');
+    },
+    
+    'Allows filtering with regular expression': function(data) {
+      var files = data.filtered;
+      assert.equal(files.length, 2);
+      assert.equal(files[0], data.path + '/coffee.txt');
+      assert.equal(files[1], data.path + '/scss.txt');
+    }
+    
+  }
+  
 }).export(module);

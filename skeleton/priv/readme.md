@@ -1,4 +1,4 @@
 
 # priv/
 
-Application-specific data.
+General application data.

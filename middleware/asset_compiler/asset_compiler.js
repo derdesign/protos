@@ -21,6 +21,7 @@
     {object} compileExts: Object containing the target extensions of compiled assets. Contains {ext: outExt}
     {object} compilers: Object containing the functions that compile the target extensions.
     {boolean} assetSourceAccess: If set to true, will enable access to the asset sources (disabled by default)
+    {boolean} allowReloadAll: If true, assets will be regenerated when doing app.reload({all: true})
     {object} uglifyOpts: UglifyJS options
     
     If the `compile` array is found in the middleware configuration object, then the default assets (such as
@@ -76,6 +77,7 @@ function AssetCompiler(config, middleware) {
     compile: ['less', 'scss', 'styl', 'coffee'],
     assetSourceAccess: false,
     assetHash: false,
+    allowReloadAll: false,
     assetHashAlgorithm: 'sha1',
     compilers: {},
     compileExts: {

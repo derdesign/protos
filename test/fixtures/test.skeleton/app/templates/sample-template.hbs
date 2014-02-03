@@ -1,0 +1,20 @@
+
+{{! Passes app}}
+{{app.config.title}}
+
+{{! Passes helpers}}
+{{#escape}}<p><a>Hello World!</a></p>{{/escape}}
+
+{{! Applies shortcodes }}
+[#escape]<p></p>[/escape]
+
+{{! Provides locals }}
+alpha: {{alpha}}
+beta: {{beta}}
+gamma: {{gamma}}
+
+{{! Provides application locals }}
+globalVarOne: {{globalVarOne}}
+
+{{! Passes protos}}
+Protos Class: {{protos.className}}
