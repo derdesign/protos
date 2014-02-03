@@ -35,13 +35,13 @@ vows.describe('lib/validator.js').addBatch({
       
       // Prints missing required fields on empty object
       assert.equal(validator.validate({}), validator.i18n.missingRequiredFields);
-
+  
       // Fails to validate only one key when more are required (even if it matches)
       assert.equal(validator.validate({first: "John Doe"}), validator.i18n.missingRequiredFields);
-
+  
       // Returns error msg when value is not validated
       assert.equal(validator.validate({first: "Jane Doe"}), "cb:error -> Jane Doe");
-
+  
       // Returns error msg replacing placeholders (%s)
       assert.equal(validator.validate({email: 'invalid.email'}), "The email is invalid: invalid.email");
       
@@ -108,15 +108,15 @@ vows.describe('lib/validator.js').addBatch({
       });
       
       ////////////////
-
+  
       validator = app.validator({cleanup: false}).add({number: 'integer'});
-
+  
       fields = {
         number: true,
         hello: "world",
         other: null
       };
-
+  
       // Prints validation error 
       assert.equal(validator.validate(fields), util.format(validator.i18n.invalidField, true));
       
@@ -140,19 +140,19 @@ vows.describe('lib/validator.js').addBatch({
       });
       
       ////////////////
-
+  
       validator = app.validator()
         .addOptional({tag: 'alpha'});
-
+  
       // Doesn't return errors on optional values
       assert.isNull(validator.validate({}));
-
+  
       ////////////////
-
+  
       validator = app.validator()
         .add({name: 'alpha'})
         .addOptional({tag: 'alpha'});
-
+  
       // Returns errors if required values missing
       assert.equal(validator.validate({}), "Missing Required Fields");
       
@@ -296,6 +296,250 @@ vows.describe('lib/validator.js').addBatch({
       age: null,
       some: null
     });
+  
+  },
+  
+  'Properly applies post validation': function() {
+
+    var validator = app.validator();
+    
+    validator.context(function() {
+      this.add({one: 'anything'});
+      this.add({two: 'anything'});
+      this.add({three: 'anything'});
+    });
+    
+    // 1st postValidate function
+    
+    validator.postValidate(function(fields, validOnly) {
+      
+      if (fields.one !== fields.two) {
+        if (validOnly) {
+          delete fields.one;
+          delete fields.two;
+        } else {
+          return "One and Two are different";
+        }
+      }
+      
+      if (fields.three !== 'three') {
+        if (validOnly) {
+          delete fields.three;
+        } else {
+          return "Three is not three";
+        }
+      }
+      
+    });
+    
+    // 2nd postValidate function
+    
+    validator.postValidate(function(fields, validOnly) {
+      
+      if (fields.one === 'heya' && fields.two === 'heya') {
+        if (validOnly) {
+          delete fields.one;
+          delete fields.two;
+        } else {
+          return "One and Two are heya";
+        }
+      }
+      
+    });
+    
+    var err, valid, fields;
+
+    
+    //////////////////////////////
+    /// 1st Post Validation
+    //////////////////////////////
+
+    
+    // Test errors
+    
+    err = validator.validate(fields={
+      one: 'one',
+      two: 'two',
+      three: 'three'
+    });
+    
+    assert.equal(err, "One and Two are different");
+    
+    assert.deepEqual(fields, {
+      one: 'one',
+      two: 'two',
+      three: 'three'
+    });
+    
+    // Test another error
+    
+    err = validator.validate(fields={
+      one: 'blah',
+      two: 'blah',
+      three: 'four'
+    });
+    
+    assert.equal(err, "Three is not three");
+    
+    assert.deepEqual(fields, {
+      one: 'blah',
+      two: 'blah',
+      three: 'four'
+    });
+    
+    // When all fields are valid
+    
+    err = validator.validate(fields={
+      one: 'one',
+      two: 'one',
+      three: 'three'
+    });
+    
+    assert.isNull(err);
+    
+    assert.deepEqual(fields, { // Not mutated
+      one: 'one',
+      two: 'one',
+      three: 'three'
+    });
+    
+    // When validOnly and not all fields are invalid
+    
+    valid = validator.getValid(fields={
+      one: 'one',
+      two: 'two',
+      three: 'three'
+    });
+    
+    assert.deepEqual(valid, {
+      three: 'three'
+    });
+
+    assert.deepEqual(fields, { // Not mutated
+      one: 'one',
+      two: 'two',
+      three: 'three'
+    });
+    
+    // When validOnly and all fields are invalid
+    
+    valid = validator.getValid(fields={
+      one: '1',
+      two: '2',
+      three: '3'
+    });
+    
+    assert.deepEqual(valid, {});
+    
+    assert.deepEqual(fields, { // Not mutated
+      one: '1',
+      two: '2',
+      three: '3'
+    });
+
+    
+    //////////////////////////////
+    /// 2nd Post Validation
+    //////////////////////////////
+    
+    
+    // NOTE: When no errors tested above
+    // NOTE: When validOnly and all fields valid tested above
+    
+    // Test error
+    
+    err = validator.validate(fields={
+      one: 'heya',
+      two: 'heya',
+      three: 'three'
+    });
+    
+    assert.equal(err, "One and Two are heya");
+    
+    assert.deepEqual(fields, {
+      one: 'heya',
+      two: 'heya',
+      three: 'three'
+    });
+    
+    // When validOnly and not all fields are invalid
+    
+    valid = validator.getValid(fields={
+      one: 'heya',
+      two: 'heya',
+      three: 'three'
+    });
+    
+    assert.deepEqual(valid, {three: 'three'});
+    
+    assert.deepEqual(fields, {
+      one: 'heya',
+      two: 'heya',
+      three: 'three'
+    });
+    
+    // When validOnly and all fields are invalid
+    
+    valid = validator.getValid(fields={
+      one: 'heya',
+      two: 'heya',
+      three: 'blah'
+    });
+    
+    assert.deepEqual(valid, {});
+    
+    assert.deepEqual(fields, {
+      one: 'heya',
+      two: 'heya',
+      three: 'blah' 
+    });
+    
+    
+    /////////////////////////////////////////////////////////////////////////////////////////
+    /// Execution order
+    /// postValidation should run after postFilters (which themselves run after filters)
+    /////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    // Post Validation runs after postFilters() are applied
+    
+    validator.postFilter({
+      one: validator.fn.toUpperCase
+    });
+    
+    err = validator.validate(fields={
+      one: 'blah',
+      two: 'blah',
+      three: 'three'
+    });
+    
+    assert.equal(err, "One and Two are different"); // two has been converted to uppercase
+    
+    assert.deepEqual(fields, {
+      one: 'BLAH',
+      two: 'blah',
+      three: 'three'
+    });
+    
+    // Add another post filter to convert two to uppercase
+    
+    validator.postFilter({
+      two: validator.fn.toUpperCase
+    });
+    
+    err = validator.validate(fields={
+      one: 'blah',
+      two: 'blah',
+      three: 'three'
+    });
+    
+    assert.isNull(err); // BLAH == BLAH, therefore no errors
+    
+    assert.deepEqual(fields, {
+      one: 'BLAH',
+      two: 'BLAH',
+      three: 'three'
+    });
     
   },
   
@@ -432,6 +676,69 @@ vows.describe('lib/validator.js').addBatch({
     assert.strictEqual(bar, instance);
     assert.strictEqual(baz, instance);
     
+  }
+  
+}).addBatch({
+  
+  '': {
+    
+    topic: function() {
+      
+      var validator = app.validator();
+    
+      validator.add({one: 'anything'});
+  
+      validator.filter({
+        one: null
+      });
+    
+    },
+  
+    "Throws when passing non-function to filter()": function(e) {
+      assert.instanceOf(e, Error);
+      assert.equal(e.toString(), 'Error: Function expected for filter: one');
+    }
+    
+  },
+  
+  ' ': {
+    
+    topic: function() {
+      
+      var validator = app.validator();
+    
+      validator.add({one: 'anything'});
+  
+      validator.postFilter({
+        one: null
+      });
+    
+    },
+  
+    "Throws when passing non-function to postFilter()": function(e) {
+      assert.instanceOf(e, Error);
+      assert.equal(e.toString(), 'Error: Function expected for filter: one');
+    }
+
+  },
+  
+  '  ': {
+    
+    topic: function() {
+      
+      var validator = app.validator();
+    
+      validator.add({one: 'anything'});
+  
+      validator.postValidate(null);
+    
+    },
+  
+    "Throws when passing non-function to postValidate()": function(e) {
+      assert.instanceOf(e, Error);
+      assert.equal(e.toString(), 'Error: Validator::postValidate() expects function');
+    }
+
   }
   
 }).export(module);
