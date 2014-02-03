@@ -6,6 +6,7 @@ module.exports = require('protos').bootstrap(__dirname, {
   server: {
     host: 'localhost',
     port: 8080,
+    portSuffix: true,
     multiProcess: false,
     stayUp: true
   },
