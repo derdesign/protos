@@ -74,6 +74,9 @@ var protos = Protos.bootstrap(testSkeleton, {
         middleware: function(app) {
           app.__middlewareEventEmitted = true;
         },
+        templates_loaded: function(ob) {
+          global.__templatesLoaded = ob;
+        },
         pre_init: function(app) {
           
           // Partials watching

@@ -865,6 +865,10 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(data.howdy, 'This is the howdy template');
       assert.equal(data.three, 'This is template three');
       assert.equal(data.three_multiple_slashes, 'This is template three');
+    },
+    
+    "Properly emits the templates_loaded event": function() {
+      assert.strictEqual(app.templates, global.__templatesLoaded);
     }
     
   }
