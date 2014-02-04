@@ -143,6 +143,25 @@ vows.describe('lib/application.js').addBatch({
       assert.strictEqual(app.__viewPartialsEventParam, app.views.partials);
     },
     
+    "Properly emits the templates_loaded event": function() {
+      assert.strictEqual(app.templates, app.__templatesLoaded);
+    },
+    
+    "Properly emits the env_data_loaded event": function() {
+      assert.strictEqual(app.env(), app.__envDataLoaded);
+      assert.strictEqual(protos.env(), app.__envDataLoaded);
+      assert.deepEqual(app.__envDataLoaded, {
+        ALPHA: 1,
+        BETA: 2,
+        GAMMA: [ 3 ],
+        SOME: {
+          OTHER: {
+            VALUE: 'abcd'
+          }
+        }
+      });
+    },
+    
     'Properly runs application event hooks': function() {
       assert.isTrue(app.hooks.init.__loaded);
       assert.isTrue(app.hooks.pre_init.__loaded);
@@ -865,10 +884,6 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(data.howdy, 'This is the howdy template');
       assert.equal(data.three, 'This is template three');
       assert.equal(data.three_multiple_slashes, 'This is template three');
-    },
-    
-    "Properly emits the templates_loaded event": function() {
-      assert.strictEqual(app.templates, global.__templatesLoaded);
     }
     
   }

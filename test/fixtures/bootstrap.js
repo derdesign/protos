@@ -75,7 +75,10 @@ var protos = Protos.bootstrap(testSkeleton, {
           app.__middlewareEventEmitted = true;
         },
         templates_loaded: function(ob) {
-          global.__templatesLoaded = ob;
+          this.__templatesLoaded = ob;
+        },
+        env_data_loaded: function(data) {
+          this.__envDataLoaded = data;
         },
         pre_init: function(app) {
           

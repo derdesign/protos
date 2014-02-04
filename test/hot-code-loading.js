@@ -16,7 +16,7 @@ app.on('after_reload', function(spec) {
   after = spec;
 });
 
-var __data, __templates;
+var __data, __templates, __envDataLoaded, __envReloadCount = 0;
 
 var testHook = app.fullPath('hook/test_hook.js');
 var testHookBuf = fs.readFileSync(testHook, 'utf8');
@@ -26,6 +26,11 @@ var otherHookDisabled = app.fullPath('other_hook.js');
 var envFile = app.fullPath('deploy.json');
 var envFile1 = app.fullPath('deploy1.json');
 var envFileTmp = app.fullPath('deploy1.json.tmp');
+
+app.on('env_data_loaded', function(data) {
+  __envReloadCount++;
+  __envDataLoaded = data;
+});
 
 vows.describe('Hot Code Loading').addBatch({
   
@@ -99,7 +104,9 @@ vows.describe('Hot Code Loading').addBatch({
     
     assert.deepEqual(app.__data, {});
     
-    assert.deepEqual(app.templates, {})
+    assert.deepEqual(app.templates, {});
+    
+    assert.equal(__envReloadCount, 0);
     
     app.reload({
       all: true
@@ -148,7 +155,10 @@ vows.describe('Hot Code Loading').addBatch({
     assert.deepEqual({TESTING: true}, protos.env());
     fs.renameSync(envFile, envFile1);
     fs.renameSync(envFileTmp, envFile);
+    assert.equal(__envReloadCount, 1);
     app.reload({env: true});
+    assert.equal(__envReloadCount, 2);
+    assert.strictEqual(app.env(), __envDataLoaded);
     
     // Data reloading
     var alphaBuf = fs.readFileSync(app.fullPath('data/alpha.json'), 'utf8');              // Get original contents of alpha
