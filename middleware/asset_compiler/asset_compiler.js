@@ -135,6 +135,9 @@ function AssetCompiler(config, middleware) {
     app.emit('asset_compiler_minify', self.config.minify);
     app.emit('asset_compiler_concat', self.config.concat);
   });
+
+  // Run compile all
+  app.emit('asset_compiler_compile_all');
   
   // Run Minify & Concat
   app.emit('asset_compiler_minify_concat');

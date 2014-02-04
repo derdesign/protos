@@ -26,8 +26,6 @@ var truthy = function(val) {
   return val; 
 }
 
-var sassPartial = /\/?_[^\/]+\.scss$/i;
-
 var assets, assetExts, compileCounter = 0;
 
 scanForFiles();
@@ -42,7 +40,6 @@ if (watch) {
   
   var watcher = chokidar.watch(app.paths.public, {interval: instance.config.watchInterval});
   
-  watcher.on('add', watchCompile);
   watcher.on('change', watchCompile);
   
   watcher.on('unlink', function(file) {
@@ -56,11 +53,6 @@ if (watch) {
     app.log(util.format("Asset Manager: ", err.stack));
   });
   
-} else {
-  
-  // Loop over each file and compile
-  compileAll();
-
 }
 
 
@@ -164,14 +156,22 @@ function compileAll() {
   assetExts.forEach(function(ext) {
     compileCounter += assets[ext].length;
   });
-  
-  assetExts.forEach(function(ext) {
-    var compiler = instance.config.compilers[ext];
-    var files = assets[ext];
-    for (var i=0,len=files.length; i < len; i++) {
-      compileSrc(files[i], compiler, ext, compilationDone);
-    }
-  });
+
+  if (compileCounter > 0) {
+    
+    assetExts.forEach(function(ext) {
+      var compiler = instance.config.compilers[ext];
+      var files = assets[ext];
+      for (var i=0,len=files.length; i < len; i++) {
+        compileSrc(files[i], compiler, ext, compilationDone);
+      }
+    });
+    
+  } else {
+    
+    app.emit('asset_compiler_compile_all_complete');
+    
+  }
   
 }
 
