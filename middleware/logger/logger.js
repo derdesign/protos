@@ -215,6 +215,7 @@ Logger.prototype.timeDelta = function(ms) {
 
 Logger.prototype.getFileStream = function(file) {
   var path, stream;
+  app.mkdir('log/');
   file = file.trim();
   path = (file.charAt(0) == '/') ? pathModule.resolve(file) : app.fullPath('log/' + file);
   stream = fs.createWriteStream(path, {flags: 'a'});
