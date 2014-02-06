@@ -6,6 +6,7 @@ module.exports = {
   encoding: 'utf-8',
   
   rawViews: false,
+  transientRaw: false,
   shortcodeFilter: true,
   
   pageTitle: '{title} &raquo; {desc}',

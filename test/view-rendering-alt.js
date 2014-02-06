@@ -262,17 +262,15 @@ vows.describe('View Rendering').addBatch({
       // process.exit();
       
       var promise = new EventEmitter();
-
-      var msgTemplate = app.fullPath('app/views/'+ app.paths.restricted +'/msg.mustache');
       
-      fs.renameSync(msgTemplate, msgTemplate + '1');
+      var view = 'app/views/__restricted/msg';
+      var path = app.views.pathAsoc[view];
+      
+      delete app.views.pathAsoc[view]; // This will actually make res.getViewPath() to return false
       
       app.request(app.url('/raw-message'), function(err, res, buf) {
-        
-        fs.renameSync(msgTemplate + 1, msgTemplate);
-        
+        app.views.pathAsoc[view] = path; // Restore the path
         promise.emit('success', [err, buf, res.headers]);
-        
       });
       
       return promise;
@@ -293,6 +291,7 @@ vows.describe('View Rendering').addBatch({
   'Plain View Engine': {
     
     'Registers valid extensions': function() {
+      
       assert.deepEqual(app.engines.plain.extensions, ['txt', 'txt.html']);
     },
     

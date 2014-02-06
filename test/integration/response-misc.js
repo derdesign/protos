@@ -287,63 +287,65 @@ vows.describe('Response Misc').addBatch({
 
       // scode-msg
       assert.isTrue(r0.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r0.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r0.indexOf('Content-Type: text/html;charset=utf-8') >= 0); // ***
       assert.isTrue(r0.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
-
-      // scode-msg [ob]
+      
+      // scode-msg [ob] (should be the same as above)
       assert.isTrue(r1.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r1.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r1.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r1.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
       
       // scode-msg-raw
       assert.isTrue(r2.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r2.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r2.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r2.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
       
       // scode-msg-raw [ob, raw]
+      
       assert.isTrue(r3.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r3.indexOf('Content-Type: text/plain') >= 0);
-      assert.isTrue(r3.indexOf('\n{{SUCCESS}}') >= 0);
+      assert.isTrue(r3.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
+      assert.isTrue(r3.indexOf('<p>{{SUCCESS}}</p>') >= 0);
       
       // scode-raw
       assert.isTrue(r4.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r4.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r4.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r4.indexOf('\n<p>202 Accepted</p>\n') >= 0);
       
       // scode-raw [ob, raw]
+      
       assert.isTrue(r5.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r5.indexOf('Content-Type: text/plain') >= 0);
-      assert.isTrue(r5.indexOf('\n202 Accepted\n') >= 0);
+      assert.isTrue(r5.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
+      assert.isTrue(r5.indexOf('\n<p>202 Accepted</p>\n') >= 0);
       
       // scode
       assert.isTrue(r6.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r6.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r6.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r6.indexOf('\n<p>202 Accepted</p>\n') >= 0);
       
       // scode [ob]
       assert.isTrue(r7.indexOf('HTTP/1.1 202 Accepted') >= 0);
-      assert.isTrue(r7.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r7.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r7.indexOf('\n<p>202 Accepted</p>\n') >= 0);
       
       // msg
       assert.isTrue(r8.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r8.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r8.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r8.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
       
       // msg [ob]
       assert.isTrue(r9.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r9.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r9.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r9.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
       
       // msg-raw
       assert.isTrue(r10.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r10.indexOf('Content-Type: text/html') >= 0);
+      assert.isTrue(r10.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
       assert.isTrue(r10.indexOf('\n<p>{{SUCCESS}}</p>\n') >= 0);
       
       // msg-raw [ob, raw]
       assert.isTrue(r11.indexOf('HTTP/1.1 200 OK') >= 0);
-      assert.isTrue(r11.indexOf('Content-Type: text/plain') >= 0);
-      assert.isTrue(r11.indexOf('\n{{SUCCESS}}') >= 0);
+      assert.isTrue(r11.indexOf('Content-Type: text/html;charset=utf-8') >= 0);
+      assert.isTrue(r11.indexOf('\n<p>{{SUCCESS}}</p>') >= 0);
       
     },
     
@@ -447,17 +449,24 @@ vows.describe('Response Misc').addBatch({
 
     "Applies to the general context filter": function(results) {
       var r2= results[1];
-      assert.equal(r2, "-- \n<p>HELLO</p>\n --");
+      var expected = '-- <!doctype html>\n<html lang="en-US">\n<head>\n<title>My Application</title>\n<meta charset="utf-8">\n\
+</head>\n<body>\n  \n<h1>My Application</h1>\n\n<p>HELLO</p>\n\n</body>\n</html> --';
+      assert.equal(r2, expected);
     },
 
     "Applies to a specific filter": function(results) {
       var r3 = results[2];
-      assert.equal(r3, "LS0gCjxwPldPUkxEPC9wPgogLS0=");
+      var expected = 'LS0gPCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImVuLVVTIj4KPGhlYWQ+Cjx0aXRsZT5NeSBBcHBsaWNhdGlvbjwvdGl0bGU+CjxtZXRhIG\
+NoYXJzZXQ9InV0Zi04Ij4KPC9oZWFkPgo8Ym9keT4KICAKPGgxPk15IEFwcGxpY2F0aW9uPC9oMT4KCjxwPldPUkxEPC9wPgoKPC9ib2R5Pgo8L2h0bWw+IC0t'
+      assert.equal(r3, expected);
     },
     
     "Applies to multiple filters": function(results) {
       var r4 = results[3];
-      assert.equal(r4, "LS0gCjxwPk1VTFRJUExFPC9wPgogLS0= <<ANOTHER CONTEXT>> <<SWEET CONTEXT>>");
+      var expected = 'LS0gPCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImVuLVVTIj4KPGhlYWQ+Cjx0aXRsZT5NeSBBcHBsaWNhdGlvbjwvdGl0bGU+CjxtZXRhIG\
+NoYXJzZXQ9InV0Zi04Ij4KPC9oZWFkPgo8Ym9keT4KICAKPGgxPk15IEFwcGxpY2F0aW9uPC9oMT4KCjxwPk1VTFRJUExFPC9wPgoKPC9ib2R5Pgo8L2h0bWw+IC0t <<ANO\
+THER CONTEXT>> <<SWEET CONTEXT>>';
+      assert.equal(r4, expected);
     }
 
   }

@@ -201,6 +201,7 @@ vows.describe('lib/application.js').addBatch({
         'gamma',
         'drivers',
         'regex',
+        'transientRaw',
         'storages' ].sort());
       
       assert.strictEqual(config.json.pretty, false);

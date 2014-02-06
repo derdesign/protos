@@ -25,7 +25,7 @@ function uploadExceedsLimit(r) {
   assert.isTrue(r.indexOf('Connection: close') >= 0);
   assert.isTrue(r.indexOf('X-Upload-Limit-Exceeded', 'true') >= 0); // Set on 'upload_limit_exceeded' event
   assert.isTrue(r.indexOf('HTTP/1.1 413 Request Entity Too Large') >= 0);
-  assert.isTrue(r.indexOf('\n413 Request Entity Too Large\n') >= 0);
+  assert.isTrue(r.indexOf('\n<p>413 Request Entity Too Large</p>\n') >= 0);
 }
 
 vows.describe('Body Parser (middleware)').addBatch({
