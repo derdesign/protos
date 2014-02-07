@@ -148,6 +148,8 @@ vows.describe('lib/application.js').addBatch({
     },
     
     "Properly emits the env_data_loaded event": function() {
+      assert.isTrue(app.__envDataLoaded.tested); // This makes sure data is modified by event
+      assert.isTrue(app.__envDataLoadedOnPreInit); // This makes sure modified data is available on pre_init
       assert.strictEqual(app.env(), app.__envDataLoaded);
       assert.strictEqual(protos.env(), app.__envDataLoaded);
       assert.deepEqual(app.__envDataLoaded, {
