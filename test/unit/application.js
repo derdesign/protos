@@ -1,5 +1,6 @@
 
 var app =require('../fixtures/bootstrap'),
+    _ = require('underscore'),
     vows = require('vows'),
     assert = require('assert'),
     fs = require('fs'),
@@ -20,6 +21,8 @@ var beforeInitCheck;
 app.onInitialize(function() {
   beforeInitCheck = true;
 });
+
+var evtOrder, evtData;
 
 vows.describe('lib/application.js').addBatch({
 
@@ -887,6 +890,79 @@ vows.describe('lib/application.js').addBatch({
       assert.equal(data.howdy, 'This is the howdy template');
       assert.equal(data.three, 'This is template three');
       assert.equal(data.three_multiple_slashes, 'This is template three');
+    }
+    
+  }
+  
+}).addBatch({
+  
+  'Internal Events and Execution Order': {
+    
+    topic: function() {
+      evtOrder = _.unique(app.__evtOrder);
+      evtData = app.__evtData;
+      return true;
+    },
+    
+    "Properly emits engines_loaded event": function() {
+      assert.deepEqual(evtOrder, [
+        'engines_loaded',
+        'static_views_loaded',
+        'exts_loaded',
+        'includes_loaded',
+        'api_loaded',
+        'models_loaded',
+        'helpers_loaded',
+        'view_partials_loaded',
+        'view_shortcodes_loaded',
+        'templates_loaded',
+        'handlers_loaded',
+        'controllers_loaded'
+        ]);
+    },
+    
+    "Properly emits static_views_loaded event": function() {
+      assert.strictEqual(evtData.static_views_loaded[0], app.views);
+    },
+    
+    "Properly emits exts_loaded event": function() {
+      assert.isUndefined(evtData.exts_loaded[0]);
+    },
+    
+    "Properly emits includes_loaded event": function() {
+      assert.isUndefined(evtData.includes_loaded[0]);
+    },
+    
+    "Properly emits api_loaded event": function() {
+      assert.strictEqual(evtData.api_loaded[0], app.api);
+    },
+    
+    "Properly emits models_loaded event": function() {
+      assert.strictEqual(evtData.models_loaded[0], app.models);
+    },
+    
+    "Properly emits helpers_loaded event": function() {
+      assert.strictEqual(evtData.helpers_loaded[0], app.helpers);
+    },
+    
+    "Properly emits view_partials_loaded event": function() {
+      assert.strictEqual(evtData.view_partials_loaded[0], app.views.partials);
+    },
+    
+    "Properly emits view_shortcodes_loaded event": function() {
+      assert.strictEqual(evtData.view_shortcodes_loaded[0], app.__shortcodeContext);
+    },
+    
+    "Properly emits templates_loaded event": function() {
+      assert.strictEqual(evtData.templates_loaded[0], app.templates);
+    },
+    
+    "Properly emits handlers_loaded event": function() {
+      assert.strictEqual(evtData.handlers_loaded[0], app.handlers);
+    },
+    
+    "Properly emits controllers_loaded event": function() {
+      assert.strictEqual(evtData.controllers_loaded[0], app.controllers);
     }
     
   }

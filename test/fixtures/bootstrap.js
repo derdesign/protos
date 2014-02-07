@@ -82,6 +82,33 @@ var protos = Protos.bootstrap(testSkeleton, {
         },
         pre_init: function(app) {
           
+          // Event testing
+          
+          var evtOrder = app.__evtOrder = [];
+          var evtData = app.__evtData = {};
+          
+          var evts = [
+            'engines_loaded',
+            'static_views_loaded',
+            'exts_loaded',
+            'includes_loaded',
+            'api_loaded',
+            'models_loaded',
+            'helpers_loaded',
+            'view_partials_loaded',
+            'view_shortcodes_loaded',
+            'templates_loaded',
+            'handlers_loaded',
+            'controllers_loaded'
+          ];
+      
+          evts.forEach(function(evt) {
+            app.on(evt, function() {
+              evtOrder.push(evt);
+              evtData[evt] = [].slice.call(arguments, 0);
+            });
+          });
+          
           // Partials watching
           app.watchPartials = true;
           
