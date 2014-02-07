@@ -221,8 +221,6 @@ vows.describe('Asset Compiler (middleware)').addBatch({
     
     "Asset helper provides expected results": function(results) {
       
-      var assetUtil = protos.require('middleware/asset_compiler/asset-util.js');
-      
       var r1 = results[++TEST],
           r2 = results[++TEST];
           
@@ -233,7 +231,7 @@ vows.describe('Asset Compiler (middleware)').addBatch({
         var expected = assetFiles[file];
         var mtime = fs.statSync(app.fullPath(app.paths.public + file)).mtime;
         var hash = app.applyFilters('static_file_mtime_hash', mtime);
-        var ext = assetUtil.getExt(file);
+        var ext = app.asset_compiler.util.getExt(file);
         file = file.replace(/\.css$/, '');
         file = util.format('/%s-%s.%s', file, hash, ext);
         assert.equal(file, expected);
