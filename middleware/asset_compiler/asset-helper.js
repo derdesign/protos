@@ -42,18 +42,11 @@ app.registerViewHelper('asset', instance.assetHelper);
 
 app.on('asset_compiler_reload_assets', function() {
   
-  var counter = 0;
-  
-  var done = function() {
-    // Once all operations are complete (minify + concat = 2)
-    if (++counter === 2) {
-      assetCache = {}; pathCache = {}; allowPath = {}; // Reset lookup caches only after everything is ready
-      config = instance.config; // Update config if replaced
-      assetHash = instance.config.assetHash; // Update asset hash boolean
-      EXT_REGEX = assetUtil.EXT_REGEX; // Update extensions regex cache
-      app.emit('after_asset_compiler_reload_assets'); // Do things after reload
-    }
-  }
+  // Once everything is done
+  app.once('asset_compiler_all_done', function() {
+    assetCache = {}; pathCache = {}; allowPath = {}; // Reset lookup caches only after everything is ready
+    app.emit('after_asset_compiler_reload_assets'); // Do things after reload
+  });
   
   // Prepare things before reload
   app.emit('before_asset_compiler_reload_assets');
@@ -64,10 +57,6 @@ app.on('asset_compiler_reload_assets', function() {
     app.emit('asset_compiler_minify_concat'); // Runs minify/concat after compilation
   });
 
-   // After compilation is complete, increment counter
-  app.once('asset_compiler_minify_complete', done); // After minification is complete, increment counter
-  app.once('asset_compiler_concat_complete', done); // After concatenation is complete, increment counter
-  
   app.emit('asset_compiler_scan_files'); // Scans for files in public/ to determine what to compile
   app.emit('asset_compiler_compile_all'); // Compile all assets (not required by minify/concat)
 

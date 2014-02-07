@@ -135,12 +135,23 @@ function AssetCompiler(config, middleware) {
   app.on('asset_compiler_minify_concat', function() {
     // NOTE: Using self.config ensures a new config is used
     // in case it is reloaded during runtime.
+    var counter = 0, done = function() {
+      if (++counter === 2) app.emit('asset_compiler_minify_concat_complete');
+    }
+    app.once('asset_compiler_minify_complete', done);
+    app.once('asset_compiler_concat_complete', done);
     app.emit('asset_compiler_minify', self.config.minify);
     app.emit('asset_compiler_concat', self.config.concat);
   });
+  
+  // Set all tasks done event
+  // NOTE: The final event may change once there are more tasks added
+  app.on('asset_compiler_minify_concat_complete', function() {
+    app.emit('asset_compiler_all_done');
+  });
 
   app.once('asset_compiler_compile_all_complete', function() {
-    // Run Minify & Concat *after* compilation is complete
+    // Run Minify & Concat *after* compilation is complete (startup)
     app.emit('asset_compiler_minify_concat');
   });
 

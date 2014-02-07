@@ -254,7 +254,7 @@ vows.describe('View Rendering').addBatch({
       
       assert.equal(data.length, 9);
       
-      urls = data.reduce(function(state, data) {
+      var urls = data.reduce(function(state, data) {
         var req = data[0], res = data[1];
         state.push(req.url);
         return state;
