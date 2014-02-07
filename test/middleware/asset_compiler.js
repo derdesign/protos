@@ -3,13 +3,19 @@ var app = require('../fixtures/bootstrap'),
     fs = require('fs'),
     vows = require('vows'),
     assert = require('assert'),
+    http = require('http'),
     util = require('util'),
     Multi = require('multi'),
     EventEmitter = require('events').EventEmitter;
-    
+
+var _ = require('underscore');
+
 var TEST = -1;
     
 var multi = new Multi(app);
+
+var IncomingMessage = http.IncomingMessage;
+var ServerResponse = http.ServerResponse;
 
 var compiledLess,
     compiledScss,
@@ -66,6 +72,31 @@ app.on('static_file_request', function(req, res) {
   res.setHeader('X-Requested-File', req.url);
 });
 
+var TESTS_RUNNING = false;
+
+var assetRequests = {}, nonAssetRequests = [];
+var staticAssetRequests = 0, nonStaticAssetRequests = 0;
+
+app.on('static_asset_request', function(req, res, asset, path) {
+  if (TESTS_RUNNING) {
+    if (arguments.length !== 4) throw new Error('Wrong number of arguments passed for static_asset_request');
+    if (req.constructor !== IncomingMessage) throw new Error('Bad data on static_asset_request');
+    if (res.constructor !== ServerResponse) throw new Error('Bad data on static_asset_request');
+    if (!(asset in assetRequests)) assetRequests[asset] = path;
+    staticAssetRequests++;
+  }
+});
+
+app.on('non_static_asset_request', function(req, res, path) {
+  if (TESTS_RUNNING) {
+    if (arguments.length !== 3) throw new Error('Wrong number of arguments passed for non_static_asset_request');
+    if (req.constructor !== IncomingMessage) throw new Error('Bad data on non_static_asset_request');
+    if (res.constructor !== ServerResponse) throw new Error('Bad data on non_static_asset_request');
+    nonAssetRequests.push(path);
+    nonStaticAssetRequests++;
+  }
+});
+
 var assetTestsAfter, assetFiles = {};
 
 vows.describe('Asset Compiler (middleware)').addBatch({
@@ -73,6 +104,8 @@ vows.describe('Asset Compiler (middleware)').addBatch({
   '': {
     
     topic: function() {
+      
+      TESTS_RUNNING = true;
       
       var promise = new EventEmitter();
       
@@ -450,6 +483,39 @@ abcdefgh");\n}\n';
     
     "Emits asset_compiler_concat_complete": function() {
       assert.isTrue(assetCompilerMinifyComplete);
+    }
+    
+  }
+  
+}).addBatch({
+  
+  'Static Asset Request Events': {
+    
+    topic: function() {
+      TESTS_RUNNING = false;
+      return true;
+      
+    },
+    
+    'Properly emits static_asset_request event': function(err) {
+      assert.equal(staticAssetRequests, 2);
+      assert.deepEqual(assetFiles, assetRequests);
+    },
+    
+    'Properly emits non_static_asset_request event': function() {
+      assert.equal(nonStaticAssetRequests, 10);
+      assert.equal(nonAssetRequests.length, 10);
+      var expected = [
+      '/assets/less.css',
+      '/assets/scss.css',
+      '/assets/stylus.css',
+      '/assets/coffee.js',
+      '/min.css',
+      '/min.js',
+      '/concat.js',
+      '/resolve-concat.css',
+      ].concat(_.values(assetRequests)).sort();
+      assert.deepEqual(nonAssetRequests.sort(), expected);
     }
     
   }

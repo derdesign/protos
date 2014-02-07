@@ -19,11 +19,18 @@ if ( !instance.config.assetSourceAccess ) {
   
   app.on('static_file_request', function(req, res, path) {
     
-    if ( EXT_REGEX.test(path) || (config.ignore.indexOf(path) >= 0) && ( ! (path in allowPath) ) ) {
+    var pathInAllowPath = (path in allowPath);
+    
+    if ( EXT_REGEX.test(path) || (config.ignore.indexOf(path) >= 0) && ( ! pathInAllowPath ) ) {
       req.stopRoute();
       app.notFound(res);
+    } else if (pathInAllowPath) {
+      var asset = app.relPath(path, 'public');
+      app.emit('static_asset_request', req, res, asset, assetCache[asset]);
+    } else {
+      app.emit('non_static_asset_request', req, res, req.url);
     }
-
+    
   });
 
 }
