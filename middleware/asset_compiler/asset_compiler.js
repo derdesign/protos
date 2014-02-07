@@ -139,11 +139,13 @@ function AssetCompiler(config, middleware) {
     app.emit('asset_compiler_concat', self.config.concat);
   });
 
+  app.once('asset_compiler_compile_all_complete', function() {
+    // Run Minify & Concat *after* compilation is complete
+    app.emit('asset_compiler_minify_concat');
+  });
+
   // Run compile all
   app.emit('asset_compiler_compile_all');
-  
-  // Run Minify & Concat
-  app.emit('asset_compiler_minify_concat');
 
 }
 
