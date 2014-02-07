@@ -73,6 +73,22 @@ function MainController(app) {
     }, true);
   });
   
+  get('/request/metadata/values', function(req, res) {
+    req.set('hello', 'world');
+    req.set('awesome', 44);
+    req.set({
+      coolio: true,
+      testing: null
+    });
+    res.json({
+      metadata: req.__metadata,
+      hello: req.get('hello'),
+      awesome: req.get('awesome'),
+      coolio: req.get('coolio'),
+      testing: req.get('testing')
+    });
+  });
+  
   /* File Download */
   
   get('/download', function(req, res) {

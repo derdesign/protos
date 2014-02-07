@@ -170,6 +170,9 @@ vows.describe('Request Misc').addBatch({
       // Request metadata
       multi.curl('/request/metadata');
       
+      // Request metadata object
+      multi.curl('/request/metadata/values');
+      
       multi.exec(function(err, results) {
         app.config.title = oldTitle;
         promise.emit('success', err || results);
@@ -191,6 +194,12 @@ vows.describe('Request Misc').addBatch({
     "Gets & Sets metadata/view locals": function(results) {
       var r = results[2];
       assert.equal(r, 'View local: [HELLO WORLD!]\nPassed: [HELLO WORLD!]');
+    },
+    
+    "Ensures metadata set/get works properly": function(results) {
+      var r = results[3].trim();
+      var expected = '{"metadata":{"hello":"world","awesome":44,"coolio":true,"testing":null},"hello":"world","awesome":44,"coolio":true,"testing":null}';
+      assert.equal(r, expected);
     }
     
   }
