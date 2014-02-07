@@ -342,6 +342,12 @@ function MainController(app) {
     res.end(out ? '1' : '0');
   });
   
+  /* Controller request event */
+  
+  get('/controller-request-event', function(req, res) {
+    res.end('THIS SHOULD NOT RENDER');
+  });
+  
 }
 
 module.exports = MainController;

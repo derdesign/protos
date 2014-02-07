@@ -4,7 +4,10 @@ var app = require('../fixtures/bootstrap'),
     assert = require('assert'),
     util = require('util'),
     Multi = require('multi'),
+    http = require('http'),
     EventEmitter = require('events').EventEmitter;
+
+var _ = require('underscore');
     
 var multi = new Multi(app),
     controllerCtor = app.controller.constructor,
@@ -12,8 +15,37 @@ var multi = new Multi(app),
 
 var total = 0; // counter for controller tests
 
+var CONTROLLER_TESTS = false;
+
 multi.on('pre_exec', app.backupFilters);
 multi.on('post_exec', app.restoreFilters);
+
+var IncomingMessage = http.IncomingMessage;
+var ServerResponse = http.ServerResponse;
+
+var controllers = [], paramsData = [], totalControllerRequests = 0;
+
+app.on('controller_request', function(req, res, params) {
+  
+  if (CONTROLLER_TESTS) {
+    
+    totalControllerRequests++;
+    if (req.constructor !== IncomingMessage) throw new Error("Bad data passed by controller_request event");
+    if (res.constructor !== ServerResponse) throw new Error("Bad data passed by controller_request event");
+    if (Object.keys(params).length) paramsData.push(params);
+    controllers.push(req.__controller.constructor.name);
+    
+    if (req.url === '/controller-request-event') {
+      res.statusCode = 404;
+      res.json({
+        success: true,
+        reason: "The controller_route event accepts req.stopRoute() calls"
+      });
+      req.stopRoute();
+    }
+    
+  }
+});
 
 // Automatically add requets url in headers (for debugging purposes)
 app.config.headers['X-Request-Url'] = function(req, res) {
@@ -115,6 +147,8 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
   'Integrity Checks': {
     
     topic: function() {
+      
+      CONTROLLER_TESTS = true;
       
       var promise = new EventEmitter();
 
@@ -332,6 +366,55 @@ vows.describe('Application Controllers').addBatch(batch).addBatch({
       
       assert.isTrue(r1.indexOf('CATEGORY ARCHIVE') >= 0);
       assert.isTrue(r2.indexOf('THIS IS A POST') >= 0);
+    }
+    
+  }
+  
+}).addBatch({
+  
+  'Controller Request Event': {
+    
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      
+      multi.curl('-i /controller-request-event');
+      
+      multi.exec(function(err, results) {
+        CONTROLLER_TESTS = false;
+        promise.emit('success', err || results);
+      });
+      
+      return promise;
+      
+    },
+    
+    'Routes can be stopped with req.stopRoute()': function(results) {
+      var r = results[0];
+      assert.isTrue(r.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      assert.isTrue(r.indexOf('Content-Type: application/json;charset=utf-8') >= 0);
+      assert.isTrue(r.indexOf('{"success":true,"reason":"The controller_route event accepts req.stopRoute() calls"}') >= 0);
+      assert.isTrue(r.indexOf('THIS SHOULD NOT RENDER') === -1);
+    },
+    
+    'Properly emits the controller_request event': function() {
+      
+      controllers = _.unique(controllers).sort();
+      
+      assert.equal(totalControllerRequests, 18);
+      
+      assert.deepEqual(_.unique(controllers).sort(), [
+        'TestController',
+        'MainController',
+        'FilterController'
+        ].sort());
+        
+      assert.deepEqual(paramsData, [
+        { rule1: 'abcde' },
+        { rule1: 'abc', rule2: '123' },
+        { name: 'ernie' }
+      ]);
+
     }
     
   }
