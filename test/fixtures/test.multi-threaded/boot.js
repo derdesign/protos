@@ -73,10 +73,20 @@ module.exports = require('../../../lib/protos.js').bootstrap(__dirname, {
     },
     
     init: function(app) {
+      
       app.helloWorld = app.multiThreaded('task_id', function() {
         app.log("Running task on pid %d", process.pid);
         process.send(['GOT_MESSAGE', process.pid]);
       });
+      
+      // This test ensures tasks only run when they need to, not always.
+      // This is due to the fact that we are dealing with IPC messages,
+      // and any mistake in identifying which message is for which task
+      // can result in all the tasks being executed.
+      app.multiThreaded('avoid_duplicates', function() {
+        throw new Error('This function should not run unless called');
+      });
+      
     }
 
   }
