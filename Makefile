@@ -14,7 +14,8 @@ integration = ./test/integration/*.js
 middleware = ./test/middleware/*.js
 commandline = ./test/command.js
 hotCodeLoading = ./test/hot-code-loading.js
-viewRenderingAlt= ./test/view-rendering-alt.js
+viewRenderingAlt = ./test/view-rendering-alt.js
+multiThreaded = ./test/fixtures/test.multi-threaded/boot.js
 
 # Make commands
 
@@ -41,16 +42,19 @@ lint:
 		@echo "bin/ drivers/ engines/ lib/ middleware/ skeleton/ storages/ test/drivers test/engines test/integration test/middleware test/storages test/unit" | NODE_ENV=lintall xargs -n 1 ./tools/lint
 		@echo
 
-test:
-		@echo "\nAvailable Test Commands: tests  test-unit  test-sto test-drv test-eng test-int test-mid\n"
-
-tests: 	tests-alt tests-core
+tests: 	tests-core tests-alt tests-standalone tests-cli
 
 tests-core: 
-		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${hotCodeLoading} ${commandline}
+		@${vows} ${vowsOpts} ${unit} ${storages} ${drivers} ${engines} ${integration} ${middleware} ${hotCodeLoading}
 	
 tests-alt:
 		@${vows} ${vowsOpts} ${viewRenderingAlt}
+		
+tests-standalone:
+		@node ${multiThreaded}
+		
+tests-cli:
+		@${vows} ${vowsOpts} ${commandline}
 
 test-unit:
 		@${vows} ${vowsOpts} ${unit}
