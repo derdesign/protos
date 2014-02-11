@@ -19,23 +19,29 @@ vows.describe('lib/utility.js').addBatch({
     
     'Converts integer': function(f) {
       assert.isTrue(f('5') === 5);
+      assert.isTrue(f(5) === 5);
     },
     
     'Converts float': function(f) {
       assert.isTrue(f('2.3') === 2.3)
+      assert.isTrue(f(2.3) === 2.3)
     },
     
     'Converts null': function(f) {
       assert.isNull(f('null'));
+      assert.isNull(f(null));
     },
     
     'Converts undefined': function(f) {
       assert.isUndefined(f('undefined'));
+      assert.isUndefined(f(undefined));
     },
     
     'Converts boolean': function(f) {
       assert.isTrue(f('true'));
+      assert.isTrue(f(true));
       assert.isFalse(f('false'));
+      assert.isFalse(f(false));
     },
     
   },
