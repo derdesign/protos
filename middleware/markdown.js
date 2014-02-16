@@ -117,7 +117,7 @@ Markdown.prototype.customExtension = function(converter) {
  */
 
 Markdown.prototype.parse = function(str, options) {
-  var html = this.converter.makeHtml(str);
+  var html = this.converter.makeHtml(str.toString());
   var config = options || {};
   config.__proto__ = this.config;
   if (config.sanitize) {
