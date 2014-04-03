@@ -128,6 +128,10 @@ app.on('view_partials_loaded', function(ob) {
     }
   });
   
+  // Allow apps to add handlebars partials and helpers
+  app.emit('handlebars_partials', optionsContext.partials);
+  app.emit('handlebars_helpers', optionsContext.helpers);
+  
 });
 
 module.exports = Handlebars;

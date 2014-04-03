@@ -185,3 +185,11 @@
 [content] content: "..."
 [locals] app.config.title: "My Application"
 [content] content: "..."
+
+# Custom defined partial
+
+true
+
+# Custom defined helper
+
+{"hash":{},"data":{}}

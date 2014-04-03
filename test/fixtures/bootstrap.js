@@ -77,6 +77,16 @@ var protos = Protos.bootstrap(testSkeleton, {
         templates_loaded: function(ob) {
           this.__templatesLoaded = ob;
         },
+        handlebars_partials: function(partials) {
+          partials.custom_partial = function(args, options) {
+            return options.partial;
+          }
+        },
+        handlebars_helpers: function(helpers) {
+          helpers.custom_helper = function(options) {
+            return JSON.stringify(options);
+          }
+        },
         env_data_loaded: function(data) {
           this.__envDataLoaded = data;
         },
