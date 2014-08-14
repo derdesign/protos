@@ -24,12 +24,12 @@
     "sanitizer": "0.1.1",
     "jshint": "2.4.2",
     "chokidar": "0.8.1",
-    "request": "2.33.0",
+    "request": "2.40.0",
     "moment": "2.5.1",
     "multi": "0.1.3",
     "mime": "1.2.11",
     "file": "0.2.1",
-    "qs": "0.6.6"
+    "qs": "1.2.1"
   },
   "devDependencies": {
     "vows": "0.7.0"
