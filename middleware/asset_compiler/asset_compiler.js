@@ -102,7 +102,7 @@ function AssetCompiler(config, middleware) {
       keepSpecialComments: 0,
       keepBreaks: false,
       benchmark: false,
-      noAdvanced: false
+      advanced: true
     }
   }, config);
   

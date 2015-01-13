@@ -317,18 +317,19 @@ vows.describe('Asset Compiler (middleware)').addBatch({
     },
     
     "Successfully minifies supported assets": function(results) {
-      var r1 = results[++TEST],
-          r2 = results[++TEST];
-          
+      
+      var r1 = results[++TEST];
+      var r2 = results[++TEST];
+      
       var expected1 = '#features #toc-sidebar{display:none!important}#toc-sidebar{overflow-y:scroll;box-shadow:5px 0 40px \
-rgba(255,255,255,.8);position:fixed;top:0;left:0;height:100%;background:#f2f2f2 repeat}#toc-sidebar>:first-child{margin:50px 0 100px 20px;\
-padding:0}#toc-sidebar ul{width:250px}#toc-sidebar ul li{list-style:none}#toc-sidebar ul li a{font-size:12px;color:#222}\
+rgba(255,255,255,.8);position:fixed;top:0;left:0;height:100%;background:#f2f2f2}#toc-sidebar>:first-child{margin:50px 0 100px \
+20px;padding:0}#toc-sidebar ul{width:250px}#toc-sidebar ul li{list-style:none}#toc-sidebar ul li a{font-size:12px;color:#222}\
 #toc-sidebar ul li.section{margin-top:.5em}#toc-sidebar ul li.section a{font-weight:700}#toc-sidebar ul li.sub{margin-left:0}\
-#metadata{content:"less";background:url(assets/assets/target.less)}#yelow #long,#yelow #short{color:#fea}#yelow \
-#rgba{color:rgba(255,238,170,.1)}#yelow #argb{color:#1affeeaa}.body{background1:url("data:image/png:asdfasdf");\
-background2:url(\'data:image/png:asdfasdf\');background3:url(data:image/png:asdfasdf);background4:url(http://hello.com/style.css);\
-background5:url(http://hello.com/style.css);background6:url(http://hello.com/style.css);background7:url(dir/images/test.jpg);\
-background8:url(dir/images/test.jpg);background9:url(dir/images/test.jpg)}';
+#metadata{content:"less";background:url(assets/assets/target.less)}#yelow #long,#yelow #short{color:#fea}#yelow #rgba{color:rgba\
+(255,238,170,.1)}#yelow #argb{color:#1affeeaa}.body{background1:url(data:image/png:asdfasdf);background2:url(data:image/png:asdfasdf);\
+background3:url(data:image/png:asdfasdf);background4:url(http://hello.com/style.css);background5:url(http://hello.com/style.css);\
+background6:url(http://hello.com/style.css);background7:url(dir/images/test.jpg);background8:url(dir/images/test.jpg);background9:\
+url(dir/images/test.jpg)}';
 
       var expected2 = 'var metadata=["js","target.js"];(function(){var e,t,r,a,n,s,o,u,i=Array.prototype.slice;n=42,s=!0,s&&\
 (n=-42),u=function(e){return e*e},t=[1,2,3,4,5],r={root:Math.sqrt,square:u,cube:function(e){return e*u(e)}},o=function()\
@@ -344,13 +345,13 @@ function(){var e,t,r,a,n;r=["coffee","assets/target.coffee"],n=["do","re","mi","
     "Minification properly resolves CSS relative paths": function() {
       
       var resolveThis = fs.readFileSync(app.fullPath('public/resolve-this.css'), 'utf8');
-      
-      // Notice how the URL is image.png, instead of ../../image.png 
-      
+
+      // Notice how the URL is image.png, instead of ../../image.png
+
       var expected = '#metadata{content:"less";background:url(assets/resolve-this/assets/resolve-this/resolve-this.less)}#resolve-\
 this{background1:url(image.png);background2:url(image.png);background3:url(image.png);background5:url(http://path-to-image.png);\
 background6:url(http://path-to-image.png);background7:url(http://path-to-image.png);background8:url(data:application/png,abcdefgh);\
-background9:url(\'data:application/png,abcdefgh\');background10:url("data:application/png,abcdefgh")}';
+background9:url(data:application/png,abcdefgh);background10:url(data:application/png,abcdefgh)}';
 
       assert.equal(resolveThis, expected);
       

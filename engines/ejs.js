@@ -8,14 +8,16 @@ var util = require('util');
 /**
   EJS engine class
   
-  https://github.com/visionmedia/ejs
+  https://github.com/mde/ejs
  */
 
 function EJS() {
   
   var opts = (app.config.engines && app.config.engines.ejs) || {};
   
-  this.options = protos.extend({open: '<?', close: '?>'}, opts);
+  this.options = protos.extend({
+    delimiter: '?'
+  }, opts);
   
   this.module = ejs;
   this.multiPart = true;

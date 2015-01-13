@@ -26,18 +26,24 @@ var pathModule = require('path');
 // ensure the configuration does not override file-specific configs.
 
 // Asset compilers
+
 module.exports = {
   
   less: function(source, file, callback) {
     var options = _.extend({}, config.lessOpts);
     options = _.extend(options, {
       filename: pathModule.basename(file),
-      paths: [pathModule.dirname(file)]
+      paths: [pathModule.dirname(file)],
+      compress: false
     });
     options = app.applyFilters('less_options', options, file);
     less.render(source, options, function(err, out) {
-      if (!err) out = app.applyFilters('compiled_less', out, file, options);
-      callback(err, out);
+      if (err) {
+        callback(err);
+      } else {
+        out = app.applyFilters('compiled_less', out.css, file, options);
+        callback(err, out);
+      }
     });
   },
 

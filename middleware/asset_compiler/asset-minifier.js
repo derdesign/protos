@@ -43,7 +43,6 @@ app.on('asset_compiler_minify', function(minifyConfig) {
 // FUNCTIONS
 //////////////////////////////////////////
 
-
 function minification(minifyConfig, minifyTargets, compiler) {
   // NOTE: The minifyTargets array is used to handle recursion state,
   // therefore it is passed as an argument, otherwise it would be
@@ -62,7 +61,7 @@ function minification(minifyConfig, minifyTargets, compiler) {
         target = app.fullPath(app.paths.public + target);
         switch (ext) {
           case 'css':
-            source = cleancss.minify(compiled.join('\n'));
+            source = cleancss.minify(compiled.join('\n')).styles;
             instance.writeFile(target, source);
             app.debug("Asset Compiler: Minified CSS: " + app.relPath(target));
             break;

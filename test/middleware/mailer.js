@@ -18,18 +18,18 @@ vows.describe('Mailer Middleware').addBatch({
     
     "Properly configures transports": function(mailer) {
       // default
-      assert.equal(mailer.default.transportType, 'SENDMAIL');
-      assert.equal(mailer.default.constructor.name, 'Transport');
+      assert.equal(mailer.default.transporter, 'sendmail');
+      assert.equal(mailer.default.constructor.name, 'Nodemailer');
       assert.isFunction(mailer.default.sendMail);
       
       // smtp
-      assert.equal(mailer.smtp.transportType, 'SMTP');
-      assert.equal(mailer.smtp.constructor.name, 'Transport');
+      assert.equal(mailer.smtp.transporter, 'SMTP');
+      assert.equal(mailer.smtp.constructor.name, 'Nodemailer');
       assert.isFunction(mailer.smtp.sendMail);
       
       // ses
-      assert.equal(mailer.other.transportType, 'SES');
-      assert.equal(mailer.other.constructor.name, 'Transport');
+      assert.equal(mailer.other.transporter, 'SES');
+      assert.equal(mailer.other.constructor.name, 'Nodemailer');
       assert.isFunction(mailer.other.sendMail);
     },
     

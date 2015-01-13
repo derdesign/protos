@@ -3,6 +3,7 @@ var app = require('../fixtures/bootstrap'),
     fs = require('fs'),
     vows = require('vows'),
     assert = require('assert'),
+    cp = require('child_process'),
     EventEmitter = require('events').EventEmitter;
 
 var logging = app.logging;
@@ -35,133 +36,147 @@ vows.describe('Logger (middleware)').addBatch({
       
       var promise = new EventEmitter();
       
-      var db = app.config.drivers,
-          sto = app.config.storages;
+      cp.exec('mongo test --eval "db.test_log.drop()"', function(err, stdout, stdin) { // Cleanup test_log collection before proceeding
+        
+        if (/(true|false)\n/.test(stdout)) {
+          
+          var db = app.config.drivers;
+          var sto = app.config.storages;
       
-      fs.writeFileSync(app.fullPath('/log/test.log'), '', 'utf-8');
-      fs.writeFileSync(app.fullPath('/log/json.log'), '', 'utf-8');
+          fs.writeFileSync(app.fullPath('/log/test.log'), '', 'utf-8');
+          fs.writeFileSync(app.fullPath('/log/json.log'), '', 'utf-8');
       
-      // Remove date from json log data, test filter
-      app.on('test_log_json', function(log) {
-        log.pid = process.pid;
-        delete log.date;
-      });
+          // Remove date from json log data, test filter
+          app.on('test_log_json', function(log) {
+            log.pid = process.pid;
+            delete log.date;
+          });
       
-      app.use('logger', {
-        accessLog: {
-          format: 'default',
-          file: 'access.log',
-          console: false
-        },
-        levels: {
-          info: null,
-          error: null,
-          nice: {console: true},
-          test: {
-            file: 'test.log',
-            console: true,
-            json: {
-              stdout: true,
-              filename: 'json.log',
-              transports: {
+          app.use('logger', {
+            accessLog: {
+              format: 'default',
+              file: 'access.log',
+              console: false
+            },
+            levels: {
+              info: null,
+              error: null,
+              nice: {console: true},
+              test: {
+                file: 'test.log',
+                console: true,
+                json: {
+                  stdout: true,
+                  filename: 'json.log',
+                  transports: {
+                    mongodb: {
+                      host: db.mongodb.host,
+                      port: db.mongodb.port,
+                      database: db.mongodb.database
+                    }
+                  }
+                },
                 mongodb: {
                   host: db.mongodb.host,
                   port: db.mongodb.port,
-                  database: db.mongodb.database
+                  logLimit: 1
+                },
+                redis: {
+                  host: sto.redis.host,
+                  port: sto.redis.port,
+                  logLimit: 1
                 }
               }
-            },
-            mongodb: {
-              host: db.mongodb.host,
-              port: db.mongodb.port,
-              logLimit: 1
-            },
-            redis: {
-              host: sto.redis.host,
-              port: sto.redis.port,
-              logLimit: 1
             }
-          }
-        }
-      });
+          });
       
-      app.locals.nativeLog = {msg: "This log should be stored as native JSON", date: new Date().toGMTString()};
+          app.locals.nativeLog = {msg: "This log should be stored as native JSON", date: new Date().toGMTString()};
       
-      app.testLog('This event should be logged!');
+          app.testLog('This event should be logged!');
       
-      app.logger.mute('nice');
+          app.logger.mute('nice');
       
-      app.niceLog('IF YOU SEE THIS, MUTED LOGS ARE NOT WORKING');
+          app.niceLog('IF YOU SEE THIS, MUTED LOGS ARE NOT WORKING');
       
-      app.logger.unmute('nice');
+          app.logger.unmute('nice');
       
-      app.niceLog('If you see this, then muted logs are working');
+          app.niceLog('If you see this, then muted logs are working');
       
-      setTimeout(function() {
+          setTimeout(function() {
         
-        var results = {};
+            var results = {};
         
-        var collection = app.logger.transports.test.mongodb.collection;
+            var collection = app.logger.transports.test.mongodb.collection;
         
-        collection.find({}, function(err, cursor) {
-          cursor.toArray(function(err, docs) {
-            
-            var doc = docs.pop();
+            collection.find({}, function(err, cursor) {
 
-            results.mongodb = (docs.length === 0 && doc.log === logMessage);
+              cursor.toArray(function(err, docs) {
             
-            var redis = app.logger.transports.test.redis.client;
-            redis.lrange('test_log', 0, -1, function(err, res) {
-              if (err) results.redis = err;
-              else {
-                var doc = res.pop();
-                results.redis = (res.length === 0 && doc == logMessage);
-              }
+                var doc = docs.pop();
+            
+                results.mongodb = (docs.length === 0 && doc.log === logMessage);
+            
+                var redis = app.logger.transports.test.redis.client;
+                redis.lrange('test_log', 0, -1, function(err, res) {
+                  if (err) results.redis = err;
+                  else {
+                    var doc = res.pop();
+                    results.redis = (res.length === 0 && doc == logMessage);
+                  }
               
-              results.file = fs.readFileSync(app.fullPath('/log/test.log', 'utf-8')).toString().trim() === logMessage;
+                  results.file = fs.readFileSync(app.fullPath('/log/test.log', 'utf-8')).toString().trim() === logMessage;
               
-              var expectedJson = '{"level":"test","host":"localhost","msg":"This event should be logged!","pid":' + process.pid + '}';
-              var obtainedJson = fs.readFileSync(app.fullPath('/log/json.log', 'utf-8')).toString().trim();
+                  var expectedJson = '{"level":"test","host":"localhost","msg":"This event should be logged!","pid":' + process.pid + '}';
+                  var obtainedJson = fs.readFileSync(app.fullPath('/log/json.log', 'utf-8')).toString().trim();
               
-              results.json = expectedJson == obtainedJson;
+                  results.json = expectedJson == obtainedJson;
               
-              // Test native logs
-              app.logger.transports.test.mongodb.write(app.locals.nativeLog);
+                  // Test native logs
+                  app.logger.transports.test.mongodb.write(app.locals.nativeLog);
               
-              collection = app.logger.transports.test.mongodb.collection;
+                  collection = app.logger.transports.test.mongodb.collection;
               
-              collection.find({}, function(err, cursor) {
-                cursor.toArray(function(err, docs) {
-                  var doc = docs.pop();
-                  results.native = (doc.log.msg == app.locals.nativeLog.msg && doc.log.date == app.locals.nativeLog.date);
-                  
-                  // Test log forwarding
-                  
-                  app.logger.transports.test.json.otherTransports.mongodb.collection.find({}, function(err, cursor) {
+                  collection.find({}, function(err, cursor) {
                     cursor.toArray(function(err, docs) {
                       var doc = docs.pop();
+                      results.native = (doc.log.msg == app.locals.nativeLog.msg && doc.log.date == app.locals.nativeLog.date);
+                  
+                      // Test log forwarding
+                  
+                      app.logger.transports.test.json.otherTransports.mongodb.collection.find({}, function(err, cursor) {
+                        cursor.toArray(function(err, docs) {
+                          var doc = docs.pop();
 
-                      // Forwarding is tested by comparing the logged message in MongoDB (coming from a json log)
-                      // and then comparing it with the regular logMessage.
-                      results.forwarding = (logMessage.slice(-doc.log.msg.length) === doc.log.msg) 
-                        && logMessage.indexOf(doc.log.msg) === 39;
+                          // Forwarding is tested by comparing the logged message in MongoDB (coming from a json log)
+                          // and then comparing it with the regular logMessage.
+                          results.forwarding = (logMessage.slice(-doc.log.msg.length) === doc.log.msg) 
+                            && logMessage.indexOf(doc.log.msg) === 39;
                       
-                      promise.emit('success', results);
+                          promise.emit('success', results);
                       
+                        });
+                      });
+                  
                     });
                   });
-                  
-                });
-              });
               
-            });
+                });
             
-          });
-        });
+              });
+            });
         
-      }, 1000);
+          }, 1000);
+          
+        } else {
+          
+          throw new Error("MongoDB cleanup command failed");
+          
+        }
+        
+      });
       
       return promise;
+      
     },
     
     "Stores logs using the JSON Transport": function(results) {
