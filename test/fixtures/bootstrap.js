@@ -84,7 +84,11 @@ var protos = Protos.bootstrap(testSkeleton, {
         },
         handlebars_helpers: function(helpers) {
           helpers.custom_helper = function(options) {
-            return JSON.stringify(options);
+            return JSON.stringify({
+              name: options.name,
+              hash: options.hash,
+              hasData: options.data && typeof options.data === 'object' && typeof options.data.root === 'object'
+            });
           }
         },
         env_data_loaded: function(data) {

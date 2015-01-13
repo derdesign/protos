@@ -1,5 +1,4 @@
-# Helpers
-{{!
+# Helpers {{!
 
   There is also a view partial on __layout called 'hbtest.hbs'. This view partial should only be called as a view
   partial, because there is a view helper already with that name.
@@ -7,6 +6,7 @@
   Testing against the hbtest partial ensures helpers have precedence over partials running as helpers.
   
 }}
+
 {{hbtest "one" "two" "three"}}
 {{hbtest "one" "two" "three" alpha=1 beta=2 gamma=3}}
 {{hbtest alpha=1 beta=2 gamma=3}}
@@ -22,39 +22,54 @@
 
 # Partial running on context
 {{#each posts}}
+
 {{> handlebars_test}}
 {{/each}}
+
 # Partial running with partials helper
 {{#each posts}}
+
 {{partial "handlebars_test"}}
 {{handlebars_test}}
 {{/each}}
+
 # Partial running with partials helper + locals argument
 {{#each posts}}
+
 {{partial "handlebars-test" ../locals}}{{! Using dash instead of underscores }}
 {{handlebars_test ../locals}}
 {{/each}}
+
 # Partial running with partials helper + locals parameter
 {{#each posts}}
+
 {{partial "handlebars_test" locals=../locals}}{{! Using dash instead of underscores }}
 {{handlebars_test locals=../locals}}
 {{/each}}
+
 # Partial running with partials helper + parameters
 {{#each posts}}
+
 {{partial "handlebars_test" alpha=1 beta=2 gamma=3}}{{! Using dash instead of underscores }}
 {{handlebars_test alpha=1 beta=2 gamma=3}}
 {{/each}}
+
 # Partial running with partials helper + parameters + local argument
 {{#each posts}}
+
 {{partial "handlebars_test" ../locals alpha=1 beta=2 gamma=3}}
 {{handlebars_test ../locals alpha=1 beta=2 gamma=3}}
 {{/each}}
+
 # Partial running with partials helper + parameters + local parameter
 {{#each posts}}
+
 {{partial "handlebars_test" alpha=1 beta=2 gamma=3 locals=../locals}}
 {{handlebars_test alpha=1 beta=2 gamma=3 locals=../locals}}
 {{/each}}
+
 # Partial running with block content
+
 {{#partial "handlebars_test"}}...{{/partial}}
 {{#handlebars_test}}...{{/handlebars_test}}
 

@@ -1,29 +1,25 @@
-# Helpers
+# Helpers 
 
 ["","one","two","three",{}]
-["","one","two","three",{"alpha":1,"beta":2,"gamma":3}]
-["",{"alpha":1,"beta":2,"gamma":3}]
+["","one","two","three",{"gamma":3,"beta":2,"alpha":1}]
+["",{"gamma":3,"beta":2,"alpha":1}]
 [{"string":""},{}]
 [{"string":"."},{}]
 [{"string":".."},"one","two",{}]
-[{"string":"..."},"one","two",{"alpha":1,"beta":2,"gamma":3}]
-[{"string":"...."},{"alpha":1,"beta":2,"gamma":3}]
+[{"string":"..."},"one","two",{"gamma":3,"beta":2,"alpha":1}]
+[{"string":"...."},{"gamma":3,"beta":2,"alpha":1}]
 
 # Partial running on global context
 
 [locals] app.config.title: "My Application"
-
 # Partial running on context
 
 [locals] app.config.title: ""
 [context] title: "One"
-
 [locals] app.config.title: ""
 [context] title: "Two"
-
 [locals] app.config.title: ""
 [context] title: "Three"
-
 # Partial running with partials helper
 
 [locals] app.config.title: ""
@@ -181,6 +177,7 @@
 [params] gamma: "3"
 
 # Partial running with block content
+
 [locals] app.config.title: "My Application"
 [content] content: "..."
 [locals] app.config.title: "My Application"
@@ -189,7 +186,6 @@
 # Custom defined partial
 
 true
-
 # Custom defined helper
 
-{"hash":{},"data":{}}
+{"name":"custom_helper","hash":{},"hasData":true}

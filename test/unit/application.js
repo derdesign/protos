@@ -858,8 +858,8 @@ vows.describe('lib/application.js').addBatch({
         three_multiple_slashes: app.renderTemplate('//one//two//three//'),
         
         sample_expected: '\
-\n\nMy Application\n\n\n&lt;p&gt;&lt;a&gt;Hello World!&lt;/a&gt;&lt;/p&gt;\n\n\n&lt;p&gt;\
-&lt;/p&gt;\n\n\nalpha: 1\nbeta: 2\ngamma: 3\n\n\nglobalVarOne: 105\n\n\nProtos Class: Protos'
+\nMy Application\n\n&lt;p&gt;&lt;a&gt;Hello World!&lt;/a&gt;&lt;/p&gt;\n\n&lt;p&gt;\
+&lt;/p&gt;\n\nalpha: 1\nbeta: 2\ngamma: 3\n\nglobalVarOne: 105\n\nProtos Class: Protos'
 
       }
       
