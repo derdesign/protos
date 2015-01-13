@@ -73,7 +73,7 @@ vows.describe('Body Parser (middleware)').addBatch({
 
   }
 
-}).addBatch({
+}).addBatch(app.environment === 'travis' ? {} : { // Disable upload tests on travis environment
   
   'File Uploads': {
     
