@@ -44,8 +44,8 @@ app.usersModel.on('delete', function(err, mod) {
   eventObjects.delete = [err, mod];
 });
 
-var tdate = 1330529734000; // Wed Feb 29 2012 15:35:34 AST
-var now = new Date();
+var tdate = 1330529734000; // Wed Feb 29 2012 15:35:34 GMT
+var now = new Date(1421173918131); // Tue, 13 Jan 2015 18:31:28 GMT
 
 vows.describe('Models').addBatch({
 
