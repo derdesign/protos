@@ -1,7 +1,7 @@
 {
   "name": "protos",
   "description": "Web Application Framework",
-  "version": "0.4.9",
+  "version": "0.5.0",
   "homepage": "https://github.com/derdesign/protos",
   "repository": "https://github.com/derdesign/protos",
   "author": "Ernesto Méndez <der@der-design.com>",
