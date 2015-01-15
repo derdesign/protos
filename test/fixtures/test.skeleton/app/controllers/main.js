@@ -95,6 +95,17 @@ function MainController(app) {
     res.download(app.fullPath(app.paths.public + 'robots.txt'), req.queryData.file);
   });
   
+  /* Serve static file */
+  
+  get('/serve-static', function(req, res) {
+    var file = req.queryData.file;
+    if (file) {
+      res.serveStaticFile(file, req.queryData.unsafe);
+    } else {
+      app.notFound(res);
+    }
+  });
+  
   /* JSON Response */
   
   get('/:file', {file: /^[a-z_]+\.json$/}, function(req, res, params) {

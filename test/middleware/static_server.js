@@ -4,7 +4,8 @@ var app = require('../fixtures/bootstrap'),
     assert = require('assert'),
     util = require('util'),
     Multi = require('multi'),
-    EventEmitter = require('events').EventEmitter;
+    EventEmitter = require('events').EventEmitter,
+    fs = require('fs');
 
 var sessionState;
 
@@ -54,8 +55,16 @@ vows.describe('Static File Server (middleware)').addBatch({
       // File download (without attachment name)
       multi.curl('-i /download');
       
-      // File download with attachment name                
+      // File download with attachment name
       multi.curl('-i -G -d "file=hello.txt" /download');
+      
+      // Serve static file
+      multi.curl('-i -G -d "file=robots1.txt" /serve-static');  // 404
+      multi.curl('-i -G -d "file=robots.txt" /serve-static');   // found
+      multi.curl('-i -G -d "file=../boot.js" /serve-static');   // 404
+      multi.curl('-i -G -d "file=../boot.js" -d "unsafe=true" /serve-static'); // found
+      multi.curl('-i -G -d "file=../public/robots.txt" /serve-static'); // 404
+      multi.curl('-i -G -d "file=../public/robots.txt" -d "unsafe=true" /serve-static'); // found
       
       multi.exec(function(err, results) {
         app.supports.session = sessionState;
@@ -144,6 +153,35 @@ vows.describe('Static File Server (middleware)').addBatch({
       assert.isTrue(r1.indexOf('Content-Disposition: attachment') >= 0);
       assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
       assert.isTrue(r2.indexOf('Content-Disposition: attachment; filename="hello.txt"') >= 0);
+    },
+    
+    'Successfully runs res.serveStaticFile': function(results) {
+      
+      var r1 = results[15];
+          r2 = results[16];
+          r3 = results[17];
+          r4 = results[18];
+          r5 = results[19];
+          r6 = results[20];
+          
+      var robots = fs.readFileSync(app.fullPath('public/robots.txt'), 'utf8').trim();
+      var bootjs = fs.readFileSync(app.fullPath('boot.js'), 'utf8');
+          
+      assert.isTrue(r1.indexOf('HTTP/1.1 404 Not Found') >= 0);
+
+      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r2.concat([]).pop() === robots);
+      
+      assert.isTrue(r3.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      
+      assert.isTrue(r4.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r4.concat([]).pop() === bootjs);
+      
+      assert.isTrue(r5.indexOf('HTTP/1.1 404 Not Found') >= 0);
+      
+      assert.isTrue(r6.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r6.concat([]).pop() === robots);
+      
     }
     
   }
