@@ -359,6 +359,31 @@ function MainController(app) {
     res.end('THIS SHOULD NOT RENDER');
   });
   
+  /* Request State */
+  
+  var states = [], a = 1000, b = 100, c = 1;
+  
+  get('/request-state', function(req, res, params, state) {
+    if (req.queryData.check) {
+      res.json({
+        checksPassed: ! (states[0] === states[1] && states[1] === states[2] && states[0] === states[2]), // states should be different
+        length: states.length
+      });
+    } else {
+      states.push(state);
+      state.a = ++a;
+      req.next();
+    }
+  }, function(req, res, params, state) {
+    state.b = ++b;
+    req.next();
+  }, function(req, res, params, state) {
+    state.c = ++c;
+    req.next();
+  }, function(req, res, params, state) {
+    res.json(state);
+  });
+  
 }
 
 module.exports = MainController;

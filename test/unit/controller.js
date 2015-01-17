@@ -3,6 +3,9 @@ var app = require('../fixtures/bootstrap'),
     vows = require('vows'),
     assert = require('assert'),
     util = require('util');
+    
+var Multi = protos.require('multi');
+var EventEmitter = require('events').EventEmitter;
 
 app.logging = false;
 
@@ -112,6 +115,53 @@ vows.describe('lib/controller.js').addBatch({
       assert.equal(alias, 'blog');
     }
     
-  }
+  },
+  
+  'Request State': {
     
+    topic: function() {
+      
+      var promise = new EventEmitter();
+      var multi = new Multi(app);
+      
+      multi.curl('-i /request-state');
+      multi.curl('-i /request-state');
+      multi.curl('-i /request-state');
+      multi.curl('-i -G -d "check=true" /request-state');
+      
+      multi.exec(function(err, results) {
+        if (err) {
+          console.exit(err);
+        } else {
+          promise.emit('success', results);
+        }
+      });
+      
+      return promise;
+      
+    },
+    
+    'Is properly set for each request': function(results) {
+      
+      var r1 = results[0],
+          r2 = results[1],
+          r3 = results[2],
+          r4 = results[3];
+          
+      assert.isTrue(r1.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r1.indexOf('{"a":1001,"b":101,"c":2}') >= 0);
+      
+      assert.isTrue(r2.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r2.indexOf('{"a":1002,"b":102,"c":3}') >= 0);
+      
+      assert.isTrue(r3.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r3.indexOf('{"a":1003,"b":103,"c":4}') >= 0);
+      
+      assert.isTrue(r4.indexOf('HTTP/1.1 200 OK') >= 0);
+      assert.isTrue(r4.indexOf('{"checksPassed":true,"length":3}') >= 0);
+      
+    }
+    
+  }
+  
 }).export(module);
