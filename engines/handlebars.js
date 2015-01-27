@@ -103,7 +103,7 @@ app.on('view_partials_loaded', function(ob) {
         var options = args.pop();
         var params = options.hash;
         var content = options.fn instanceof Function ? new SafeString(options.fn(this)) : '';
-        var out = ob[name].apply(null, [content].concat(args).concat([params]));
+        var out = ob[name].apply(null, [content instanceof SafeString ? content.toString() : content].concat(args).concat([params]));
         return new SafeString(out);
       }
     } else { // Partials
