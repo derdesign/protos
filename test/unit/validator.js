@@ -660,7 +660,7 @@ vows.describe('lib/validator.js').addBatch({
     assert.strictEqual(instance, validator);
   },
   
-  'Properly sets multiple contexts': function() {
+  'Properly sets context aliases': function() {
     
     var instance, validator = app.validator();
     
@@ -675,6 +675,49 @@ vows.describe('lib/validator.js').addBatch({
     assert.strictEqual(foo, instance);
     assert.strictEqual(bar, instance);
     assert.strictEqual(baz, instance);
+    
+  },
+  
+  'Properly gets/sets multiple contexts': function() {
+    
+    var customInstance = app.validator();
+    var validator = app.validator();
+
+    var one, two;
+    
+    validator.context({
+      
+      one: function(v) {
+        if (this === v) {
+          one = this;
+        }
+      },
+      
+      two: function(v) {
+        if (this === v) {
+          two = this;
+        }
+      },
+      
+      three: customInstance,
+      
+      four: 4, // Should be ignored
+      
+      five: {} // Should be ignored
+      
+    });
+    
+    // Checking multiple contexts being set
+    assert.strictEqual(one, validator.context('one'));
+    assert.strictEqual(two, validator.context('two'));
+    assert.strictEqual(customInstance, validator.context('three'));
+
+    // Invalid properties in context object are ignored
+    assert.isUndefined(validator.context('four'));
+    assert.isUndefined(validator.context('five'));
+    
+    // Validator.prototype.getContexts() returns the internal context representation
+    assert.strictEqual(validator.__context, validator.getContexts());
     
   }
   
