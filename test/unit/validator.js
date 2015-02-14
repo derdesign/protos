@@ -21,7 +21,7 @@ vows.describe('lib/validator.js').addBatch({
       // Default messages
       
       var validator = app.validator({cleanup: true})
-      .add({first: /^John Doe$/, last: 'alpha_spaces'}, function(val) { return "cb:error -> " + val;})
+      .add({first: /^John Doe$/, last: 'alpha_spaces'}, function(val, key) { return util.format('cb:error [%s] -> %s', key, val) })
       .add({email: 'email'}, "The email is invalid: %s") 
       .add([{msg: 'alpha'}])  // array arg test for [add]
       .addOptional({some: function(val) { return (/^[a-z]$/).test(val); }})
@@ -40,7 +40,7 @@ vows.describe('lib/validator.js').addBatch({
       assert.equal(validator.validate({first: "John Doe"}), validator.i18n.missingRequiredFields);
   
       // Returns error msg when value is not validated
-      assert.equal(validator.validate({first: "Jane Doe"}), "cb:error -> Jane Doe");
+      assert.equal(validator.validate({first: "Jane Doe"}), "cb:error [first] -> Jane Doe");
   
       // Returns error msg replacing placeholders (%s)
       assert.equal(validator.validate({email: 'invalid.email'}), "The email is invalid: invalid.email");
